@@ -1,0 +1,207 @@
+{
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 415,
+      "type": "VEC3",
+      "max": [
+        0.17287686467170715,
+        1.3406717777252197,
+        0.13829721510410309
+      ],
+      "min": [
+        -0.17287686467170715,
+        1.0644047260284424,
+        -0.14653630554676056
+      ]
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 415,
+      "type": "VEC3",
+      "max": [
+        0.99264305830001831,
+        0.9954492449760437,
+        0.99930095672607422
+      ],
+      "min": [
+        -0.973828136920929,
+        -0.93836534023284912,
+        -0.9793056845664978
+      ]
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 415,
+      "type": "VEC4",
+      "max": [
+        1.0,
+        0.35682439804077148,
+        0.99824082851409912,
+        1.0
+      ],
+      "min": [
+        -1.0,
+        -0.43775275349617004,
+        -0.99824082851409912,
+        1.0
+      ]
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5126,
+      "count": 415,
+      "type": "VEC2",
+      "max": [
+        0.99091190099716187,
+        0.99949997663497925
+      ],
+      "min": [
+        0.00050000002374872565,
+        0.00049996376037597656
+      ]
+    },
+    {
+      "bufferView": 4,
+      "componentType": 5126,
+      "count": 415,
+      "type": "VEC2",
+      "max": [
+        0.99091190099716187,
+        0.99949997663497925
+      ],
+      "min": [
+        0.00050000002374872565,
+        0.00049996376037597656
+      ]
+    },
+    {
+      "bufferView": 5,
+      "componentType": 5123,
+      "count": 1611,
+      "type": "SCALAR",
+      "max": [
+        414.0
+      ],
+      "min": [
+        0.0
+      ]
+    }
+  ],
+  "asset": {
+    "version": "2.0"
+  },
+  "buffers": [
+    {
+      "uri": "F_Lower_duanqun_01_he.bin",
+      "byteLength": 26464
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 4980
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 4980,
+      "byteLength": 4980
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 9960,
+      "byteLength": 6640
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 16600,
+      "byteLength": 3320
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 19920,
+      "byteLength": 3320
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 23240,
+      "byteLength": 3224
+    }
+  ],
+  "images": [
+    {
+      "uri": "Assets/FBX/F_Lower_duanqun_01_he.png",
+      "name": "F_Lower_duanqun_01_he"
+    }
+  ],
+  "materials": [
+    {
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 0
+        },
+        "metallicFactor": 0.0
+      },
+      "name": "F_Lower_duanqun_01_he"
+    }
+  ],
+  "meshes": [
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TANGENT": 2,
+            "TEXCOORD_0": 3,
+            "TEXCOORD_1": 4
+          },
+          "indices": 5,
+          "material": 0
+        }
+      ],
+      "name": "F_Lower_duanqun_01_he"
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0,
+      "rotation": [
+        2.18556941E-08,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "translation": [
+        0.0,
+        0.0,
+        1.11023E-08
+      ],
+      "name": "F_Lower_duanqun_01_he"
+    }
+  ],
+  "samplers": [
+    {
+      "minFilter": 9985
+    }
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ],
+      "name": "F_Lower_duanqun_01_he"
+    }
+  ],
+  "textures": [
+    {
+      "sampler": 0,
+      "source": 0,
+      "name": "F_Lower_duanqun_01_he"
+    }
+  ]
+}

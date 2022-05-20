@@ -6,22 +6,23 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityGLTF.Loader;
+using GLTF.Schema;
 
 namespace UnityGLTF
 {
-    /// <summary>
-    /// Component to load a GLTF scene with
-    /// </summary>
-    public class GLTFComponent : MonoBehaviour
+	/// <summary>
+	/// Component to load a GLTF scene with
+	/// </summary>
+	public class GLTFComponent : MonoBehaviour
 	{
 		public string GLTFUri = null;
 		public bool Multithreaded = true;
 		public bool UseStream = false;
 		public bool AppendStreamingAssets = true;
 		public bool PlayAnimationOnLoad = true;
-        public ImporterFactory Factory = null;
+		public ImporterFactory Factory = null;
 
-        public IEnumerable<Animation> Animations { get; private set; }
+		public IEnumerable<Animation> Animations { get; private set; }
 
 		[SerializeField]
 		private bool loadOnStart = true;
@@ -44,9 +45,10 @@ namespace UnityGLTF
 		private async void Start()
 		{
 			if (!loadOnStart) return;
-			
+
 			try
 			{
+				GLTFMaterial.TryRegisterExtension(new MToonMaterialExtensionFactory());
 				await Load();
 			}
 #if WINDOWS_UWP
@@ -74,7 +76,7 @@ namespace UnityGLTF
 			GLTFSceneImporter sceneImporter = null;
 			try
 			{
-                Factory = Factory ?? ScriptableObject.CreateInstance<DefaultImporterFactory>();
+				Factory = Factory ?? ScriptableObject.CreateInstance<DefaultImporterFactory>();
 
 				if (UseStream)
 				{
@@ -92,21 +94,23 @@ namespace UnityGLTF
 					}
 					string directoryPath = URIHelper.GetDirectoryName(fullPath);
 					importOptions.DataLoader = new FileLoader(directoryPath);
-					sceneImporter = Factory.CreateSceneImporter(
-						Path.GetFileName(GLTFUri),
-						importOptions
-						);
+					//sceneImporter = Factory.CreateSceneImporter(
+					//	Path.GetFileName(GLTFUri),
+					//	importOptions
+					//	);
+
+					sceneImporter = new ModelImporter1(Path.GetFileName(GLTFUri), importOptions);
 				}
 				else
 				{
 					string directoryPath = URIHelper.GetDirectoryName(GLTFUri);
 					importOptions.DataLoader = new WebRequestLoader(directoryPath);
 
-					sceneImporter = Factory.CreateSceneImporter(
-						URIHelper.GetFileFromUri(new Uri(GLTFUri)),
-						importOptions
-						);
-
+					//sceneImporter = Factory.CreateSceneImporter(
+					//	URIHelper.GetFileFromUri(new Uri(GLTFUri)),
+					//	importOptions
+					//	);
+					sceneImporter = new ModelImporter1(URIHelper.GetFileFromUri(new Uri(GLTFUri)), importOptions);
 				}
 
 				sceneImporter.SceneParent = gameObject.transform;
@@ -151,7 +155,7 @@ namespace UnityGLTF
 			}
 			finally
 			{
-				if(importOptions.DataLoader != null)
+				if (importOptions.DataLoader != null)
 				{
 					sceneImporter?.Dispose();
 					sceneImporter = null;

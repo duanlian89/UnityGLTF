@@ -32,7 +32,7 @@ namespace UnityGLTF
 			G_INVERT
 		}
 
-		private enum TextureMapType
+		public enum TextureMapType
 		{
 			Main,
 			Bump,
@@ -816,7 +816,7 @@ namespace UnityGLTF
 			return prims;
 		}
 
-		private MaterialId ExportMaterial(Material materialObj)
+		public virtual MaterialId ExportMaterial(Material materialObj)
 		{
 			MaterialId id = GetMaterialId(_root, materialObj);
 			if (id != null)
@@ -997,7 +997,7 @@ namespace UnityGLTF
 			material.HasProperty("_LightFactor");
 		}
 
-		private void ExportTextureTransform(TextureInfo def, Material mat, string texName)
+		public void ExportTextureTransform(TextureInfo def, Material mat, string texName)
 		{
 			Vector2 offset = mat.GetTextureOffset(texName);
 			Vector2 scale = mat.GetTextureScale(texName);
@@ -1201,7 +1201,7 @@ namespace UnityGLTF
 			return constant;
 		}
 
-		private TextureInfo ExportTextureInfo(Texture texture, TextureMapType textureMapType)
+		public TextureInfo ExportTextureInfo(Texture texture, TextureMapType textureMapType)
 		{
 			var info = new TextureInfo();
 

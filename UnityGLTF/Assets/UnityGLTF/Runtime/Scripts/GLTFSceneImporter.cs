@@ -1230,7 +1230,7 @@ namespace UnityGLTF
 				{
 					NodeId node = scene.Nodes[i];
 					GameObject nodeObj = await GetNode(node.Id, cancellationToken);
-					nodeObj.transform.SetParent(sceneObj.transform, false);
+					//nodeObj.transform.SetParent(sceneObj.transform, false);
 					nodeTransforms[i] = nodeObj.transform;
 				}
 
@@ -1893,7 +1893,7 @@ namespace UnityGLTF
 			_assetCache.MeshCache[meshIndex].LoadedMesh = mesh;
 		}
 
-		protected virtual async Task ConstructMaterial(GLTFMaterial def, int materialIndex)
+		protected virtual async Task<IUniformMap> ConstructMaterial(GLTFMaterial def, int materialIndex)
 		{
 			IUniformMap mapper;
 			const string specGlossExtName = KHR_materials_pbrSpecularGlossinessExtensionFactory.EXTENSION_NAME;
@@ -2087,8 +2087,9 @@ namespace UnityGLTF
 			{
 				_defaultLoadedMaterial = materialWrapper;
 			}
-		}
 
+			return mapper;
+		}
 
 		protected virtual int GetTextureSourceId(GLTFTexture texture)
 		{

@@ -54,7 +54,11 @@ namespace UnityGLTF
 			}
 		}
 
-		public Material Material { get { return _material; } }
+		public Material Material
+		{
+			get { return _material; }
+			set { _material = value; }
+		}
 
 		public virtual Texture NormalTexture
 		{

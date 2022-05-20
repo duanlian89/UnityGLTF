@@ -8,7 +8,7 @@ namespace UnityGLTF
 {
 	public interface IUniformMap
 	{
-		Material Material { get; }
+		Material Material { get; set; }
 
 		Texture NormalTexture { get; set; }
 		int NormalTexCoord { get; set; }
