@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityGLTF;
@@ -23,7 +23,7 @@ public class ModelExporter : GLTFSceneExporter
 
 	public void Export()
 	{
-		var path = EditorUtility.OpenFolderPanel("glTF Export Path", "", ""); // TODO: Ìæ»»½Ó¿Ú
+		var path = EditorUtility.OpenFolderPanel("glTF Export Path", "", ""); // TODO: æ›¿æ¢æ¥å£
 		if (!string.IsNullOrEmpty(path))
 		{
 			SaveGLB(path, name);
@@ -34,13 +34,14 @@ public class ModelExporter : GLTFSceneExporter
 	{
 		MaterialId id = base.ExportMaterial(materialObj);
 
-		// TODO: ×¢²á¸öÀ©Õ¹À´Íê³ÉÈÎÎñ£¬ÕâÑù¸üÁé»îÒ»Ğ©
+		// TODO: é’ˆå¯¹ä¸åŒæ˜¯æè´¨ï¼Œæä¸ªå·¥åœºæ¨¡å¼æ¥å®Œæˆä»»åŠ¡ï¼Œè¿™æ ·æ›´çµæ´»ä¸€äº›
 		GLTFMaterial gltfMaterial = GetRoot().Materials[id.Id];
 
 		if (gltfMaterial.Extensions == null) gltfMaterial.Extensions = new Dictionary<string, IExtension>();
 		gltfMaterial.Extensions[MToonMaterialExtensionFactory.Extension_Name] = new MToonMaterialExtension();
 
-		// TODO:  ´Ó materialObj ÖĞ¶ÁÈ¡ÊôĞÔ£¬Texture, ³õÊ¼»¯ Extension
+		// TODO:  ä» materialObj ä¸­è¯»å–å±æ€§ï¼ŒTexture, åˆå§‹åŒ– Extension
+		// Iextension.Init(UnityEngine.Material)
 		MToonMaterialExtension ext = gltfMaterial.Extensions[MToonMaterialExtensionFactory.Extension_Name] as MToonMaterialExtension;
 
 		ext._Cutoff = materialObj.GetFloat(MToonMaterialExtensionFactory._Cutoff);

@@ -456,6 +456,7 @@ namespace UnityGLTF
 			foreach (var transform in rootObjTransforms)
 			{
 				scene.Nodes.Add(ExportNode(transform));
+				// TODO: 脚本： Node.Extensives
 			}
 
 			_root.Scenes.Add(scene);

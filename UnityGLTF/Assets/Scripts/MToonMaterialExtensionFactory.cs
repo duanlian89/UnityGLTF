@@ -1,4 +1,4 @@
-using System.Collections;
+Ôªøusing System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using GLTF.Schema;
@@ -7,6 +7,7 @@ using GLTF.Extensions;
 
 public class MToonMaterialExtensionFactory : ExtensionFactory
 {
+	#region property name
 	public const string Extension_Name = "Mtoon";
 
 	public const string _Cutoff = "_Cutoff";
@@ -77,6 +78,7 @@ public class MToonMaterialExtensionFactory : ExtensionFactory
 
 	public const string _UvAnimRotation = "_UvAnimScrollX";
 
+	#endregion 
 	public MToonMaterialExtensionFactory()
 	{
 		ExtensionName = Extension_Name;
@@ -84,7 +86,7 @@ public class MToonMaterialExtensionFactory : ExtensionFactory
 
 	public override IExtension Deserialize(GLTFRoot root, JProperty extensionToken)
 	{
-		// ¥”extensionToken∂¡≥ˆ Ù–‘£¨≥ı ºªØ MToonMaterialExtension
+		// ‰ªéextensionTokenËØªÂá∫Â±ûÊÄßÔºåÂàùÂßãÂåñ MToonMaterialExtension
 		MToonMaterialExtension ext = new MToonMaterialExtension();
 
 		JToken v = extensionToken.Value["FOR TEST"];

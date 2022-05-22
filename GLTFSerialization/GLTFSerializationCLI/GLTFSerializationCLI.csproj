@@ -5,7 +5,7 @@
     <OutputType>Exe</OutputType>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 
-    <TargetFrameworks>net461</TargetFrameworks>
+    <TargetFrameworks>net48</TargetFrameworks>
 
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 

@@ -3,10 +3,7 @@
     <RootNamespace>GLTF</RootNamespace>
     <AssemblyName>GLTFSerialization</AssemblyName>
     <StartupObject />
-
-    <TargetFrameworks>net35;netstandard1.3</TargetFrameworks>
-    <TargetFrameworks Condition="'$(MSBuildRuntimeType)' != 'Mono'">$(TargetFrameworks);uap10.0.10586</TargetFrameworks>
-
+	<TargetFrameworks>net48;</TargetFrameworks>
     <OutputType>Library</OutputType>
     <OutputPath>..\..\UnityGLTF\Assets\UnityGLTF\Runtime\Plugins\</OutputPath>
     <WarningLevel>4</WarningLevel>

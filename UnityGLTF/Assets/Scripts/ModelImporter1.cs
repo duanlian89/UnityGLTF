@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityGLTF;
@@ -48,7 +48,7 @@ public class ModelImporter1 : GLTFSceneImporter
 
 		if (ext._MainTex != null)
 		{
-			// TODO: Ò²¸ãÒ»¸ö mapper È¥ÉèÖÃ material ²ÎÊı ¡£ Íê³ÉÆäËû²ÎÊıµÄÉèÖÃ
+			// TODO: ä¹Ÿæä¸€ä¸ª mapper å»è®¾ç½® material å‚æ•° ï¼Œ å®Œæˆå…¶ä»–å‚æ•°çš„è®¾ç½®ï¼Œå’Œ ModelExpoter å¯¼å‡ºæè´¨å·®ä¸å¯¹
 			TextureId textureId = ext._MainTex.Index;
 			await ConstructTexture(textureId.Value, textureId.Id, !KeepCPUCopyOfTexture, false);
 			Texture tex = _assetCache.TextureCache[textureId.Id].Texture;
@@ -57,7 +57,7 @@ public class ModelImporter1 : GLTFSceneImporter
 
 		if (ext._ShadeTexture != null)
 		{
-			// TODO: Ò²¸ãÒ»¸ö mapper È¥ÉèÖÃ material ²ÎÊı
+			// TODO: ä¹Ÿæä¸€ä¸ª mapper å»è®¾ç½® material å‚æ•°
 			TextureId textureId = ext._ShadeTexture.Index;
 			await ConstructTexture(textureId.Value, textureId.Id, !KeepCPUCopyOfTexture, false);
 			Texture tex = _assetCache.TextureCache[textureId.Id].Texture;

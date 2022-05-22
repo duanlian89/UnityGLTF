@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using GLTF.Schema;
@@ -6,7 +6,9 @@ using Newtonsoft.Json.Linq;
 
 public class MToonMaterialExtension : IExtension
 {
-	//TODO: ½øÒ»²½ÕûÀí³É floatProperty,colorProperty ...
+	#region properties and default value
+
+	//TODO: è¿›ä¸€æ­¥æ•´ç†æˆ floatProperty,colorProperty ...
 	public float _Cutoff = 0.0f;
 	public static readonly float _Cutoff_Default = 0.5f;
 
@@ -109,6 +111,8 @@ public class MToonMaterialExtension : IExtension
 	public float _UvAnimRotation = 0;
 	public static readonly float _UvAnimRotation_Default = 0;
 
+	#endregion
+
 	public MToonMaterialExtension()
 	{
 
@@ -118,12 +122,16 @@ public class MToonMaterialExtension : IExtension
 	{
 		return new MToonMaterialExtension();
 	}
+	// UnityEngine.Material ro MToonMaterialExtension
+	// å¯¼å‡ºçš„æ—¶å€™ç”¨äºåˆå§‹åŒ– IExtension
+	// Init(Material m)
 
+	// properties to json
+	// å¯¼å‡ºæ—¶ç”¨äºåºåˆ—åŒ–å±æ€§åå’Œå±æ€§å€¼
 	public JProperty Serialize()
 	{
 		JObject ext = new JObject();
 
-		// TODO: ext Ìí¼Ó·ÇÄ¬ÈÏÖµµÄÊôĞÔ
 		if (_Cutoff != _Cutoff_Default)
 		{
 			ext.Add(new JProperty(MToonMaterialExtensionFactory._Cutoff, _Cutoff));
@@ -299,4 +307,7 @@ public class MToonMaterialExtension : IExtension
 
 		return new JProperty(MToonMaterialExtensionFactory.Extension_Name, ext);
 	}
+
+	// json to MToonMaterialExtension
+	// public MToonMaterialExtension Deserialize(JProperty p)
 }
