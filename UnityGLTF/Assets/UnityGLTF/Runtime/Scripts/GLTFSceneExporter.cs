@@ -43,20 +43,20 @@ namespace UnityGLTF
 			Occlusion
 		}
 
-		private struct ImageInfo
+		protected struct ImageInfo
 		{
 			public Texture2D texture;
 			public TextureMapType textureMapType;
 		}
 
 		private Transform[] _rootTransforms;
-		private GLTFRoot _root;
-		private BufferId _bufferId;
-		private GLTFBuffer _buffer;
-		private BinaryWriter _bufferWriter;
-		private List<ImageInfo> _imageInfos;
-		private List<Texture> _textures;
-		private List<Material> _materials;
+		protected GLTFRoot _root;
+		protected BufferId _bufferId;
+		protected GLTFBuffer _buffer;
+		protected BinaryWriter _bufferWriter;
+		protected List<ImageInfo> _imageInfos;
+		protected List<Texture> _textures;
+		protected List<Material> _materials;
 		private bool _shouldUseInternalBufferForImages;
 
 		private ExportOptions _exportOptions;
@@ -109,7 +109,7 @@ namespace UnityGLTF
 			_normalChannelMaterial = new Material(normalChannelShader);
 
 			_rootTransforms = rootTransforms;
-			_root = new GLTFRoot
+			_root = new MyGLTFRoot
 			{
 				Accessors = new List<Accessor>(),
 				Asset = new Asset
@@ -443,7 +443,7 @@ namespace UnityGLTF
 			return Path.ChangeExtension(filenamePath, ".png");
 		}
 
-		private SceneId ExportScene(string name, Transform[] rootObjTransforms)
+		protected virtual SceneId ExportScene(string name, Transform[] rootObjTransforms)
 		{
 			var scene = new GLTFScene();
 
@@ -468,7 +468,7 @@ namespace UnityGLTF
 			};
 		}
 
-		private NodeId ExportNode(Transform nodeTransform)
+		protected virtual NodeId ExportNode(Transform nodeTransform)
 		{
 			var node = new Node();
 
@@ -1531,7 +1531,7 @@ namespace UnityGLTF
 			return id;
 		}
 
-		private long AppendToBufferMultiplyOf4(long byteOffset, long byteLength)
+		public long AppendToBufferMultiplyOf4(long byteOffset, long byteLength)
 		{
 		    var moduloOffset = byteLength % 4;
 		    if (moduloOffset > 0)
@@ -1869,7 +1869,7 @@ namespace UnityGLTF
 			return id;
 		}
 
-		private BufferViewId ExportBufferView(uint byteOffset, uint byteLength)
+		public BufferViewId ExportBufferView(uint byteOffset, uint byteLength)
 		{
 			var bufferView = new BufferView
 			{

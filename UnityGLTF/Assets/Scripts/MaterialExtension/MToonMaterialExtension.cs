@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using GLTF.Schema;
 using Newtonsoft.Json.Linq;
+using GLTF.Extensions;
+using UnityGLTF.Extensions;
 
-public class MToonMaterialExtension : IExtension
+public class MToonMaterialExtension : IPropExtension
 {
 	#region properties and default value
 
@@ -13,7 +15,7 @@ public class MToonMaterialExtension : IExtension
 	public static readonly float _Cutoff_Default = 0.5f;
 
 	public Color _Color = Color.white;
-	public static readonly Color _Color_Default = Color.white;
+	public static readonly UnityEngine.Color _Color_Default = UnityEngine.Color.white;
 
 	public Color _ColorOL = Color.white;
 	public static readonly Color _ColorOL_Default = new Color(1, 1, 1, 0);
@@ -122,12 +124,10 @@ public class MToonMaterialExtension : IExtension
 	{
 		return new MToonMaterialExtension();
 	}
-	// UnityEngine.Material ro MToonMaterialExtension
-	// 导出的时候用于初始化 IExtension
-	// Init(Material m)
+
 
 	// properties to json
-	// 导出时用于序列化属性名和属性值
+	// 用于导出时序列化属性名和属性值
 	public JProperty Serialize()
 	{
 		JObject ext = new JObject();
@@ -309,5 +309,110 @@ public class MToonMaterialExtension : IExtension
 	}
 
 	// json to MToonMaterialExtension
-	// public MToonMaterialExtension Deserialize(JProperty p)
+	public void Deserialize(GLTFRoot root, JProperty extensionToken)
+	{
+		//MToonMaterialExtension ext = new MToonMaterialExtension();
+
+		JToken token = extensionToken.Value[MToonMaterialExtensionFactory._Cutoff];
+		_Cutoff = token != null ? (float)token.DeserializeAsDouble() : _Cutoff_Default;
+
+		token = extensionToken.Value[MToonMaterialExtensionFactory._Color];
+		_Color = token != null ? token.DeserializeAsColor().ToUnityColorRaw() : _Color_Default;
+
+		token = extensionToken.Value[MToonMaterialExtensionFactory._ColorOL];
+		_ColorOL = token != null ? token.DeserializeAsColor().ToUnityColorRaw() : _ColorOL_Default;
+
+		token = extensionToken.Value[MToonMaterialExtensionFactory._ShadeColor];
+		_ShadeColor = token != null ? token.DeserializeAsColor().ToUnityColorRaw() : _ShadeColor_Default;
+
+		token = extensionToken.Value[MToonMaterialExtensionFactory._MainTex];
+		_MainTex = token != null ? token.DeserializeAsTexture(root) : _MainTex_Default;
+
+		token = extensionToken.Value[MToonMaterialExtensionFactory._MainTex2];
+		_MainTex2 = token != null ? token.DeserializeAsTexture(root) : _MainTex2_Default;
+
+		token = extensionToken.Value[MToonMaterialExtensionFactory._ShadeTexture];
+		_ShadeTexture = token != null ? token.DeserializeAsTexture(root) : _ShadeTexture_Default;
+
+		token = extensionToken.Value[MToonMaterialExtensionFactory._BumpScale];
+		_BumpScale = token != null ? (float)token.DeserializeAsDouble() : _BumpScale_Default;
+
+		token = extensionToken.Value[MToonMaterialExtensionFactory._BumpMap];
+		_BumpMap = token != null ? token.DeserializeAsTexture(root) : _BumpMap_Default;
+
+		token = extensionToken.Value[MToonMaterialExtensionFactory._ReceiveShadowRate];
+		_ReceiveShadowRate = token != null ? (float)token.DeserializeAsDouble() : _ReceiveShadowRate_Default;
+
+		token = extensionToken.Value[MToonMaterialExtensionFactory._ReceiveShadowTexture];
+		_ReceiveShadowTexture = token != null ? token.DeserializeAsTexture(root) : _ReceiveShadowTexture_Default;
+
+		token = extensionToken.Value[MToonMaterialExtensionFactory._ShadingGradeRate];
+		_ShadingGradeRate = token != null ? (float)token.DeserializeAsDouble() : _ShadingGradeRate_Default;
+
+		token = extensionToken.Value[MToonMaterialExtensionFactory._ShadingGradeTexture];
+		_ShadingGradeTexture = token != null ? token.DeserializeAsTexture(root) : _ShadingGradeTexture_Default;
+
+		token = extensionToken.Value[MToonMaterialExtensionFactory._ShadeShift];
+		_ShadeShift = token != null ? (float)token.DeserializeAsDouble() : _ShadeShift_Default;
+
+		token = extensionToken.Value[MToonMaterialExtensionFactory._ShadeToony];
+		_ShadeToony = token != null ? (float)token.DeserializeAsDouble() : _ShadeToony_Default;
+
+		token = extensionToken.Value[MToonMaterialExtensionFactory._LightColorAttenuation];
+		_LightColorAttenuation = token != null ? (float)token.DeserializeAsDouble() : _LightColorAttenuation_Default;
+
+		token = extensionToken.Value[MToonMaterialExtensionFactory._IndirectLightIntensity];
+		_IndirectLightIntensity = token != null ? (float)token.DeserializeAsDouble() : _IndirectLightIntensity_Default;
+
+		token = extensionToken.Value[MToonMaterialExtensionFactory._RimColor];
+		_RimColor = token != null ? token.DeserializeAsColor().ToUnityColorRaw() : _RimColor_Default;
+
+		token = extensionToken.Value[MToonMaterialExtensionFactory._RimTexture];
+		_RimTexture = token != null ? token.DeserializeAsTexture(root) : _RimTexture_Default;
+
+		token = extensionToken.Value[MToonMaterialExtensionFactory._RimLightingMix];
+		_RimLightingMix = token != null ? (float)token.DeserializeAsDouble() : _RimLightingMix_Default;
+
+		token = extensionToken.Value[MToonMaterialExtensionFactory._RimFresnelPower];
+		_RimFresnelPower = token != null ? (float)token.DeserializeAsDouble() : _RimFresnelPower_Default;
+
+		token = extensionToken.Value[MToonMaterialExtensionFactory._RimLift];
+		_RimLift = token != null ? (float)token.DeserializeAsDouble() : _RimLift_Default;
+
+		token = extensionToken.Value[MToonMaterialExtensionFactory._SphereAdd];
+		_SphereAdd = token != null ? token.DeserializeAsTexture(root) : _SphereAdd_Default;
+
+		token = extensionToken.Value[MToonMaterialExtensionFactory._EmissionColor];
+		_EmissionColor = token != null ? token.DeserializeAsColor().ToUnityColorRaw() : _EmissionColor_Default;
+
+		token = extensionToken.Value[MToonMaterialExtensionFactory._EmissionMap];
+		_EmissionMap = token != null ? token.DeserializeAsTexture(root) : _EmissionMap_Default;
+
+		token = extensionToken.Value[MToonMaterialExtensionFactory._OutlineWidthTexture];
+		_OutlineWidthTexture = token != null ? token.DeserializeAsTexture(root) : _OutlineWidthTexture_Default;
+
+		token = extensionToken.Value[MToonMaterialExtensionFactory._OutlineWidth];
+		_OutlineWidth = token != null ? (float)token.DeserializeAsDouble() : _OutlineWidth_Default;
+
+		token = extensionToken.Value[MToonMaterialExtensionFactory._OutlineScaledMaxDistance];
+		_OutlineScaledMaxDistance = token != null ? (float)token.DeserializeAsDouble() : _OutlineScaledMaxDistance_Default;
+
+		token = extensionToken.Value[MToonMaterialExtensionFactory._OutlineColor];
+		_OutlineColor = token != null ? token.DeserializeAsColor().ToUnityColorRaw() : _OutlineColor_Default;
+
+		token = extensionToken.Value[MToonMaterialExtensionFactory._OutlineLightingMix];
+		_OutlineLightingMix = token != null ? (float)token.DeserializeAsDouble() : _OutlineLightingMix_Default;
+
+		token = extensionToken.Value[MToonMaterialExtensionFactory._UvAnimMaskTexture];
+		_UvAnimMaskTexture = token != null ? token.DeserializeAsTexture(root) : _UvAnimMaskTexture_Default;
+
+		token = extensionToken.Value[MToonMaterialExtensionFactory._UvAnimScrollX];
+		_UvAnimScrollX = token != null ? (float)token.DeserializeAsDouble() : _UvAnimScrollX_Default;
+
+		token = extensionToken.Value[MToonMaterialExtensionFactory._UvAnimScrollY];
+		_UvAnimScrollY = token != null ? (float)token.DeserializeAsDouble() : _UvAnimScrollY_Default;
+
+		token = extensionToken.Value[MToonMaterialExtensionFactory._UvAnimRotation];
+		_UvAnimRotation = token != null ? (float)token.DeserializeAsDouble() : _UvAnimRotation_Default;
+	}
 }

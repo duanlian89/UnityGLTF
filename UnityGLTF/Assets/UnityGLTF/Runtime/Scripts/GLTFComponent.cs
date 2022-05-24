@@ -48,7 +48,6 @@ namespace UnityGLTF
 
 			try
 			{
-				GLTFMaterial.TryRegisterExtension(new MToonMaterialExtensionFactory());
 				await Load();
 			}
 #if WINDOWS_UWP

@@ -8,6 +8,11 @@ using GLTF.Schema;
 public class ModelExporter : GLTFSceneExporter
 {
 	public string name = "sample";
+
+	public System.IO.BinaryWriter BufferWriter
+	{
+		get { return _bufferWriter; }
+	}
 	static string RetrieveTexturePath(UnityEngine.Texture texture)
 	{
 		//return texture.name;
@@ -18,7 +23,44 @@ public class ModelExporter : GLTFSceneExporter
 	public ModelExporter(Transform parent) :
 		base(new[] { parent }, new ExportOptions() { TexturePathRetriever = RetrieveTexturePath, ExportInactivePrimitives = true })
 	{
-		GLTFMaterial.TryRegisterExtension(new MToonMaterialExtensionFactory());
+		GLTFMaterial.RegisterExtension(new MToonMaterialExtensionFactory());
+		//Node.TryRegisterExtension(new XXXXComponentExtensionFactory());
+		Node.RegisterExtension(new XXXXComponentExtensionFactory1(this, null));
+		Node.RegisterExtension(new XXXXComponentExtensionFactory2());
+
+		// 重写部分属性
+		_root = new MyGLTFRoot
+		{
+			Accessors = new List<Accessor>(),
+			Asset = new Asset
+			{
+				Version = "2.0"
+			},
+			Buffers = new List<GLTFBuffer>(),
+			BufferViews = new List<BufferView>(),
+			Cameras = new List<GLTFCamera>(),
+			Images = new List<GLTFImage>(),
+			Materials = new List<GLTFMaterial>(),
+			Meshes = new List<GLTFMesh>(),
+			Nodes = new List<Node>(),
+			Samplers = new List<Sampler>(),
+			Scenes = new List<GLTFScene>(),
+			Textures = new List<GLTFTexture>(),
+
+			gameObjects = new List<GameObject>()
+		};
+
+		_imageInfos = new List<ImageInfo>();
+		_materials = new List<Material>();
+		_textures = new List<Texture>();
+
+		_buffer = new GLTFBuffer();
+		_bufferId = new BufferId
+		{
+			Id = _root.Buffers.Count,
+			Root = _root
+		};
+		_root.Buffers.Add(_buffer);
 	}
 
 	public void Export()
@@ -30,241 +72,121 @@ public class ModelExporter : GLTFSceneExporter
 		}
 	}
 
+	protected override SceneId ExportScene(string name, Transform[] rootObjTransforms)
+	{
+		var scene = new GLTFScene();
+
+		if (ExportNames)
+		{
+			scene.Name = name;
+		}
+
+		RecurGameObject(rootObjTransforms[0].gameObject); // TODO: 默认只有一个根节点
+
+		scene.Nodes = new List<NodeId>(rootObjTransforms.Length);
+		foreach (var transform in rootObjTransforms)
+		{
+			scene.Nodes.Add(ExportNode(transform));
+		}
+
+		_root.Scenes.Add(scene);
+
+		return new SceneId
+		{
+			Id = _root.Scenes.Count - 1,
+			Root = _root
+		};
+	}
+
+	protected override NodeId ExportNode(Transform nodeTransform)
+	{
+		NodeId id = base.ExportNode(nodeTransform);
+
+		Node node = _root.Nodes[id.Id];
+
+		//export Component
+		MonoBehaviour[] components = nodeTransform.GetComponents<MonoBehaviour>();
+		if (components != null)
+		{
+			if (node.Extensions == null)
+				node.Extensions = new Dictionary<string, IExtension>();
+
+			foreach (var component in components)
+			{
+				string extensionName = component.GetType().ToString();
+				ComponentExtensionFactory extensionFactory = Node.TryGetExtension(extensionName) as ComponentExtensionFactory;
+				IPropExtension ext = null;
+				if (extensionFactory != null)
+				{
+					ext = extensionFactory.ConstructExtension(component);
+				}
+				node.Extensions.Add(extensionName, ext);
+			}
+		}
+
+		return id;
+	}
+
+	private void RecurGameObject(GameObject go)
+	{
+		(_root as MyGLTFRoot).gameObjects.Add(go);
+
+		int childCount = go.transform.childCount;
+		for (var i = 0; i < childCount; i++)
+		{
+			RecurGameObject(go.transform.GetChild(i).gameObject);
+		}
+	}
+
 	public override MaterialId ExportMaterial(Material materialObj)
 	{
 		MaterialId id = base.ExportMaterial(materialObj);
 
-		// TODO: 针对不同是材质，搞个工场模式来完成任务，这样更灵活一些
 		GLTFMaterial gltfMaterial = GetRoot().Materials[id.Id];
+		MaterialExtensionFactory factory = GLTFMaterial.TryGetExtension(materialObj.shader.name) as MaterialExtensionFactory;
 
 		if (gltfMaterial.Extensions == null) gltfMaterial.Extensions = new Dictionary<string, IExtension>();
-		gltfMaterial.Extensions[MToonMaterialExtensionFactory.Extension_Name] = new MToonMaterialExtension();
 
-		// TODO:  从 materialObj 中读取属性，Texture, 初始化 Extension
-		// Iextension.Init(UnityEngine.Material)
-		MToonMaterialExtension ext = gltfMaterial.Extensions[MToonMaterialExtensionFactory.Extension_Name] as MToonMaterialExtension;
-
-		ext._Cutoff = materialObj.GetFloat(MToonMaterialExtensionFactory._Cutoff);
-		ext._Color = materialObj.GetColor(MToonMaterialExtensionFactory._Color);
-		ext._ColorOL = materialObj.GetColor(MToonMaterialExtensionFactory._ColorOL);
-		ext._ShadeColor = materialObj.GetColor(MToonMaterialExtensionFactory._ShadeColor);
-
-		if (materialObj.HasProperty(MToonMaterialExtensionFactory._MainTex))
-		{
-			var Tex = materialObj.GetTexture(MToonMaterialExtensionFactory._MainTex);
-			if (Tex != null)
-			{
-				if (Tex is Texture2D)
-				{
-					ext._MainTex = ExportTextureInfo(Tex, TextureMapType.Main);
-					ExportTextureTransform(ext._MainTex, materialObj, MToonMaterialExtensionFactory._MainTex);
-				}
-				else
-				{
-					Debug.LogErrorFormat("Can't export a {0} emissive texture in material {1}", Tex.GetType(), materialObj.name);
-				}
-			}
-		}
-
-		//public Texture2D _MainTex2;
-		if (materialObj.HasProperty(MToonMaterialExtensionFactory._MainTex2))
-		{
-			var Tex = materialObj.GetTexture(MToonMaterialExtensionFactory._MainTex2);
-			if (Tex != null)
-			{
-				if (Tex is Texture2D)
-				{
-					ext._MainTex2 = ExportTextureInfo(Tex, TextureMapType.Main);
-					ExportTextureTransform(ext._MainTex2, materialObj, MToonMaterialExtensionFactory._MainTex2);
-				}
-				else
-				{
-					Debug.LogErrorFormat("Can't export a {0} emissive texture in material {1}", Tex.GetType(), materialObj.name);
-				}
-			}
-		}
-
-		//public Texture2D _ShadeTexture;
-		if (materialObj.HasProperty(MToonMaterialExtensionFactory._ShadeTexture))
-		{
-			var Tex = materialObj.GetTexture(MToonMaterialExtensionFactory._ShadeTexture);
-			if (Tex != null)
-			{
-				if (Tex is Texture2D)
-				{
-					ext._ShadeTexture = ExportTextureInfo(Tex, TextureMapType.Main);
-					ExportTextureTransform(ext._ShadeTexture, materialObj, MToonMaterialExtensionFactory._ShadeTexture);
-				}
-				else
-				{
-					Debug.LogErrorFormat("Can't export a {0} emissive texture in material {1}", Tex.GetType(), materialObj.name);
-				}
-			}
-		}
-
-		ext._BumpScale = materialObj.GetFloat(MToonMaterialExtensionFactory._BumpScale);
-
-		if (materialObj.HasProperty(MToonMaterialExtensionFactory._BumpMap))
-		{
-			var Tex = materialObj.GetTexture(MToonMaterialExtensionFactory._BumpMap);
-			if (Tex != null)
-			{
-				if (Tex is Texture2D)
-				{
-					ext._BumpMap = ExportTextureInfo(Tex, TextureMapType.Main);
-					ExportTextureTransform(ext._BumpMap, materialObj, MToonMaterialExtensionFactory._BumpMap);
-				}
-				else
-				{
-					Debug.LogErrorFormat("Can't export a {0} emissive texture in material {1}", Tex.GetType(), materialObj.name);
-				}
-			}
-		}
-
-		ext._ReceiveShadowRate = materialObj.GetFloat(MToonMaterialExtensionFactory._ReceiveShadowRate);
-
-		if (materialObj.HasProperty(MToonMaterialExtensionFactory._ReceiveShadowTexture))
-		{
-			var Tex = materialObj.GetTexture(MToonMaterialExtensionFactory._ReceiveShadowTexture);
-			if (Tex != null)
-			{
-				if (Tex is Texture2D)
-				{
-					ext._ReceiveShadowTexture = ExportTextureInfo(Tex, TextureMapType.Main);
-					ExportTextureTransform(ext._ReceiveShadowTexture, materialObj, MToonMaterialExtensionFactory._ReceiveShadowTexture);
-				}
-				else
-				{
-					Debug.LogErrorFormat("Can't export a {0} emissive texture in material {1}", Tex.GetType(), materialObj.name);
-				}
-			}
-		}
-
-		ext._ShadingGradeRate = materialObj.GetFloat(MToonMaterialExtensionFactory._ShadingGradeRate);
-
-		if (materialObj.HasProperty(MToonMaterialExtensionFactory._ShadingGradeTexture))
-		{
-			var Tex = materialObj.GetTexture(MToonMaterialExtensionFactory._ShadingGradeTexture);
-			if (Tex != null)
-			{
-				if (Tex is Texture2D)
-				{
-					ext._ShadingGradeTexture = ExportTextureInfo(Tex, TextureMapType.Main);
-					ExportTextureTransform(ext._ShadingGradeTexture, materialObj, MToonMaterialExtensionFactory._ShadingGradeTexture);
-				}
-				else
-				{
-					Debug.LogErrorFormat("Can't export a {0} emissive texture in material {1}", Tex.GetType(), materialObj.name);
-				}
-			}
-		}
-
-		ext._ShadeShift = materialObj.GetFloat(MToonMaterialExtensionFactory._ShadeShift);
-		ext._ShadeToony = materialObj.GetFloat(MToonMaterialExtensionFactory._ShadeToony);
-		ext._LightColorAttenuation = materialObj.GetFloat(MToonMaterialExtensionFactory._LightColorAttenuation);
-		ext._IndirectLightIntensity = materialObj.GetFloat(MToonMaterialExtensionFactory._IndirectLightIntensity);
-		ext._RimColor = materialObj.GetColor(MToonMaterialExtensionFactory._RimColor);
-
-		if (materialObj.HasProperty(MToonMaterialExtensionFactory._RimTexture))
-		{
-			var Tex = materialObj.GetTexture(MToonMaterialExtensionFactory._RimTexture);
-			if (Tex != null)
-			{
-				if (Tex is Texture2D)
-				{
-					ext._RimTexture = ExportTextureInfo(Tex, TextureMapType.Main);
-					ExportTextureTransform(ext._RimTexture, materialObj, MToonMaterialExtensionFactory._RimTexture);
-				}
-				else
-				{
-					Debug.LogErrorFormat("Can't export a {0} emissive texture in material {1}", Tex.GetType(), materialObj.name);
-				}
-			}
-		}
-
-		ext._RimLightingMix = materialObj.GetFloat(MToonMaterialExtensionFactory._RimLightingMix);
-		ext._RimFresnelPower = materialObj.GetFloat(MToonMaterialExtensionFactory._RimFresnelPower);
-		ext._RimLift = materialObj.GetFloat(MToonMaterialExtensionFactory._RimLift);
-
-		if (materialObj.HasProperty(MToonMaterialExtensionFactory._SphereAdd))
-		{
-			var Tex = materialObj.GetTexture(MToonMaterialExtensionFactory._SphereAdd);
-			if (Tex != null)
-			{
-				if (Tex is Texture2D)
-				{
-					ext._SphereAdd = ExportTextureInfo(Tex, TextureMapType.Main);
-					ExportTextureTransform(ext._SphereAdd, materialObj, MToonMaterialExtensionFactory._SphereAdd);
-				}
-				else
-				{
-					Debug.LogErrorFormat("Can't export a {0} emissive texture in material {1}", Tex.GetType(), materialObj.name);
-				}
-			}
-		}
-
-		ext._EmissionColor = materialObj.GetColor(MToonMaterialExtensionFactory._EmissionColor);
-
-		if (materialObj.HasProperty(MToonMaterialExtensionFactory._EmissionMap))
-		{
-			var Tex = materialObj.GetTexture(MToonMaterialExtensionFactory._EmissionMap);
-			if (Tex != null)
-			{
-				if (Tex is Texture2D)
-				{
-					ext._EmissionMap = ExportTextureInfo(Tex, TextureMapType.Main);
-					ExportTextureTransform(ext._EmissionMap, materialObj, MToonMaterialExtensionFactory._EmissionMap);
-				}
-				else
-				{
-					Debug.LogErrorFormat("Can't export a {0} emissive texture in material {1}", Tex.GetType(), materialObj.name);
-				}
-			}
-		}
-
-		if (materialObj.HasProperty(MToonMaterialExtensionFactory._OutlineWidthTexture))
-		{
-			var Tex = materialObj.GetTexture(MToonMaterialExtensionFactory._OutlineWidthTexture);
-			if (Tex != null)
-			{
-				if (Tex is Texture2D)
-				{
-					ext._OutlineWidthTexture = ExportTextureInfo(Tex, TextureMapType.Main);
-					ExportTextureTransform(ext._OutlineWidthTexture, materialObj, MToonMaterialExtensionFactory._OutlineWidthTexture);
-				}
-				else
-				{
-					Debug.LogErrorFormat("Can't export a {0} emissive texture in material {1}", Tex.GetType(), materialObj.name);
-				}
-			}
-		}
-
-		ext._OutlineWidth = materialObj.GetFloat(MToonMaterialExtensionFactory._OutlineWidth);
-		ext._OutlineScaledMaxDistance = materialObj.GetFloat(MToonMaterialExtensionFactory._OutlineScaledMaxDistance);
-		ext._OutlineColor = materialObj.GetColor(MToonMaterialExtensionFactory._OutlineColor);
-		ext._OutlineLightingMix = materialObj.GetFloat(MToonMaterialExtensionFactory._OutlineLightingMix);
-
-		if (materialObj.HasProperty(MToonMaterialExtensionFactory._UvAnimMaskTexture))
-		{
-			var Tex = materialObj.GetTexture(MToonMaterialExtensionFactory._UvAnimMaskTexture);
-			if (Tex != null)
-			{
-				if (Tex is Texture2D)
-				{
-					ext._UvAnimMaskTexture = ExportTextureInfo(Tex, TextureMapType.Main);
-					ExportTextureTransform(ext._UvAnimMaskTexture, materialObj, MToonMaterialExtensionFactory._UvAnimMaskTexture);
-				}
-				else
-				{
-					Debug.LogErrorFormat("Can't export a {0} emissive texture in material {1}", Tex.GetType(), materialObj.name);
-				}
-			}
-		}
-
-		ext._UvAnimScrollX = materialObj.GetFloat(MToonMaterialExtensionFactory._UvAnimScrollX);
-		ext._UvAnimScrollY = materialObj.GetFloat(MToonMaterialExtensionFactory._UvAnimScrollY);
-		ext._UvAnimRotation = materialObj.GetFloat(MToonMaterialExtensionFactory._UvAnimRotation);
+		IPropExtension ext = factory.GetExtension() as IPropExtension;
+		ExportMtoonMaterialExtension(ext, materialObj, factory);
+		gltfMaterial.Extensions[MToonMaterialExtensionFactory.Extension_Name] = ext;
 
 		return id;
+	}
+
+	private void ExportMtoonMaterialExtension(IPropExtension ext, Material materialObj, MaterialExtensionFactory factory)
+	{
+		System.Type t = ext.GetType();
+
+		for (int i = 0; i < factory.FloatProperties.Length; i++)
+		{
+			string prop = factory.FloatProperties[i];
+			t.GetField(prop).SetValue(ext, materialObj.GetFloat(prop));
+		}
+
+		for (int i = 0; i < factory.ColorProperties.Length; i++)
+		{
+			string prop = factory.ColorProperties[i];
+			t.GetField(prop).SetValue(ext, materialObj.GetColor(prop));
+		}
+
+		for (int i = 0; i < factory.TextureProperties.Length; i++)
+		{
+			string prop = factory.TextureProperties[i];
+			Texture Tex = materialObj.GetTexture(prop);
+			if (Tex != null)
+			{
+				if (Tex is Texture2D)
+				{
+					TextureInfo textureInfo = ExportTextureInfo(Tex, TextureMapType.Main);
+					t.GetField(prop).SetValue(ext, textureInfo);
+					ExportTextureTransform(textureInfo, materialObj, MToonMaterialExtensionFactory._MainTex);
+				}
+				else
+				{
+					Debug.LogErrorFormat("Can't export a {0} emissive texture in material {1}", Tex.GetType(), materialObj.name);
+				}
+			}
+		}
 	}
 }
