@@ -10,7 +10,6 @@ public class MToonMaterialExtension : IPropExtension
 {
 	#region properties and default value
 
-	//TODO: 进一步整理成 floatProperty,colorProperty ...
 	public float _Cutoff = 0.0f;
 	public static readonly float _Cutoff_Default = 0.5f;
 
