@@ -6,10 +6,8 @@
 
 half _Cutoff;
 fixed4 _Color;
-fixed4 _ColorOL;
 fixed4 _ShadeColor;
 sampler2D _MainTex; float4 _MainTex_ST;
-sampler2D _MainTex2;
 sampler2D _ShadeTexture;
 half _BumpScale;
 sampler2D _BumpMap;
@@ -21,6 +19,8 @@ half _ShadeShift;
 half _ShadeToony;
 half _LightColorAttenuation;
 half _IndirectLightIntensity;
+half _Shininess;
+sampler2D _LightTexColor;
 sampler2D _RimTexture;
 half4 _RimColor;
 half _RimLightingMix;
@@ -41,23 +41,6 @@ float _UvAnimRotation;
 
 //UNITY_INSTANCING_BUFFER_START(Props)
 //UNITY_INSTANCING_BUFFER_END(Props)
-
-half4 Overlay (half4 a, half4 b, half4 c)
-{
-    /* return multiply */
-    if ( b.a == 0.0 )
-        return c*a;
-
-    /* return Overlay */
-    half4 r = a < .5 ? 2.0 * a * b : 1.0 - 2.0 * (1.0 - a) * (1.0 - b);
-    return r;
-}
-
-fixed4 ColorBurn (fixed4 a, fixed4 b)
-{
-    fixed4 r = a - (1 - a) * (1 - b)/b;
-    return r; 
-}
 
 struct v2f
 {
@@ -152,8 +135,6 @@ float4 frag_forward(v2f i) : SV_TARGET
     
     // main tex
     half4 mainTex = tex2D(_MainTex, mainUv);
-    half4 mainTex2 = tex2D(_MainTex2, mainUv);
-    mainTex = lerp( mainTex, mainTex2, mainTex2.a );
     
     // alpha
     half alpha = 1;
@@ -207,8 +188,7 @@ float4 frag_forward(v2f i) : SV_TARGET
     
     // Albedo color
     half4 shade = _ShadeColor * tex2D(_ShadeTexture, mainUv);
-    //half4 lit = _Color * mainTex;
-    half4 lit = Overlay( mainTex, _ColorOL, _Color );
+    half4 lit = _Color * mainTex;
     half3 col = lerp(shade.rgb, lit.rgb, lightIntensity);
 
     // Direct Light
@@ -245,21 +225,36 @@ float4 frag_forward(v2f i) : SV_TARGET
     half3 staticRimLighting = 1;
     half3 mixedRimLighting = lighting + indirectLighting;
 #endif
+    half3 worldCameraUp = normalize(UNITY_MATRIX_V[1].xyz);
+    half3 worldViewUp = normalize(worldCameraUp - worldView * dot(worldView, worldCameraUp));
+    half3 worldViewRight = normalize(cross(worldView, worldViewUp));
+    half2 matcapUv = half2(dot(worldViewRight, worldNormal), dot(worldViewUp, worldNormal)) * 0.5 + 0.5;
     half3 rimLighting = lerp(staticRimLighting, mixedRimLighting, _RimLightingMix);
-    half3 rim = pow(saturate(1.0 - dot(worldNormal, worldView) + _RimLift), _RimFresnelPower) * _RimColor.rgb * tex2D(_RimTexture, mainUv).rgb;
+    half3 rim = pow(saturate(1.0 - dot(worldNormal, worldView) + _RimLift), _RimFresnelPower) * _RimColor.rgb * tex2D(_RimTexture, matcapUv).rgb;
     col += lerp(rim * rimLighting, half3(0, 0, 0), i.isOutline);
 
     // additive matcap
 #ifdef MTOON_FORWARD_ADD
 #else
-    half3 worldCameraUp = normalize(UNITY_MATRIX_V[1].xyz);
-    half3 worldViewUp = normalize(worldCameraUp - worldView * dot(worldView, worldCameraUp));
-    half3 worldViewRight = normalize(cross(worldView, worldViewUp));
-    half2 matcapUv = half2(dot(worldViewRight, worldNormal), dot(worldViewUp, worldNormal)) * 0.5 + 0.5;
-    half3 matcapLighting = tex2D(_SphereAdd, matcapUv);
+    half3 matcapLighting = tex2D(_SphereAdd, matcapUv) * 0.2f;
     col += lerp(matcapLighting, half3(0, 0, 0), i.isOutline);
 #endif
+/*
+    //tint
+    //高光区域计算
+    half3 worldViewDir = normalize(_WorldSpaceCameraPos.xyz - i.posWorld.xyz);
+    half3 worldHalfVec = normalize(worldViewDir + _WorldSpaceLightPos0.xyz);
 
+    //高光计算
+    half spec = pow(saturate(dot(worldNormal, worldHalfVec)), 0.05f);
+    //计算高光遮罩--根据光照的数据进行高光计算。贴图中为1表示高光区域
+    //spec = step(1.0f - tex2D(_LightTexColor, mainUv).b, spec);
+    //lightTexColor.r定义了高光系数
+    half3 specularColor = 0.1f * spec;
+    //half3 specularColor = _lightSpecColor * _SpecMulti * tex2D(_LightTexColor, mainUv).r * spec;
+    //float3 shadowEndColor = specularColor + diffuseColor;
+    col += lerp(specularColor, half3(0, 0, 0), i.isOutline);
+*/
     // Emission
 #ifdef MTOON_FORWARD_ADD
 #else

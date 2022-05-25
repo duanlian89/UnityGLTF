@@ -4,10 +4,8 @@ Shader "VRM/MToon"
     {
         _Cutoff ("Alpha Cutoff", Range(0, 1)) = 0.5
         _Color ("Lit Color + Alpha", Color) = (1,1,1,1)
-        _ColorOL ("Overlay Color + Alpha", Color) = (1,1,1,0)
         _ShadeColor ("Shade Color", Color) = (0.97, 0.81, 0.86, 1)
         [NoScaleOffset] _MainTex ("Lit Texture + Alpha", 2D) = "white" {}
-        [NoScaleOffset] _MainTex2 ("Blend to MainTex", 2D) = "black" {}
         [NoScaleOffset] _ShadeTexture ("Shade Texture", 2D) = "white" {}
         _BumpScale ("Normal Scale", Float) = 1.0
         [Normal] _BumpMap ("Normal Texture", 2D) = "bump" {}
