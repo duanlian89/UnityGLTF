@@ -102,6 +102,6 @@ public class GLTFExportMenu : EditorWindow
 
 		var exportOptions = new ExportOptions { TexturePathRetriever = RetrieveTexturePath };
 		var exporter = new ModelExporter(Selection.transforms[0]);
-		exporter.Export();
+		exporter.Export(name);
 	}
 }

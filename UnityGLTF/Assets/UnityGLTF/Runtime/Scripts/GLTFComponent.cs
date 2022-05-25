@@ -93,23 +93,20 @@ namespace UnityGLTF
 					}
 					string directoryPath = URIHelper.GetDirectoryName(fullPath);
 					importOptions.DataLoader = new FileLoader(directoryPath);
-					//sceneImporter = Factory.CreateSceneImporter(
-					//	Path.GetFileName(GLTFUri),
-					//	importOptions
-					//	);
-
-					sceneImporter = new ModelImporter1(Path.GetFileName(GLTFUri), importOptions);
+					sceneImporter = Factory.CreateSceneImporter(
+						Path.GetFileName(GLTFUri),
+						importOptions
+						);
 				}
 				else
 				{
 					string directoryPath = URIHelper.GetDirectoryName(GLTFUri);
 					importOptions.DataLoader = new WebRequestLoader(directoryPath);
 
-					//sceneImporter = Factory.CreateSceneImporter(
-					//	URIHelper.GetFileFromUri(new Uri(GLTFUri)),
-					//	importOptions
-					//	);
-					sceneImporter = new ModelImporter1(URIHelper.GetFileFromUri(new Uri(GLTFUri)), importOptions);
+					sceneImporter = Factory.CreateSceneImporter(
+						URIHelper.GetFileFromUri(new Uri(GLTFUri)),
+						importOptions
+						);
 				}
 
 				sceneImporter.SceneParent = gameObject.transform;

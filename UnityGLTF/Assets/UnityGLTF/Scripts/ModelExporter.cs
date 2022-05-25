@@ -1,190 +1,217 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityGLTF;
 using UnityEditor;
 using GLTF.Schema;
+using System.IO;
+using System.Text;
 
-public class ModelExporter : GLTFSceneExporter
+namespace UnityGLTF
 {
-	public string name = "sample";
-
-	public System.IO.BinaryWriter BufferWriter
+	public class ModelExporter : GLTFSceneExporter
 	{
-		get { return _bufferWriter; }
-	}
-	static string RetrieveTexturePath(UnityEngine.Texture texture)
-	{
-		//return texture.name;
-		return AssetDatabase.GetAssetPath(texture);
-	}
-
-	//var exportOptions = new ExportOptions { TexturePathRetriever = RetrieveTexturePath };
-	public ModelExporter(Transform parent) :
-		base(new[] { parent }, new ExportOptions() { TexturePathRetriever = RetrieveTexturePath, ExportInactivePrimitives = true })
-	{
-		GLTFMaterial.RegisterExtension(new MToonMaterialExtensionFactory());
-		//Node.TryRegisterExtension(new XXXXComponentExtensionFactory());
-		Node.RegisterExtension(new XXXXComponentExtensionFactory1(this, null));
-		Node.RegisterExtension(new XXXXComponentExtensionFactory2());
-
-		// 重写部分属性
-		_root = new MyGLTFRoot
+		protected string gltfFileName;
+		public System.IO.BinaryWriter BufferWriter
 		{
-			Accessors = new List<Accessor>(),
-			Asset = new Asset
+			get { return _bufferWriter; }
+		}
+		static string RetrieveTexturePath(UnityEngine.Texture texture)
+		{
+			//return texture.name;
+			return AssetDatabase.GetAssetPath(texture);
+		}
+
+		//var exportOptions = new ExportOptions { TexturePathRetriever = RetrieveTexturePath };
+		public ModelExporter(Transform parent) :
+			base(new[] { parent }, new ExportOptions() { TexturePathRetriever = RetrieveTexturePath, ExportInactivePrimitives = true })
+		{
+			gltfFileName = parent.name;
+
+			GLTFMaterial.RegisterExtension(new MToonMaterialExtensionFactory());
+			//Node.TryRegisterExtension(new XXXXComponentExtensionFactory());
+			Node.RegisterExtension(new XXXXComponentExtensionFactory1(this, null));
+			Node.RegisterExtension(new XXXXComponentExtensionFactory2());
+
+			// 重写部分属性
+			_root = new MyGLTFRoot
 			{
-				Version = "2.0"
-			},
-			Buffers = new List<GLTFBuffer>(),
-			BufferViews = new List<BufferView>(),
-			Cameras = new List<GLTFCamera>(),
-			Images = new List<GLTFImage>(),
-			Materials = new List<GLTFMaterial>(),
-			Meshes = new List<GLTFMesh>(),
-			Nodes = new List<Node>(),
-			Samplers = new List<Sampler>(),
-			Scenes = new List<GLTFScene>(),
-			Textures = new List<GLTFTexture>(),
-
-			gameObjects = new List<GameObject>()
-		};
-
-		_imageInfos = new List<ImageInfo>();
-		_materials = new List<Material>();
-		_textures = new List<Texture>();
-
-		_buffer = new GLTFBuffer();
-		_bufferId = new BufferId
-		{
-			Id = _root.Buffers.Count,
-			Root = _root
-		};
-		_root.Buffers.Add(_buffer);
-	}
-
-	public void Export()
-	{
-		var path = EditorUtility.OpenFolderPanel("glTF Export Path", "", ""); // TODO: 替换接口
-		if (!string.IsNullOrEmpty(path))
-		{
-			SaveGLB(path, name);
-		}
-	}
-
-	protected override SceneId ExportScene(string name, Transform[] rootObjTransforms)
-	{
-		var scene = new GLTFScene();
-
-		if (ExportNames)
-		{
-			scene.Name = name;
-		}
-
-		RecurGameObject(rootObjTransforms[0].gameObject); // TODO: 默认只有一个根节点
-
-		scene.Nodes = new List<NodeId>(rootObjTransforms.Length);
-		foreach (var transform in rootObjTransforms)
-		{
-			scene.Nodes.Add(ExportNode(transform));
-		}
-
-		_root.Scenes.Add(scene);
-
-		return new SceneId
-		{
-			Id = _root.Scenes.Count - 1,
-			Root = _root
-		};
-	}
-
-	protected override NodeId ExportNode(Transform nodeTransform)
-	{
-		NodeId id = base.ExportNode(nodeTransform);
-
-		Node node = _root.Nodes[id.Id];
-
-		//export Component
-		MonoBehaviour[] components = nodeTransform.GetComponents<MonoBehaviour>();
-		if (components != null)
-		{
-			if (node.Extensions == null)
-				node.Extensions = new Dictionary<string, IExtension>();
-
-			foreach (var component in components)
-			{
-				string extensionName = component.GetType().ToString();
-				ComponentExtensionFactory extensionFactory = Node.TryGetExtension(extensionName) as ComponentExtensionFactory;
-				IPropExtension ext = null;
-				if (extensionFactory != null)
+				Accessors = new List<Accessor>(),
+				Asset = new Asset
 				{
-					ext = extensionFactory.ConstructExtension(component);
-				}
-				node.Extensions.Add(extensionName, ext);
+					Version = "2.0"
+				},
+				Buffers = new List<GLTFBuffer>(),
+				BufferViews = new List<BufferView>(),
+				Cameras = new List<GLTFCamera>(),
+				Images = new List<GLTFImage>(),
+				Materials = new List<GLTFMaterial>(),
+				Meshes = new List<GLTFMesh>(),
+				Nodes = new List<Node>(),
+				Samplers = new List<Sampler>(),
+				Scenes = new List<GLTFScene>(),
+				Textures = new List<GLTFTexture>(),
+
+				gameObjects = new List<GameObject>()
+			};
+
+			_imageInfos = new List<ImageInfo>();
+			_materials = new List<Material>();
+			_textures = new List<Texture>();
+
+			_buffer = new GLTFBuffer();
+			_bufferId = new BufferId
+			{
+				Id = _root.Buffers.Count,
+				Root = _root
+			};
+			_root.Buffers.Add(_buffer);
+		}
+
+		public void Export(string gltfFileName = "")
+		{
+			if (!string.IsNullOrEmpty(gltfFileName))
+				this.gltfFileName = gltfFileName;
+
+			var path = EditorUtility.OpenFolderPanel("glTF Export Path", "", ""); // TODO: 替换接口
+			if (!string.IsNullOrEmpty(path))
+			{
+				base.SaveGLB(path, gltfFileName);
 			}
 		}
 
-		return id;
-	}
-
-	private void RecurGameObject(GameObject go)
-	{
-		(_root as MyGLTFRoot).gameObjects.Add(go);
-
-		int childCount = go.transform.childCount;
-		for (var i = 0; i < childCount; i++)
+		public override void SaveGLB(string path, string fileName)
 		{
-			RecurGameObject(go.transform.GetChild(i).gameObject);
-		}
-	}
+			_shouldUseInternalBufferForImages = false;
+			string fullPath = Path.Combine(path, Path.ChangeExtension(fileName, "glb"));
 
-	public override MaterialId ExportMaterial(Material materialObj)
-	{
-		MaterialId id = base.ExportMaterial(materialObj);
-
-		GLTFMaterial gltfMaterial = GetRoot().Materials[id.Id];
-		MaterialExtensionFactory factory = GLTFMaterial.TryGetExtension(materialObj.shader.name) as MaterialExtensionFactory;
-
-		if (gltfMaterial.Extensions == null) gltfMaterial.Extensions = new Dictionary<string, IExtension>();
-
-		IPropExtension ext = factory.GetExtension() as IPropExtension;
-		ExportMtoonMaterialExtension(ext, materialObj, factory);
-		gltfMaterial.Extensions[MToonMaterialExtensionFactory.Extension_Name] = ext;
-
-		return id;
-	}
-
-	private void ExportMtoonMaterialExtension(IPropExtension ext, Material materialObj, MaterialExtensionFactory factory)
-	{
-		System.Type t = ext.GetType();
-
-		for (int i = 0; i < factory.FloatProperties.Length; i++)
-		{
-			string prop = factory.FloatProperties[i];
-			t.GetField(prop).SetValue(ext, materialObj.GetFloat(prop));
-		}
-
-		for (int i = 0; i < factory.ColorProperties.Length; i++)
-		{
-			string prop = factory.ColorProperties[i];
-			t.GetField(prop).SetValue(ext, materialObj.GetColor(prop));
-		}
-
-		for (int i = 0; i < factory.TextureProperties.Length; i++)
-		{
-			string prop = factory.TextureProperties[i];
-			Texture Tex = materialObj.GetTexture(prop);
-			if (Tex != null)
+			using (FileStream glbFile = new FileStream(fullPath, FileMode.Create))
 			{
-				if (Tex is Texture2D)
+				SaveGLBToStream(glbFile, fileName);
+			}
+
+			if (!_shouldUseInternalBufferForImages)
+			{
+				ExportImages(path);
+			}
+		}
+
+		protected override SceneId ExportScene(string name, Transform[] rootObjTransforms)
+		{
+			var scene = new GLTFScene();
+
+			if (ExportNames)
+			{
+				scene.Name = name;
+			}
+
+			RecurGameObject(rootObjTransforms[0].gameObject); // TODO: 默认只有一个根节点
+
+			scene.Nodes = new List<NodeId>(rootObjTransforms.Length);
+			foreach (var transform in rootObjTransforms)
+			{
+				scene.Nodes.Add(ExportNode(transform));
+			}
+
+			_root.Scenes.Add(scene);
+
+			return new SceneId
+			{
+				Id = _root.Scenes.Count - 1,
+				Root = _root
+			};
+		}
+
+		protected override NodeId ExportNode(Transform nodeTransform)
+		{
+			NodeId id = base.ExportNode(nodeTransform);
+
+			Node node = _root.Nodes[id.Id];
+
+			//export Component
+			MonoBehaviour[] components = nodeTransform.GetComponents<MonoBehaviour>();
+			if (components != null)
+			{
+				if (node.Extensions == null)
+					node.Extensions = new Dictionary<string, IExtension>();
+
+				foreach (var component in components)
 				{
-					TextureInfo textureInfo = ExportTextureInfo(Tex, TextureMapType.Main);
-					t.GetField(prop).SetValue(ext, textureInfo);
-					ExportTextureTransform(textureInfo, materialObj, MToonMaterialExtensionFactory._MainTex);
+					string extensionName = component.GetType().ToString();
+					ComponentExtensionFactory extensionFactory = Node.TryGetExtension(extensionName) as ComponentExtensionFactory;
+					IPropExtension ext = null;
+					if (extensionFactory != null)
+					{
+						ext = extensionFactory.ConstructExtension(component);
+					}
+					node.Extensions.Add(extensionName, ext);
 				}
-				else
+			}
+
+			return id;
+		}
+
+		private void RecurGameObject(GameObject go)
+		{
+			(_root as MyGLTFRoot).gameObjects.Add(go);
+
+			int childCount = go.transform.childCount;
+			for (var i = 0; i < childCount; i++)
+			{
+				RecurGameObject(go.transform.GetChild(i).gameObject);
+			}
+		}
+
+		public override MaterialId ExportMaterial(Material materialObj)
+		{
+			MaterialId id = base.ExportMaterial(materialObj);
+
+			GLTFMaterial gltfMaterial = GetRoot().Materials[id.Id];
+			MaterialExtensionFactory factory = GLTFMaterial.TryGetExtension(materialObj.shader.name) as MaterialExtensionFactory;
+
+			if (gltfMaterial.Extensions == null) gltfMaterial.Extensions = new Dictionary<string, IExtension>();
+
+			IPropExtension ext = factory.GetExtension() as IPropExtension;
+			ExportMaterialExtension(ext, materialObj, factory);
+			gltfMaterial.Extensions[MToonMaterialExtensionFactory.Extension_Name] = ext;
+
+			return id;
+		}
+
+		private void ExportMaterialExtension(IPropExtension ext, Material materialObj, MaterialExtensionFactory factory)
+		{
+			System.Type t = ext.GetType();
+
+			for (int i = 0; i < factory.FloatProperties.Length; i++)
+			{
+				string prop = factory.FloatProperties[i];
+				if (materialObj.HasFloat(prop))
+					t.GetField(prop).SetValue(ext, materialObj.GetFloat(prop));
+			}
+
+			for (int i = 0; i < factory.ColorProperties.Length; i++)
+			{
+				string prop = factory.ColorProperties[i];
+				if (materialObj.HasColor(prop))
+					t.GetField(prop).SetValue(ext, materialObj.GetColor(prop));
+			}
+
+			for (int i = 0; i < factory.TextureProperties.Length; i++)
+			{
+				string prop = factory.TextureProperties[i];
+				if (materialObj.HasTexture(prop))
 				{
-					Debug.LogErrorFormat("Can't export a {0} emissive texture in material {1}", Tex.GetType(), materialObj.name);
+					Texture Tex = materialObj.GetTexture(prop);
+					if (Tex != null)
+					{
+						//if (Tex is Texture2D)
+						//{
+						TextureInfo textureInfo = ExportTextureInfo(Tex, TextureMapType.Main);
+						t.GetField(prop).SetValue(ext, textureInfo);
+						ExportTextureTransform(textureInfo, materialObj, MToonMaterialExtensionFactory._MainTex);
+					}
+					else
+					{
+						//Debug.LogErrorFormat("Can't export a {0} emissive texture in material {1}", Tex.GetType(), materialObj.name);
+					}
 				}
 			}
 		}

@@ -1,36 +1,35 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using GLTF.Schema;
 using Newtonsoft.Json.Linq;
-using UnityGLTF;
 
-
-public class XXXXComponentExtensionFactory : ComponentExtensionFactory
+namespace UnityGLTF
 {
-	public const string Extension_Name = "Test.XXXX";
-	#region property name
-
-	public const string _Cutoff = "_Cutoff";
-
-	#endregion
-	public XXXXComponentExtensionFactory()
+	public class XXXXComponentExtensionFactory : ComponentExtensionFactory
 	{
-		ExtensionName = Extension_Name;
-	}
+		public const string Extension_Name = "UnityGLTF.XXXX";
+		#region property name
 
-	// [import] 从extensionToken读出属性，初始化 MToonMaterialExtension
-	public override IExtension Deserialize(GLTFRoot root, JProperty extensionToken)
-	{
-		XXXXComponentExtension ext = new XXXXComponentExtension();
-		ext.Deserialize(root, extensionToken);
-		return ext;
-	}
+		public const string _Cutoff = "_Cutoff";
 
-	// [export]
-	public override IComponentExtension ConstructExtension(Component component)
-	{
-		IComponentExtension extension = new XXXXComponentExtension(component as Test.XXXX);
-		return extension;
+		#endregion
+		public XXXXComponentExtensionFactory()
+		{
+			ExtensionName = Extension_Name;
+		}
+
+		// [import] 从extensionToken读出属性，初始化 MToonMaterialExtension
+		public override IExtension Deserialize(GLTFRoot root, JProperty extensionToken)
+		{
+			XXXXComponentExtension ext = new XXXXComponentExtension();
+			ext.Deserialize(root, extensionToken);
+			return ext;
+		}
+
+		// [export]
+		public override IComponentExtension ConstructExtension(Component component)
+		{
+			IComponentExtension extension = new XXXXComponentExtension(component as XXXX);
+			return extension;
+		}
 	}
 }

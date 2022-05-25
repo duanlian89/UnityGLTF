@@ -1,16 +1,12 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using GLTF.Schema;
 using Newtonsoft.Json.Linq;
 using UnityGLTF;
-using UnityGLTF.Cache;
-using GLTF.Extensions;
 
 public class XXXXComponentExtensionFactory1 : ComponentExtensionFactory
 {
 	ModelExporter exporter;
-	ModelImporter1 importer;
+	ModelImporter importer;
 	public const string Extension_Name = "Test.XXXX";
 	#region property name
 	public const string _Cutoff = "_Cutoff";
@@ -19,7 +15,7 @@ public class XXXXComponentExtensionFactory1 : ComponentExtensionFactory
 	public XXXXComponentExtensionFactory1(GLTFSceneExporter exporter, GLTFSceneImporter importer)
 	{
 		this.exporter = exporter as ModelExporter;
-		this.importer = importer as ModelImporter1;
+		this.importer = importer as ModelImporter;
 
 		ExtensionName = Extension_Name;
 	}
@@ -36,7 +32,7 @@ public class XXXXComponentExtensionFactory1 : ComponentExtensionFactory
 	//[export]
 	public override IComponentExtension ConstructExtension(Component component)
 	{
-		IByteComponentExtension ext = new XXXXComponentExtension1(exporter, component as Test.XXXX);
+		IByteComponentExtension ext = new XXXXComponentExtension1(exporter, component as XXXX);
 
 		var byteOffset = exporter.BufferWriter.BaseStream.Position;
 

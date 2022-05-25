@@ -146,8 +146,8 @@ namespace UnityGLTF
 		/// <summary>
 		/// The last created object
 		/// </summary>
-		public GameObject CreatedObject { get; private set; }
-
+		public GameObject CreatedObject { get; protected set; }
+		
 		/// <summary>
 		/// Adds colliders to primitive objects when created
 		/// </summary>
@@ -1270,7 +1270,7 @@ namespace UnityGLTF
 			}
 		}
 
-		private async Task<GameObject> GetNode(int nodeId, CancellationToken cancellationToken)
+		protected async Task<GameObject> GetNode(int nodeId, CancellationToken cancellationToken)
 		{
 			try
 			{
