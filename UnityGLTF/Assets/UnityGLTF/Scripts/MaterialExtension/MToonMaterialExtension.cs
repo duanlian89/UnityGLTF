@@ -113,6 +113,39 @@ namespace UnityGLTF
 		public float _UvAnimRotation = 0;
 		public static readonly float _UvAnimRotation_Default = 0;
 
+		public float _MToonVersion = 34;
+		public static readonly float _MToonVersion_Default = 34;
+
+		public float _DebugMode = 0.0f;
+		public static readonly float _DebugMode_Default = 0.0f;
+
+		public float _BlendMode = 0.0f;
+		public static readonly float _BlendMode_Default = 0.0f;
+
+		public float _OutlineWidthMode = 0.0f;
+		public static readonly float _OutlineWidthMode_Default = 0.0f;
+
+		public float _OutlineColorMode = 0.0f;
+		public static readonly float _OutlineColorMode_Default = 0.0f;
+
+		public float _CullMode = 2.0f;
+		public static readonly float _CullMode_Default = 2.0f;
+
+		public float _OutlineCullMode = 1.0f;
+		public static readonly float _OutlineCullMode_Default = 1.0f;
+
+		public float _SrcBlend = 1.0f;
+		public static readonly float _SrcBlend_Default = 1.0f;
+
+		public float _DstBlend = 0.0f;
+		public static readonly float _DstBlend_Default = 0.0f;
+
+		public float _ZWrite = 1.0f;
+		public static readonly float _ZWrite_Default = 1.0f;
+
+		public float _AlphaToMask = 0.0f;
+		public static readonly float _AlphaToMask_Default = 0.0f;
+
 		#endregion
 
 		public MToonMaterialExtension()
@@ -305,6 +338,61 @@ namespace UnityGLTF
 				ext.Add(new JProperty(MToonMaterialExtensionFactory._UvAnimRotation, _UvAnimRotation));
 			}
 
+			if (_MToonVersion != _MToonVersion_Default)
+			{
+				ext.Add(new JProperty(MToonMaterialExtensionFactory._MToonVersion, _MToonVersion));
+			}
+
+			if (_DebugMode != _DebugMode_Default)
+			{
+				ext.Add(new JProperty(MToonMaterialExtensionFactory._DebugMode, _DebugMode));
+			}
+
+			if (_BlendMode != _BlendMode_Default)
+			{
+				ext.Add(new JProperty(MToonMaterialExtensionFactory._BlendMode, _BlendMode));
+			}
+
+			if (_OutlineWidthMode != _OutlineWidthMode_Default)
+			{
+				ext.Add(new JProperty(MToonMaterialExtensionFactory._OutlineWidthMode, _OutlineWidthMode));
+			}
+
+			if (_OutlineColorMode != _OutlineColorMode_Default)
+			{
+				ext.Add(new JProperty(MToonMaterialExtensionFactory._OutlineColorMode, _OutlineColorMode));
+			}
+
+			if (_CullMode != _CullMode_Default)
+			{
+				ext.Add(new JProperty(MToonMaterialExtensionFactory._CullMode, _CullMode));
+			}
+
+			if (_OutlineCullMode != _OutlineCullMode_Default)
+			{
+				ext.Add(new JProperty(MToonMaterialExtensionFactory._OutlineCullMode, _OutlineCullMode));
+			}
+
+			if (_SrcBlend != _SrcBlend_Default)
+			{
+				ext.Add(new JProperty(MToonMaterialExtensionFactory._SrcBlend, _SrcBlend));
+			}
+
+			if (_DstBlend != _DstBlend_Default)
+			{
+				ext.Add(new JProperty(MToonMaterialExtensionFactory._DstBlend, _DstBlend));
+			}
+
+			if (_ZWrite != _ZWrite_Default)
+			{
+				ext.Add(new JProperty(MToonMaterialExtensionFactory._ZWrite, _ZWrite));
+			}
+
+			if (_AlphaToMask != _AlphaToMask_Default)
+			{
+				ext.Add(new JProperty(MToonMaterialExtensionFactory._AlphaToMask, _AlphaToMask));
+			}
+
 			return new JProperty(MToonMaterialExtensionFactory.Extension_Name, ext);
 		}
 
@@ -414,6 +502,43 @@ namespace UnityGLTF
 
 			token = extensionToken.Value[MToonMaterialExtensionFactory._UvAnimRotation];
 			_UvAnimRotation = token != null ? (float)token.DeserializeAsDouble() : _UvAnimRotation_Default;
+
+			token = extensionToken.Value[MToonMaterialExtensionFactory._MToonVersion];
+			_MToonVersion = token != null ? (float)token.DeserializeAsDouble() : _MToonVersion_Default;
+
+			token = extensionToken.Value[MToonMaterialExtensionFactory._DebugMode];
+			_DebugMode = token != null ? (float)token.DeserializeAsDouble() : _DebugMode_Default;
+
+			token = extensionToken.Value[MToonMaterialExtensionFactory._BlendMode];
+			_BlendMode = token != null ? (float)token.DeserializeAsDouble() : _BlendMode_Default;
+
+
+			token = extensionToken.Value[MToonMaterialExtensionFactory._OutlineWidthMode];
+			_OutlineWidthMode = token != null ? (float)token.DeserializeAsDouble() : _OutlineWidthMode_Default;
+
+			token = extensionToken.Value[MToonMaterialExtensionFactory._OutlineColorMode];
+			_OutlineColorMode = token != null ? (float)token.DeserializeAsDouble() : _OutlineColorMode_Default;
+
+			token = extensionToken.Value[MToonMaterialExtensionFactory._CullMode];
+			_CullMode = token != null ? (float)token.DeserializeAsDouble() : _CullMode_Default;
+
+
+			token = extensionToken.Value[MToonMaterialExtensionFactory._OutlineCullMode];
+			_OutlineCullMode = token != null ? (float)token.DeserializeAsDouble() : _OutlineCullMode_Default;
+
+			token = extensionToken.Value[MToonMaterialExtensionFactory._SrcBlend];
+			_SrcBlend = token != null ? (float)token.DeserializeAsDouble() : _SrcBlend_Default;
+
+			token = extensionToken.Value[MToonMaterialExtensionFactory._DstBlend];
+			_DstBlend = token != null ? (float)token.DeserializeAsDouble() : _DstBlend_Default;
+
+			token = extensionToken.Value[MToonMaterialExtensionFactory._ZWrite];
+			_ZWrite = token != null ? (float)token.DeserializeAsDouble() : _ZWrite_Default;
+
+			token = extensionToken.Value[MToonMaterialExtensionFactory._AlphaToMask];
+			_AlphaToMask = token != null ? (float)token.DeserializeAsDouble() : _AlphaToMask_Default;
+
+
 		}
 	}
 }

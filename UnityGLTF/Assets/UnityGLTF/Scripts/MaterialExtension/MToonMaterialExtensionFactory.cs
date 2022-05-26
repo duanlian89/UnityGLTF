@@ -77,6 +77,28 @@ namespace UnityGLTF
 
 		public const string _UvAnimRotation = "_UvAnimScrollX";
 
+		public const string _MToonVersion = "_MToonVersion";
+
+		public const string _DebugMode = "_DebugMode";
+
+		public const string _BlendMode = "_BlendMode";
+
+		public const string _OutlineWidthMode = "_OutlineWidthMode";
+
+		public const string _OutlineColorMode = "_OutlineColorMode";
+
+		public const string _CullMode = "_CullMode";
+
+		public const string _OutlineCullMode = "_OutlineCullMode";
+
+		public const string _SrcBlend = "_SrcBlend";
+
+		public const string _DstBlend = "_DstBlend";
+
+		public const string _ZWrite = "_ZWrite";
+
+		public const string _AlphaToMask = "_AlphaToMask";
+
 		#endregion
 
 		public MToonMaterialExtensionFactory()
@@ -86,7 +108,9 @@ namespace UnityGLTF
 			FloatProperties = new string[] { _Cutoff, _UvAnimRotation, _BumpScale , _ReceiveShadowRate ,
 		_ShadingGradeRate , _ShadeShift,    _ShadeShift,_ShadeToony,_LightColorAttenuation,
 		_IndirectLightIntensity,_RimLightingMix,_RimFresnelPower    ,_RimLift,_OutlineWidth,_OutlineScaledMaxDistance,
-		_OutlineLightingMix,_UvAnimScrollX,_UvAnimScrollY,_UvAnimRotation   };
+		_OutlineLightingMix,_UvAnimScrollX,_UvAnimScrollY,_UvAnimRotation,_MToonVersion ,
+		_DebugMode ,_BlendMode ,_OutlineWidthMode ,_OutlineColorMode ,_CullMode ,
+		_OutlineCullMode,_SrcBlend ,_DstBlend ,_ZWrite,_AlphaToMask   };
 
 			ColorProperties = new string[] { _Color, _ColorOL, _ShadeColor, _RimColor, _EmissionColor, _OutlineColor };
 
