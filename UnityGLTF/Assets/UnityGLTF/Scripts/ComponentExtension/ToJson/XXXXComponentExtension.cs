@@ -46,7 +46,7 @@ namespace UnityGLTF
 			_Cutoff = token != null ? (float)token.DeserializeAsDouble() : _Cutoff_Default;
 		}
 
-		//TODO:[import] 导入时、构建节点时，设置脚本的属性值
+		//TODO:[import] 构建节点时，设置脚本的属性值
 		public void SetComponentParam(UnityEngine.Component com)
 		{
 			(com as XXXX)._Cutoff = _Cutoff;

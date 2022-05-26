@@ -32,6 +32,7 @@ namespace UnityGLTF
 
 			try
 			{
+				// 先创建节点树，并附上 Mesh 相关信息
 				Transform[] nodeTransforms = new Transform[scene.Nodes.Count];
 				for (int i = 0; i < scene.Nodes.Count; ++i)
 				{
@@ -39,6 +40,14 @@ namespace UnityGLTF
 					sceneObj = await GetNode(node.Id, cancellationToken);
 					//nodeObj.transform.SetParent(sceneObj.transform, false);
 					nodeTransforms[i] = sceneObj.transform;
+				}
+
+				// 遍历节点，在节点上创建脚本
+				for (int i = 0; i < scene.Nodes.Count; ++i)
+				{
+					NodeId node = scene.Nodes[i];
+					sceneObj = await GetNode(node.Id, cancellationToken);
+					ConstructNodeExtension(_gltfRoot.Nodes[node.Id], node.Id);
 				}
 
 				if (_gltfRoot.Animations != null && _gltfRoot.Animations.Count > 0)
@@ -172,10 +181,8 @@ namespace UnityGLTF
 			return material;
 		}
 
-		protected override async Task ConstructNode(Node node, int nodeIndex, CancellationToken cancellationToken)
+		protected void ConstructNodeExtension(Node node, int nodeIndex)
 		{
-			await base.ConstructNode(node, nodeIndex, cancellationToken);
-
 			if (node.Extensions != null)
 			{
 				foreach (var ext in node.Extensions)

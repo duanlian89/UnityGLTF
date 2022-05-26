@@ -31,7 +31,7 @@ namespace UnityGLTF
 			Node.RegisterExtension(new XXXXComponentExtensionFactory1(this, null));
 			Node.RegisterExtension(new XXXXComponentExtensionFactory2());
 
-			// 重写部分属性
+			// + gameObjects 属性
 			_root = new MyGLTFRoot
 			{
 				Accessors = new List<Accessor>(),
