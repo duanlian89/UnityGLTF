@@ -99,7 +99,7 @@ namespace UnityGLTF
 			Custom_Unknown
 		}
 
-		private struct ImageInfo
+		protected struct ImageInfo
 		{
 			public Texture2D texture;
 			public TextureMapType textureMapType;
@@ -110,15 +110,15 @@ namespace UnityGLTF
 		public IReadOnlyList<Transform> RootTransforms => _rootTransforms;
 
 		private Transform[] _rootTransforms;
-		private GLTFRoot _root;
-		private BufferId _bufferId;
-		private GLTFBuffer _buffer;
-		private BinaryWriter _bufferWriter;
-		private List<ImageInfo> _imageInfos;
-		private List<Texture> _textures;
-		private Dictionary<Material, int> _materials;
+		protected GLTFRoot _root;
+		protected BufferId _bufferId;
+		protected GLTFBuffer _buffer;
+		protected BinaryWriter _bufferWriter;
+		protected List<ImageInfo> _imageInfos;
+		protected List<Texture> _textures;
+		protected Dictionary<Material, int> _materials;
 		private List<AnimationClip> _animationClips;
-		private bool _shouldUseInternalBufferForImages;
+		protected bool _shouldUseInternalBufferForImages;
 		private Dictionary<int, int> _exportedTransforms;
 		private List<Transform> _animatedNodes;
 		private List<Transform> _skinnedNodes;
@@ -361,7 +361,7 @@ namespace UnityGLTF
 		/// </summary>
 		/// <param name="path">File path for saving the binary file</param>
 		/// <param name="fileName">The name of the GLTF file</param>
-		public void SaveGLB(string path, string fileName)
+		public virtual void SaveGLB(string path, string fileName)
 		{
 			var fullPath = GetFileName(path, fileName, ".glb");
 			var dirName = Path.GetDirectoryName(fullPath);
@@ -638,7 +638,7 @@ namespace UnityGLTF
 		}
 
 
-		private void ExportImages(string outputPath)
+		protected void ExportImages(string outputPath)
 		{
 			for (int t = 0; t < _imageInfos.Count; ++t)
 			{
@@ -767,7 +767,7 @@ namespace UnityGLTF
 			return true;
 		}
 
-		private SceneId ExportScene(string name, Transform[] rootObjTransforms)
+		protected virtual SceneId ExportScene(string name, Transform[] rootObjTransforms)
 		{
 			exportSceneMarker.Begin();
 
@@ -809,7 +809,7 @@ namespace UnityGLTF
 			};
 		}
 
-		private NodeId ExportNode(Transform nodeTransform)
+		protected virtual NodeId ExportNode(Transform nodeTransform)
 		{
 			exportNodeMarker.Begin();
 
@@ -1396,7 +1396,7 @@ namespace UnityGLTF
 	        return id;
         }
 
-        public MaterialId ExportMaterial(Material materialObj)
+        public virtual MaterialId ExportMaterial(Material materialObj)
 		{
             //TODO if material is null
 			MaterialId id = GetMaterialId(_root, materialObj);
@@ -1806,7 +1806,7 @@ namespace UnityGLTF
 			material.HasProperty("_LightFactor");
 		}
 
-		private void ExportTextureTransform(TextureInfo def, Material mat, string texName)
+		protected void ExportTextureTransform(TextureInfo def, Material mat, string texName)
 		{
 			Vector2 offset = mat.GetTextureOffset(texName);
 			Vector2 scale = mat.GetTextureScale(texName);

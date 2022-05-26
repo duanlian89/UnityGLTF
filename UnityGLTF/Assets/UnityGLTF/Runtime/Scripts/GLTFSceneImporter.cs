@@ -153,7 +153,7 @@ namespace UnityGLTF
 		/// <summary>
 		/// The last created object
 		/// </summary>
-		public GameObject CreatedObject { get; private set; }
+		public GameObject CreatedObject { get; protected set; }
 
 		/// <summary>
 		/// Adds colliders to primitive objects when created
@@ -1328,7 +1328,7 @@ namespace UnityGLTF
 			}
 		}
 
-		private async Task<GameObject> GetNode(int nodeId, CancellationToken cancellationToken)
+		protected virtual async Task<GameObject> GetNode(int nodeId, CancellationToken cancellationToken)
 		{
 			try
 			{
@@ -1994,7 +1994,7 @@ namespace UnityGLTF
 			_assetCache.MeshCache[meshIndex].LoadedMesh = mesh;
 		}
 
-		protected virtual async Task ConstructMaterial(GLTFMaterial def, int materialIndex)
+		protected virtual async Task<IUniformMap> ConstructMaterial(GLTFMaterial def, int materialIndex)
 		{
 			IUniformMap mapper;
 			const string specGlossExtName = KHR_materials_pbrSpecularGlossinessExtensionFactory.EXTENSION_NAME;
@@ -2232,6 +2232,8 @@ namespace UnityGLTF
 			{
 				_defaultLoadedMaterial = materialWrapper;
 			}
+
+			return mapper;
 		}
 
 

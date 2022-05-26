@@ -54,7 +54,11 @@ namespace UnityGLTF
 			}
 		}
 
-		public Material Material { get { return _material; } }
+		public Material Material
+		{
+			get { return _material; }
+			set { _material = value; }
+		}
 
 		public virtual Texture NormalTexture
 		{
@@ -100,7 +104,8 @@ namespace UnityGLTF
 		public virtual Vector2 NormalXScale
 		{
 			get { return _material.GetTextureScale("_BumpMap"); }
-			set {
+			set
+			{
 				_material.SetTextureScale("_BumpMap", value);
 				NormalXOffset = normalOffset;
 			}
@@ -171,7 +176,8 @@ namespace UnityGLTF
 		public virtual Vector2 OcclusionXScale
 		{
 			get { return _material.GetTextureScale("_OcclusionMap"); }
-			set {
+			set
+			{
 				_material.SetTextureScale("_OcclusionMap", value);
 				OcclusionXOffset = occlusionOffset;
 			}
@@ -243,7 +249,8 @@ namespace UnityGLTF
 		public virtual Vector2 EmissiveXScale
 		{
 			get { return _material.GetTextureScale("_EmissionMap"); }
-			set {
+			set
+			{
 				_material.SetTextureScale("_EmissionMap", value);
 				EmissiveXOffset = emissiveOffset;
 			}
