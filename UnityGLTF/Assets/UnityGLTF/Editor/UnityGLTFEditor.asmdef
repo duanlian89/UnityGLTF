@@ -3,7 +3,8 @@
     "rootNamespace": "",
     "references": [
         "GLTFSerialization",
-        "UnityGLTFScripts"
+        "UnityGLTFScripts",
+        "CKUnityGLTF"
     ],
     "includePlatforms": [
         "Editor"

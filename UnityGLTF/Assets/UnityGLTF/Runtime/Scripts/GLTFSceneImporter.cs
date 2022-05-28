@@ -156,6 +156,11 @@ namespace UnityGLTF
 		public GameObject CreatedObject { get; protected set; }
 
 		/// <summary>
+		/// info.json
+		/// </summary>
+		public string ConfigJson { get; protected set; }
+
+		/// <summary>
 		/// Adds colliders to primitive objects when created
 		/// </summary>
 		public ColliderType Collider { get; set; }
@@ -829,8 +834,8 @@ namespace UnityGLTF
 
 		private static void AddNewBufferAndViewToAccessor(byte[] data, Accessor accessor, GLTFRoot _gltfRoot)
 		{
-			_gltfRoot.Buffers.Add(new GLTFBuffer() { ByteLength = (uint) data.Length });
-			_gltfRoot.BufferViews.Add(new BufferView() { ByteLength = (uint) data.Length, ByteOffset = 0, Buffer = new BufferId() { Id = _gltfRoot.Buffers.Count, Root = _gltfRoot } });
+			_gltfRoot.Buffers.Add(new GLTFBuffer() { ByteLength = (uint)data.Length });
+			_gltfRoot.BufferViews.Add(new BufferView() { ByteLength = (uint)data.Length, ByteOffset = 0, Buffer = new BufferId() { Id = _gltfRoot.Buffers.Count, Root = _gltfRoot } });
 			accessor.BufferView = new BufferViewId() { Id = _gltfRoot.BufferViews.Count - 1, Root = _gltfRoot };
 		}
 
@@ -1150,7 +1155,8 @@ namespace UnityGLTF
 			var valueDelta = keyframes[keyframeIndex].value - keyframes[keyframeIndex - 1].value;
 			var timeDelta = keyframes[keyframeIndex].time - keyframes[keyframeIndex - 1].time;
 
-			if(timeDelta <= 0) {
+			if (timeDelta <= 0)
+			{
 				Debug.LogWarning("Unity does not allow you to put two keyframes in with the same time, so this should never occur.");
 				return 0;
 			}
@@ -1551,15 +1557,15 @@ namespace UnityGLTF
 				}
 
 				newLight.name = light.Name;
-				newLight.intensity = (float) light.Intensity / Mathf.PI;
+				newLight.intensity = (float)light.Intensity / Mathf.PI;
 				newLight.color = new Color(light.Color.R, light.Color.G, light.Color.B, light.Color.A);
-				newLight.range = (float) light.Range;
+				newLight.range = (float)light.Range;
 				if (light.Spot != null)
 				{
-					#if UNITY_2019_1_OR_NEWER
-					newLight.innerSpotAngle = (float) light.Spot.InnerConeAngle * 2 / (Mathf.Deg2Rad * 0.8f);
-					#endif
-					newLight.spotAngle = (float) light.Spot.OuterConeAngle * 2 / Mathf.Deg2Rad;
+#if UNITY_2019_1_OR_NEWER
+					newLight.innerSpotAngle = (float)light.Spot.InnerConeAngle * 2 / (Mathf.Deg2Rad * 0.8f);
+#endif
+					newLight.spotAngle = (float)light.Spot.OuterConeAngle * 2 / Mathf.Deg2Rad;
 				}
 
 				// flip?
@@ -2448,9 +2454,9 @@ namespace UnityGLTF
 		protected virtual KHR_materials_emissive_strength GetEmissiveStrength(GLTFMaterial def)
 		{
 			if (_gltfRoot.ExtensionsUsed != null && _gltfRoot.ExtensionsUsed.Contains(KHR_materials_emissive_strength_Factory.EXTENSION_NAME) &&
-			    def.Extensions != null && def.Extensions.TryGetValue(KHR_materials_emissive_strength_Factory.EXTENSION_NAME, out var extension))
+				def.Extensions != null && def.Extensions.TryGetValue(KHR_materials_emissive_strength_Factory.EXTENSION_NAME, out var extension))
 			{
-				return (KHR_materials_emissive_strength) extension;
+				return (KHR_materials_emissive_strength)extension;
 			}
 			else return null;
 		}

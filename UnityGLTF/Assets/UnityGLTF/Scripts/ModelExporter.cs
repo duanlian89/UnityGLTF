@@ -4,8 +4,9 @@ using UnityEditor;
 using GLTF.Schema;
 using System.IO;
 using System.Text;
+using UnityGLTF;
 
-namespace UnityGLTF
+namespace CKUnityGLTF
 {
 	public class ModelExporter : GLTFSceneExporter
 	{
@@ -21,16 +22,18 @@ namespace UnityGLTF
 		}
 
 		//var exportOptions = new ExportOptions { TexturePathRetriever = RetrieveTexturePath };
-		public ModelExporter(Transform parent) :
+		public ModelExporter(Transform parent, string configJson) :
 			base(new[] { parent }, new ExportOptions() { TexturePathRetriever = RetrieveTexturePath, ExportInactivePrimitives = true })
 		{
 			gltfFileName = parent.name;
 
 			GLTFMaterial.RegisterExtension(new MToonMaterialExtensionFactory());
+			GLTFMaterial.RegisterExtension(new ConfigJsonExtensionFactory());
 
 			// 重写部分属性
 			_root = new MyGLTFRoot
 			{
+				Extensions = new Dictionary<string, IExtension>(),
 				Accessors = new List<Accessor>(),
 				Asset = new Asset
 				{
@@ -61,6 +64,9 @@ namespace UnityGLTF
 				Root = _root
 			};
 			_root.Buffers.Add(_buffer);
+
+			var configJsonExtension = new ConfigJsonExtension() { configJson = configJson };
+			_root.Extensions.Add(ConfigJsonExtensionFactory.Extension_Name, configJsonExtension);
 		}
 
 		public void Export(string gltfFileName = "")

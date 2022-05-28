@@ -7,8 +7,9 @@ using System.Threading;
 using Newtonsoft.Json.Linq;
 using GLTF.Extensions;
 using System;
+using UnityGLTF;
 
-namespace UnityGLTF
+namespace CKUnityGLTF
 {
 	public class ModelImporter : GLTFSceneImporter
 	{
@@ -21,6 +22,7 @@ namespace UnityGLTF
 			: base(gltfFileName, options)
 		{
 			GLTFMaterial.RegisterExtension(new MToonMaterialExtensionFactory());
+			GLTFMaterial.RegisterExtension(new ConfigJsonExtensionFactory());
 		}
 
 		protected override async Task ConstructScene(GLTFScene scene, bool showSceneObj, CancellationToken cancellationToken)
@@ -57,6 +59,7 @@ namespace UnityGLTF
 				}
 
 				CreatedObject = sceneObj;
+				ConfigJson = (_gltfRoot.Extensions[ConfigJsonExtensionFactory.Extension_Name] as ConfigJsonExtension).configJson;
 			}
 			catch (Exception ex)
 			{

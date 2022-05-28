@@ -5,99 +5,124 @@ using System.Runtime.ExceptionServices;
 using UnityEngine;
 using System.Threading.Tasks;
 using UnityGLTF;
+using CKUnityGLTF;
 
 public class ModelLoader
 {
-	public static async Task<GameObject> Load(string absoluteStreamingPath)
+	public class Result
+	{
+		public GameObject model;
+		public string configJson;
+	}
+
+	public static async Task<Result> Load(string absoluteStreamingPath)
 	{
 		string directoryPath = URIHelper.GetDirectoryName(absoluteStreamingPath);
 
 		UnityGLTF.ImportOptions importOptions = new UnityGLTF.ImportOptions();
 		importOptions.DataLoader = new UnityGLTF.Loader.FileLoader(directoryPath);
 
-		using (var sceneImporter = new UnityGLTF.ModelImporter(System.IO.Path.GetFileName(absoluteStreamingPath), importOptions))
+		using (var sceneImporter = new ModelImporter(System.IO.Path.GetFileName(absoluteStreamingPath), importOptions))
 		{
 			sceneImporter.Collider = UnityGLTF.GLTFSceneImporter.ColliderType.None;
 			await sceneImporter.LoadSceneAsync();
-			GameObject go = sceneImporter.CreatedObject;
-			return go;
+			Result result = new Result()
+			{
+				model = sceneImporter.CreatedObject,
+				configJson = sceneImporter.ConfigJson
+			};
+			return result;
 		}
 	}
 
-	public static async Task Load(string absoluteStreamingPath, Action<GameObject, ExceptionDispatchInfo> onLoadComplete)
+	public static async Task Load(string absoluteStreamingPath, Action<GameObject, string, ExceptionDispatchInfo> onLoadComplete)
 	{
 		string directoryPath = URIHelper.GetDirectoryName(absoluteStreamingPath);
 
 		UnityGLTF.ImportOptions importOptions = new UnityGLTF.ImportOptions();
 		importOptions.DataLoader = new UnityGLTF.Loader.FileLoader(directoryPath);
 
-		using (var sceneImporter = new UnityGLTF.ModelImporter(System.IO.Path.GetFileName(absoluteStreamingPath), importOptions))
+		using (var sceneImporter = new ModelImporter(System.IO.Path.GetFileName(absoluteStreamingPath), importOptions))
 		{
 			sceneImporter.Collider = UnityGLTF.GLTFSceneImporter.ColliderType.None;
-			await sceneImporter.LoadSceneAsync(-1, true, onLoadComplete);
-			GameObject go = sceneImporter.CreatedObject;
+			await sceneImporter.LoadSceneAsync(-1, true, (go, e) =>
+			{
+				onLoadComplete.Invoke(go, sceneImporter.ConfigJson, e);
+			});
 		}
 	}
 
-	public static async Task<GameObject> LoadStream(string absoluteStreamingPath)
+	public static async Task<Result> LoadStream(string absoluteStreamingPath)
 	{
 		string directoryPath = URIHelper.GetDirectoryName(absoluteStreamingPath);
 
 		UnityGLTF.ImportOptions importOptions = new UnityGLTF.ImportOptions();
 		importOptions.DataLoader = new UnityGLTF.Loader.UnityWebRequestLoader(directoryPath);
 
-		using (var sceneImporter = new UnityGLTF.ModelImporter(System.IO.Path.GetFileName(absoluteStreamingPath), importOptions))
+		using (var sceneImporter = new ModelImporter(System.IO.Path.GetFileName(absoluteStreamingPath), importOptions))
 		{
 			sceneImporter.Collider = UnityGLTF.GLTFSceneImporter.ColliderType.None;
 			await sceneImporter.LoadSceneAsync();
-			GameObject go = sceneImporter.CreatedObject;
-			return go;
+			var result = new Result()
+			{
+				model = sceneImporter.CreatedObject,
+				configJson = sceneImporter.ConfigJson
+			};
+			return result;
 		}
 	}
 
-	public static async Task LoadStream(string absoluteStreamingPath, Action<GameObject, ExceptionDispatchInfo> onLoadComplete)
+	public static async Task LoadStream(string absoluteStreamingPath, Action<GameObject, string, ExceptionDispatchInfo> onLoadComplete)
 	{
 		string directoryPath = URIHelper.GetDirectoryName(absoluteStreamingPath);
 
 		UnityGLTF.ImportOptions importOptions = new UnityGLTF.ImportOptions();
 		importOptions.DataLoader = new UnityGLTF.Loader.UnityWebRequestLoader(directoryPath);
 
-		using (var sceneImporter = new UnityGLTF.ModelImporter(System.IO.Path.GetFileName(absoluteStreamingPath), importOptions))
+		using (var sceneImporter = new ModelImporter(System.IO.Path.GetFileName(absoluteStreamingPath), importOptions))
 		{
 			sceneImporter.Collider = UnityGLTF.GLTFSceneImporter.ColliderType.None;
-			await sceneImporter.LoadSceneAsync(-1, true, onLoadComplete);
-			GameObject go = sceneImporter.CreatedObject;
+			await sceneImporter.LoadSceneAsync(-1, true, (go, e) =>
+			{
+				onLoadComplete.Invoke(go, sceneImporter.ConfigJson, e);
+			});
 		}
 	}
 
-	public static async Task<GameObject> LoadHttpStream(string absoluteStreamingPath)
+	public static async Task<Result> LoadHttpStream(string absoluteStreamingPath)
 	{
 		string directoryPath = URIHelper.GetDirectoryName(absoluteStreamingPath);
 
 		UnityGLTF.ImportOptions importOptions = new UnityGLTF.ImportOptions();
-		importOptions.DataLoader = new UnityGLTF.Loader.UnityWebRequestLoader(directoryPath);
+		importOptions.DataLoader = new UnityGLTF.Loader.WebRequestLoader(directoryPath);
 
-		using (var sceneImporter = new UnityGLTF.ModelImporter(System.IO.Path.GetFileName(absoluteStreamingPath), importOptions))
-		{
-			sceneImporter.Collider = UnityGLTF.GLTFSceneImporter.ColliderType.None;
-			await sceneImporter.LoadSceneAsync();
-			GameObject go = sceneImporter.CreatedObject;
-			return go;
-		}
-	}
-
-	public static async Task LoadHttpStream(string absoluteStreamingPath, Action<GameObject, ExceptionDispatchInfo> onLoadComplete)
-	{
-		string directoryPath = URIHelper.GetDirectoryName(absoluteStreamingPath);
-
-		UnityGLTF.ImportOptions importOptions = new UnityGLTF.ImportOptions();
-		importOptions.DataLoader = new UnityGLTF.Loader.UnityWebRequestLoader(directoryPath);
-
-		using (var sceneImporter = new UnityGLTF.ModelImporter(System.IO.Path.GetFileName(absoluteStreamingPath), importOptions))
+		using (var sceneImporter = new ModelImporter(System.IO.Path.GetFileName(absoluteStreamingPath), importOptions))
 		{
 			sceneImporter.Collider = UnityGLTF.GLTFSceneImporter.ColliderType.None;
 			await sceneImporter.LoadSceneAsync();
-			GameObject go = sceneImporter.CreatedObject;
+			var result = new Result()
+			{
+				model = sceneImporter.CreatedObject,
+				configJson = sceneImporter.ConfigJson
+			};
+			return result;
+		}
+	}
+
+	public static async Task LoadHttpStream(string absoluteStreamingPath, Action<GameObject, string, ExceptionDispatchInfo> onLoadComplete)
+	{
+		string directoryPath = URIHelper.GetDirectoryName(absoluteStreamingPath);
+
+		UnityGLTF.ImportOptions importOptions = new UnityGLTF.ImportOptions();
+		importOptions.DataLoader = new UnityGLTF.Loader.WebRequestLoader(directoryPath);
+
+		using (var sceneImporter = new ModelImporter(System.IO.Path.GetFileName(absoluteStreamingPath), importOptions))
+		{
+			sceneImporter.Collider = UnityGLTF.GLTFSceneImporter.ColliderType.None;
+			await sceneImporter.LoadSceneAsync(-1, true, (go, e) =>
+			{
+				onLoadComplete.Invoke(go, sceneImporter.ConfigJson, e);
+			});
 		}
 	}
 }
