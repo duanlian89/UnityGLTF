@@ -69,12 +69,12 @@ namespace CKUnityGLTF
 			_root.Extensions.Add(ConfigJsonExtensionFactory.Extension_Name, configJsonExtension);
 		}
 
-		public void Export(string gltfFileName = "")
+		public void Export(string path ,string gltfFileName = "")
 		{
 			if (!string.IsNullOrEmpty(gltfFileName))
 				this.gltfFileName = gltfFileName;
 
-			var path = EditorUtility.OpenFolderPanel("glTF Export Path", "", ""); // TODO: 替换接口
+			//var path = EditorUtility.OpenFolderPanel("glTF Export Path", "", "");
 			if (!string.IsNullOrEmpty(path))
 			{
 				base.SaveGLB(path, gltfFileName);
@@ -152,6 +152,7 @@ namespace CKUnityGLTF
 			return id;
 		}
 
+		// TODO: 应该是不需要了
 		private void RecurGameObject(GameObject go)
 		{
 			(_root as MyGLTFRoot).gameObjects.Add(go);

@@ -160,7 +160,8 @@ namespace UnityGLTF
 
 			var exportOptions = new ExportOptions { TexturePathRetriever = RetrieveTexturePath };
 			var exporter = new ModelExporter(Selection.transforms[0], "");
-			exporter.Export(name);
+			var path = EditorUtility.OpenFolderPanel("glTF Export Path", "", "");
+			exporter.Export(path, name);
 		}
 	}
 }
