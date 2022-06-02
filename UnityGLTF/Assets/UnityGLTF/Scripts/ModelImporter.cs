@@ -59,7 +59,12 @@ namespace CKUnityGLTF
 				}
 
 				CreatedObject = sceneObj;
-				ConfigJson = (_gltfRoot.Extensions[ConfigJsonExtensionFactory.Extension_Name] as ConfigJsonExtension).configJson;
+				ConfigJson = "";
+				if (_gltfRoot.Extensions != null && _gltfRoot.Extensions.Count > 0 && _gltfRoot.Extensions[ConfigJsonExtensionFactory.Extension_Name] != null)
+				{
+					ConfigJsonExtension configJson = _gltfRoot.Extensions[ConfigJsonExtensionFactory.Extension_Name] as ConfigJsonExtension;
+					if (configJson != null) ConfigJson = configJson.configJson;
+				}
 			}
 			catch (Exception ex)
 			{

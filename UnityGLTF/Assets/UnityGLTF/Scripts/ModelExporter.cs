@@ -17,8 +17,8 @@ namespace CKUnityGLTF
 		}
 		static string RetrieveTexturePath(UnityEngine.Texture texture)
 		{
-			//return texture.name;
-			return AssetDatabase.GetAssetPath(texture);
+			return texture.name;
+			//return AssetDatabase.GetAssetPath(texture);
 		}
 
 		//var exportOptions = new ExportOptions { TexturePathRetriever = RetrieveTexturePath };

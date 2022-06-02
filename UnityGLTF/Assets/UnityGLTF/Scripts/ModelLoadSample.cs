@@ -15,15 +15,6 @@ public class ModelLoadSample : MonoBehaviour
 	{
 		// await ModelLoader.LoadStream(glbPath);
 
-		await ModelLoader.LoadStream(glbPath, (go, configJson, e) =>
-		{
-			if (e != null)
-				Debug.Log(e.ToString());
-			else
-			{
-				Debug.Log(go.name);
-				Debug.Log(configJson);
-			}
-		});
+		await ModelLoader.LoadStream(glbPath);
 	}
 }
