@@ -14,6 +14,18 @@ public class ModelLoader
 		public GameObject model;
 		public string configJson;
 	}
+	public static async Task<GLTFSceneImporter> LoadI(string absoluteStreamingPath)
+	{
+		string directoryPath = URIHelper.GetDirectoryName(absoluteStreamingPath);
+
+		UnityGLTF.ImportOptions importOptions = new UnityGLTF.ImportOptions();
+		importOptions.DataLoader = new UnityGLTF.Loader.FileLoader(directoryPath);
+
+		var sceneImporter = new ModelImporter(System.IO.Path.GetFileName(absoluteStreamingPath), importOptions);
+		sceneImporter.Collider = UnityGLTF.GLTFSceneImporter.ColliderType.None;
+		await sceneImporter.LoadSceneAsync();
+		return sceneImporter;
+	}
 
 	public static async Task<Result> Load(string absoluteStreamingPath)
 	{
