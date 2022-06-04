@@ -70,5 +70,8 @@ public class ModelLoadSample : MonoBehaviour
 		Texture tex = assetCache.TextureCache[0].Texture;
 		UnityEngine.Object.DestroyImmediate(tex, true);
 
+		// await ModelLoader.LoadStream(glbPath);
+
+		//await ModelLoader.LoadStream(glbPath);
 	}
 }
