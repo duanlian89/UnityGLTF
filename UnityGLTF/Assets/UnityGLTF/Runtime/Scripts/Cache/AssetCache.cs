@@ -51,7 +51,7 @@ namespace UnityGLTF.Cache
 		/// <summary>
 		/// Cache of loaded node objects
 		/// </summary>
-		public GameObject[] NodeCache { get; private set; }
+		public GameObject[] NodeCache { get; set; }
 
 		/// <summary>
 		/// Creates an asset cache which caches objects used in scene

@@ -2,7 +2,7 @@ using GLTF.Schema;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 
-namespace UnityGLTF
+namespace CKUnityGLTF
 {
 	public interface IPropExtension : IExtension
 	{

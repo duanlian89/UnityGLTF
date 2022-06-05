@@ -29,15 +29,19 @@ namespace CKUnityGLTF
 
 			GLTFMaterial.RegisterExtension(new MToonMaterialExtensionFactory());
 			GLTFMaterial.RegisterExtension(new ConfigJsonExtensionFactory());
+			Node.RegisterExtension(new XXXXComponentExtensionFactory());
+			Node.RegisterExtension(new XXXXComponentExtensionFactory2());
 
 			// 重写部分属性
 			_root = new MyGLTFRoot
 			{
 				Extensions = new Dictionary<string, IExtension>(),
 				Accessors = new List<Accessor>(),
+				Animations = new List<GLTFAnimation>(),
 				Asset = new Asset
 				{
-					Version = "2.0"
+					Version = "2.0",
+					Generator = "UnityGLTF"
 				},
 				Buffers = new List<GLTFBuffer>(),
 				BufferViews = new List<BufferView>(),
@@ -48,6 +52,7 @@ namespace CKUnityGLTF
 				Nodes = new List<Node>(),
 				Samplers = new List<Sampler>(),
 				Scenes = new List<GLTFScene>(),
+				Skins = new List<Skin>(),
 				Textures = new List<GLTFTexture>(),
 
 				gameObjects = new List<GameObject>()
@@ -69,7 +74,7 @@ namespace CKUnityGLTF
 			_root.Extensions.Add(ConfigJsonExtensionFactory.Extension_Name, configJsonExtension);
 		}
 
-		public void Export(string path ,string gltfFileName = "")
+		public void Export(string path, string gltfFileName = "")
 		{
 			if (!string.IsNullOrEmpty(gltfFileName))
 				this.gltfFileName = gltfFileName;
@@ -106,12 +111,18 @@ namespace CKUnityGLTF
 				scene.Name = name;
 			}
 
-			RecurGameObject(rootObjTransforms[0].gameObject); // TODO: 默认只有一个根节点
+			//RecurGameObject(rootObjTransforms[0].gameObject); // TODO: 默认只有一个根节点
 
 			scene.Nodes = new List<NodeId>(rootObjTransforms.Length);
 			foreach (var transform in rootObjTransforms)
 			{
 				scene.Nodes.Add(ExportNode(transform));
+			}
+
+			for (int i = 0; i < rootObjTransforms.Length; i++)
+			{
+				var transform = rootObjTransforms[i];
+				ExportComponent(i, transform);
 			}
 
 			_root.Scenes.Add(scene);
@@ -123,11 +134,9 @@ namespace CKUnityGLTF
 			};
 		}
 
-		protected override NodeId ExportNode(Transform nodeTransform)
+		protected void ExportComponent(int index, Transform nodeTransform)
 		{
-			NodeId id = base.ExportNode(nodeTransform);
-
-			Node node = _root.Nodes[id.Id];
+			Node node = _root.Nodes[index];
 
 			//export Component
 			MonoBehaviour[] components = nodeTransform.GetComponents<MonoBehaviour>();
@@ -148,8 +157,6 @@ namespace CKUnityGLTF
 					node.Extensions.Add(extensionName, ext);
 				}
 			}
-
-			return id;
 		}
 
 		// TODO: 应该是不需要了

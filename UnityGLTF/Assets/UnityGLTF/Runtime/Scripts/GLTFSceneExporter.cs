@@ -500,7 +500,7 @@ namespace UnityGLTF
 		/// space (' ').</param>
 		/// <param name="boundary">The boundary to align with, in bytes.
 		/// </param>
-		private static void AlignToBoundary(Stream stream, byte pad = (byte)' ', uint boundary = 4)
+		public static void AlignToBoundary(Stream stream, byte pad = (byte)' ', uint boundary = 4)
 		{
 			uint currentLength = (uint)stream.Length;
 			uint newLength = CalculateAlignment(currentLength, boundary);
@@ -3360,7 +3360,7 @@ namespace UnityGLTF
 			return id;
 		}
 
-		private BufferViewId ExportBufferView(uint byteOffset, uint byteLength, uint byteStride = 0)
+		public BufferViewId ExportBufferView(uint byteOffset, uint byteLength, uint byteStride = 0)
 		{
 			var bufferView = new BufferView
 			{

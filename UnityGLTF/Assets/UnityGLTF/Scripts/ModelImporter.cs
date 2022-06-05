@@ -23,6 +23,8 @@ namespace CKUnityGLTF
 		{
 			GLTFMaterial.RegisterExtension(new MToonMaterialExtensionFactory());
 			GLTFMaterial.RegisterExtension(new ConfigJsonExtensionFactory());
+			Node.RegisterExtension(new XXXXComponentExtensionFactory());
+			Node.RegisterExtension(new XXXXComponentExtensionFactory2());
 		}
 
 		protected override async Task ConstructScene(GLTFScene scene, bool showSceneObj, CancellationToken cancellationToken)
@@ -31,13 +33,13 @@ namespace CKUnityGLTF
 
 			try
 			{
-				Transform[] nodeTransforms = new Transform[scene.Nodes.Count];
+				//Transform[] nodeTransforms = new Transform[scene.Nodes.Count];
 				for (int i = 0; i < scene.Nodes.Count; ++i)
 				{
 					NodeId node = scene.Nodes[i];
 					sceneObj = await GetNode(node.Id, cancellationToken);
 					//nodeObj.transform.SetParent(sceneObj.transform, false);
-					nodeTransforms[i] = sceneObj.transform;
+					//nodeTransforms[i] = sceneObj.transform;
 				}
 
 				if (_gltfRoot.Animations != null && _gltfRoot.Animations.Count > 0)
@@ -64,6 +66,25 @@ namespace CKUnityGLTF
 				{
 					ConfigJsonExtension configJson = _gltfRoot.Extensions[ConfigJsonExtensionFactory.Extension_Name] as ConfigJsonExtension;
 					if (configJson != null) ConfigJson = configJson.configJson;
+				}
+
+				//TODO: node's component
+				for (int i = 0; i < scene.Nodes.Count; ++i)
+				{
+					NodeId node = scene.Nodes[i];
+					sceneObj = await GetNode(node.Id, cancellationToken);
+					//nodeObj.transform.SetParent(sceneObj.transform, false);
+					//nodeTransforms[i] = sceneObj.transform;
+
+					if (node.Value.Extensions != null)
+					{
+						foreach (var ext in node.Value.Extensions)
+						{
+							System.Type t = System.Type.GetType(ext.Key);
+							Component component = sceneObj.AddComponent(t);// _assetCache.NodeCache[i].AddComponent(t);
+							(ext.Value as IComponentExtension).SetComponentParam(component);
+						}
+					}
 				}
 			}
 			catch (Exception ex)
@@ -177,19 +198,19 @@ namespace CKUnityGLTF
 			return material;
 		}
 
-		protected override async Task ConstructNode(Node node, int nodeIndex, CancellationToken cancellationToken)
-		{
-			await base.ConstructNode(node, nodeIndex, cancellationToken);
+		//protected override async Task ConstructNode(Node node, int nodeIndex, CancellationToken cancellationToken)
+		//{
+		//	await base.ConstructNode(node, nodeIndex, cancellationToken);
 
-			if (node.Extensions != null)
-			{
-				foreach (var ext in node.Extensions)
-				{
-					System.Type t = System.Type.GetType(ext.Key);
-					Component component = _assetCache.NodeCache[nodeIndex].AddComponent(t);
-					(ext.Value as IComponentExtension).SetComponentParam(component);
-				}
-			}
-		}
+		//	if (node.Extensions != null)
+		//	{
+		//		foreach (var ext in node.Extensions)
+		//		{
+		//			System.Type t = System.Type.GetType(ext.Key);
+		//			Component component = _assetCache.NodeCache[nodeIndex].AddComponent(t);
+		//			(ext.Value as IComponentExtension).SetComponentParam(component);
+		//		}
+		//	}
+		//}
 	}
 }

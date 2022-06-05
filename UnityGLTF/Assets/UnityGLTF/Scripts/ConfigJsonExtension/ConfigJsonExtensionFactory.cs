@@ -6,23 +6,26 @@ using GLTF.Extensions;
 using GLTF.Schema;
 using Newtonsoft.Json.Linq;
 
-public class ConfigJsonExtensionFactory : ExtensionFactory
+namespace CKUnityGLTF
 {
-	public const string Extension_Name = "ConfigJson";
-
-	public ConfigJsonExtensionFactory()
+	public class ConfigJsonExtensionFactory : ExtensionFactory
 	{
-		this.ExtensionName = Extension_Name;
-	}
+		public const string Extension_Name = "ConfigJson";
 
-	public override IExtension Deserialize(GLTFRoot root, JProperty extensionToken)
-	{
-		ConfigJsonExtension extension = new ConfigJsonExtension();
-		if (extensionToken.Value!= null)
+		public ConfigJsonExtensionFactory()
 		{
-			string configJson = extensionToken.Value.ToString();
-			extension.configJson = configJson;
+			this.ExtensionName = Extension_Name;
 		}
-		return extension;
+
+		public override IExtension Deserialize(GLTFRoot root, JProperty extensionToken)
+		{
+			ConfigJsonExtension extension = new ConfigJsonExtension();
+			if (extensionToken.Value != null)
+			{
+				string configJson = extensionToken.Value.ToString();
+				extension.configJson = configJson;
+			}
+			return extension;
+		}
 	}
 }

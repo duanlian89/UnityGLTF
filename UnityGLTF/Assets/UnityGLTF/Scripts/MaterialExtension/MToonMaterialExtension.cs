@@ -5,7 +5,7 @@ using GLTF.Extensions;
 using UnityGLTF.Extensions;
 using GLTF.Schema;
 
-namespace UnityGLTF
+namespace CKUnityGLTF
 {
 	public class MToonMaterialExtension : IPropExtension
 	{

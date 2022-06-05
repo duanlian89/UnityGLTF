@@ -216,8 +216,8 @@ namespace UnityGLTF
 
 		protected string _gltfFileName;
 		protected GLBStream _gltfStream;
-		protected GLTFRoot _gltfRoot;
-		protected AssetCache _assetCache;
+		public GLTFRoot _gltfRoot;
+		public AssetCache _assetCache;
 		protected bool _isRunning = false;
 
 		protected ImportProgress progressStatus = default(ImportProgress);
@@ -1338,6 +1338,7 @@ namespace UnityGLTF
 		{
 			try
 			{
+				// TODO:节点需要从新创建，否则父会改变。但是资源公用。那这个 assetCache 就需要有多分。
 				if (_assetCache.NodeCache[nodeId] == null)
 				{
 					if (nodeId >= _gltfRoot.Nodes.Count)

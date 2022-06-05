@@ -1,7 +1,7 @@
 ﻿using GLTF.Schema;
 using Newtonsoft.Json.Linq;
 
-namespace UnityGLTF
+namespace CKUnityGLTF
 {
 	public class MToonMaterialExtensionFactory : MaterialExtensionFactory
 	{

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace UnityGLTF
+namespace CKUnityGLTF
 {
 	public class XXXX : MonoBehaviour
 	{

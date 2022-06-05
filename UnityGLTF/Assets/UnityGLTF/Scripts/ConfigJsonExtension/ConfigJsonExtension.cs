@@ -4,18 +4,22 @@ using UnityEngine;
 using GLTF.Schema;
 using Newtonsoft.Json.Linq;
 
-public class ConfigJsonExtension : IExtension
+
+namespace CKUnityGLTF
 {
-	public string configJson = "";
-
-	public JProperty Serialize()
+	public class ConfigJsonExtension : IExtension
 	{
-		JProperty p = new JProperty(ConfigJsonExtensionFactory.Extension_Name, configJson);
-		return p;
-	}
+		public string configJson = "";
 
-	public IExtension Clone(GLTFRoot root)
-	{
-		return new ConfigJsonExtension();
+		public JProperty Serialize()
+		{
+			JProperty p = new JProperty(ConfigJsonExtensionFactory.Extension_Name, configJson);
+			return p;
+		}
+
+		public IExtension Clone(GLTFRoot root)
+		{
+			return new ConfigJsonExtension();
+		}
 	}
 }
