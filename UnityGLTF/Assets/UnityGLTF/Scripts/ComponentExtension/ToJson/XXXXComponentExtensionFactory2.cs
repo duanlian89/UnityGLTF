@@ -6,7 +6,7 @@ namespace CKUnityGLTF
 {
 	public class XXXXComponentExtensionFactory2 : ComponentExtensionFactory
 	{
-		public const string Extension_Name = "UnityGLTF.XXXX2";
+		public const string Extension_Name = "CKUnityGLTF.XXXX2";
 		#region property name
 
 		public const string _Cutoff = "_Cutoff";

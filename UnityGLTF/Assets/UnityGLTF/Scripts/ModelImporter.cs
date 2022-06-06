@@ -69,16 +69,16 @@ namespace CKUnityGLTF
 				}
 
 				//TODO: node's component
-				for (int i = 0; i < scene.Nodes.Count; ++i)
+				for (int i = 0; i < _gltfRoot.Nodes.Count; ++i)
 				{
-					NodeId node = scene.Nodes[i];
-					sceneObj = await GetNode(node.Id, cancellationToken);
+					Node node = _gltfRoot.Nodes[i];
+					sceneObj = await GetNode(i, cancellationToken);
 					//nodeObj.transform.SetParent(sceneObj.transform, false);
 					//nodeTransforms[i] = sceneObj.transform;
 
-					if (node.Value.Extensions != null)
+					if (node.Extensions != null)
 					{
-						foreach (var ext in node.Value.Extensions)
+						foreach (var ext in node.Extensions)
 						{
 							System.Type t = System.Type.GetType(ext.Key);
 							Component component = sceneObj.AddComponent(t);// _assetCache.NodeCache[i].AddComponent(t);

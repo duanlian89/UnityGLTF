@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.37311918, g: 0.3807398, b: 0.35872716, a: 1}
+  m_IndirectSpecularColor: {r: 0.37311953, g: 0.38074014, b: 0.3587274, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -531,7 +531,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3df59aeda7920764594c7d3ac4515d21, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _Cutoff: 9.9
+  _Cutoff: 9.999
 --- !u!1 &576914274
 GameObject:
   m_ObjectHideFlags: 0
@@ -832,7 +832,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9087a95f22bcee64ebc45f6deec08714, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GLTFUri: C:/WorkSpace/ForkUnityGLTF/UnityGLTF/www/M_Lower_dadiku_02_02_A.glb
+  GLTFUri: C:/WorkSpace/ForkUnityGLTF/UnityGLTF/www/M_Upper_Ugc_016_01_01.glb
   Multithreaded: 0
   UseStream: 1
   AppendStreamingAssets: 0
@@ -872,7 +872,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3cfc8f49a246c6f4eb774739b5f0a612, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  glbPath: D:/WorkSpace/ForkUnityGLTF/UnityGLTF/www/M_Lower_dadiku_02_02.glb
+  glbPath: C:\WorkSpace\ForkUnityGLTF\UnityGLTF\www\M_Lower_dadiku_02_02.glb
   go1: {fileID: 0}
   go2: {fileID: 0}
 --- !u!1 &1046853576
@@ -919,6 +919,12 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1068097835 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: c5e0436c8f2b708428708ec21c645a48,
+    type: 3}
+  m_PrefabInstance: {fileID: 1518453983}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1201553126
 GameObject:
   m_ObjectHideFlags: 0
@@ -1147,6 +1153,19 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1518453983}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1518453987
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1068097835}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3df59aeda7920764594c7d3ac4515d21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _Cutoff: 6.88
 --- !u!1001 &1671826907
 PrefabInstance:
   m_ObjectHideFlags: 0

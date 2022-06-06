@@ -9,7 +9,7 @@ namespace CKUnityGLTF
 	{
 		ModelExporter exporter;
 		ModelImporter importer;
-		public const string Extension_Name = "Test.XXXX";
+		public const string Extension_Name = "CKUnityGLTF.XXXX";
 		#region property name
 		public const string _Cutoff = "_Cutoff";
 

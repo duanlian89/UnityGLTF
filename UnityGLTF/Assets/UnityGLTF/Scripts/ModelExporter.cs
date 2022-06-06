@@ -5,12 +5,16 @@ using GLTF.Schema;
 using System.IO;
 using System.Text;
 using UnityGLTF;
+using System.Reflection;
 
 namespace CKUnityGLTF
 {
 	public class ModelExporter : GLTFSceneExporter
 	{
 		protected string gltfFileName;
+
+		private Dictionary<Transform, int> _exportedTransforms;
+
 		public System.IO.BinaryWriter BufferWriter
 		{
 			get { return _bufferWriter; }
@@ -25,6 +29,8 @@ namespace CKUnityGLTF
 		public ModelExporter(Transform parent, string configJson) :
 			base(new[] { parent }, new ExportOptions() { TexturePathRetriever = RetrieveTexturePath, ExportInactivePrimitives = true })
 		{
+			_exportedTransforms = new Dictionary<Transform, int>();
+
 			gltfFileName = parent.name;
 
 			GLTFMaterial.RegisterExtension(new MToonMaterialExtensionFactory());
@@ -119,10 +125,9 @@ namespace CKUnityGLTF
 				scene.Nodes.Add(ExportNode(transform));
 			}
 
-			for (int i = 0; i < rootObjTransforms.Length; i++)
+			foreach (var kv in _exportedTransforms)
 			{
-				var transform = rootObjTransforms[i];
-				ExportComponent(i, transform);
+				ExportComponent(kv.Value, kv.Key);
 			}
 
 			_root.Scenes.Add(scene);
@@ -132,6 +137,15 @@ namespace CKUnityGLTF
 				Id = _root.Scenes.Count - 1,
 				Root = _root
 			};
+		}
+
+		protected override NodeId ExportNode(Transform nodeTransform)
+		{
+			NodeId id = base.ExportNode(nodeTransform);
+
+			_exportedTransforms.Add(nodeTransform, id.Id);
+
+			return id;
 		}
 
 		protected void ExportComponent(int index, Transform nodeTransform)
@@ -226,5 +240,7 @@ namespace CKUnityGLTF
 				}
 			}
 		}
+
+
 	}
 }
