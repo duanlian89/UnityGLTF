@@ -39,10 +39,10 @@ public class ModelLoadSample : MonoBehaviour
 		go2 = importer.CreatedObject;
 		config2 = importer.ConfigJson;
 
+		assetCache = importer.AssetCache;
+
 		importer.Dispose();
 		importer = null;
-
-		assetCache = importer.AssetCache;
 	}
 
 	async void Load1()

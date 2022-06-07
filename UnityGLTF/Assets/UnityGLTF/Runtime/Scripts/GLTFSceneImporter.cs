@@ -444,7 +444,7 @@ namespace UnityGLTF
 			);
 		}
 
-		private async Task ConstructBufferData(Node node, CancellationToken cancellationToken)
+		protected virtual async Task ConstructBufferData(Node node, CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
@@ -484,7 +484,7 @@ namespace UnityGLTF
 			}
 		}
 
-		private async Task ConstructMeshAttributes(GLTFMesh mesh, MeshId meshId)
+		protected async Task ConstructMeshAttributes(GLTFMesh mesh, MeshId meshId)
 		{
 			int meshIndex = meshId.Id;
 

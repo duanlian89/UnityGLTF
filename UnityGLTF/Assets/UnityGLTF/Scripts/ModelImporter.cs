@@ -27,6 +27,7 @@ namespace CKUnityGLTF
 			GLTFMaterial.RegisterExtension(new ConfigJsonExtensionFactory());
 			Node.RegisterExtension(new XXXXComponentExtensionFactory()); // TODO: 传入 this
 			Node.RegisterExtension(new XXXXComponentExtensionFactory2());
+			Node.RegisterExtension(new MeshFilterAndMeshColliderExtensionFactory());
 		}
 
 		/// <summary>
@@ -136,9 +137,13 @@ namespace CKUnityGLTF
 					{
 						foreach (var ext in node.Extensions)
 						{
-							System.Type t = System.Type.GetType(ext.Key);
-							Component component = sceneObj.AddComponent(t);// _assetCache.NodeCache[i].AddComponent(t);
-							(ext.Value as IComponentExtension).SetComponentParam(component);
+							var componentExtension = ext.Value as IComponentExtension;
+							if (componentExtension != null)
+							{
+								System.Type t = System.Type.GetType(ext.Key);
+								Component component = sceneObj.AddComponent(t);// _assetCache.NodeCache[i].AddComponent(t);
+								(ext.Value as IComponentExtension).SetComponentParam(component);
+							}
 						}
 					}
 				}
@@ -185,7 +190,7 @@ namespace CKUnityGLTF
 		}
 		protected override async Task<IUniformMap> ConstructMaterial(GLTFMaterial def, int materialIndex)
 		{
-			if (_assetCache.MaterialCache[materialIndex] == null)
+			if (materialIndex >= 0 && materialIndex < _assetCache.MaterialCache.Length && _assetCache.MaterialCache[materialIndex] == null)
 			{
 				IUniformMap mapper = await base.ConstructMaterial(def, materialIndex);
 
@@ -259,19 +264,52 @@ namespace CKUnityGLTF
 			return material;
 		}
 
-		//protected override async Task ConstructNode(Node node, int nodeIndex, CancellationToken cancellationToken)
-		//{
-		//	await base.ConstructNode(node, nodeIndex, cancellationToken);
+		protected override async Task ConstructNode(Node node, int nodeIndex, CancellationToken cancellationToken)
+		{
+			await base.ConstructNode(node, nodeIndex, cancellationToken);
 
-		//	if (node.Extensions != null)
-		//	{
-		//		foreach (var ext in node.Extensions)
-		//		{
-		//			System.Type t = System.Type.GetType(ext.Key);
-		//			Component component = _assetCache.NodeCache[nodeIndex].AddComponent(t);
-		//			(ext.Value as IComponentExtension).SetComponentParam(component);
-		//		}
-		//	}
-		//}
+			if (node.Extensions != null)
+			{
+				foreach (var ext in node.Extensions)
+				{
+					MeshFilterAndMeshColliderExtension extension = ext.Value as MeshFilterAndMeshColliderExtension;
+					if (extension != null)
+					{
+						var mesh = extension.Mesh.Value;
+						await ConstructMesh(mesh, extension.Mesh.Id, cancellationToken);
+						var unityMesh = _assetCache.MeshCache[extension.Mesh.Id].LoadedMesh;
+
+						// TODO: weight ??
+						//var morphTargets = mesh.Primitives[0].Targets;
+						//var weights = node.Weights ?? mesh.Weights ??
+						//	(morphTargets != null ? new List<double>(morphTargets.Select(mt => 0.0)) : null);
+						//if (weights != null)
+						//{
+						_assetCache.NodeCache[nodeIndex].AddComponent<MeshFilter>().sharedMesh = unityMesh;
+						_assetCache.NodeCache[nodeIndex].AddComponent<MeshCollider>().sharedMesh = unityMesh;
+						//}
+					}
+				}
+			}
+		}
+
+		protected override async Task ConstructBufferData(Node node, CancellationToken cancellationToken)
+		{
+			await base.ConstructBufferData(node, cancellationToken);
+
+			if (node.Extensions != null)
+			{
+				var extension = node.Extensions.Values.ToList().
+					Find(e => { return e is MeshFilterAndMeshColliderExtension; });
+				MeshId mesh = (extension as MeshFilterAndMeshColliderExtension).Mesh;
+				if (mesh != null)
+				{
+					if (mesh.Value.Primitives != null)
+					{
+						await ConstructMeshAttributes(mesh.Value, mesh);
+					}
+				}
+			}
+		}
 	}
 }
