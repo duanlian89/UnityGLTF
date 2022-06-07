@@ -156,11 +156,6 @@ namespace UnityGLTF
 		public GameObject CreatedObject { get; protected set; }
 
 		/// <summary>
-		/// info.json
-		/// </summary>
-		public string ConfigJson { get; protected set; }
-
-		/// <summary>
 		/// Adds colliders to primitive objects when created
 		/// </summary>
 		public ColliderType Collider { get; set; }
@@ -217,7 +212,7 @@ namespace UnityGLTF
 		protected string _gltfFileName;
 		protected GLBStream _gltfStream;
 		public GLTFRoot _gltfRoot;
-		public AssetCache _assetCache;
+		protected AssetCache _assetCache;
 		protected bool _isRunning = false;
 
 		protected ImportProgress progressStatus = default(ImportProgress);
@@ -302,7 +297,7 @@ namespace UnityGLTF
 		/// <param name="onLoadComplete">Callback function for when load is completed</param>
 		/// <param name="cancellationToken">Cancellation token for loading</param>
 		/// <returns></returns>
-		public async Task LoadSceneAsync(int sceneIndex = -1, bool showSceneObj = true, Action<GameObject, ExceptionDispatchInfo> onLoadComplete = null, CancellationToken cancellationToken = default(CancellationToken), IProgress<ImportProgress> progress = null)
+		public virtual async Task LoadSceneAsync(int sceneIndex = -1, bool showSceneObj = true, Action<GameObject, ExceptionDispatchInfo> onLoadComplete = null, CancellationToken cancellationToken = default(CancellationToken), IProgress<ImportProgress> progress = null)
 		{
 			try
 			{

@@ -3,7 +3,6 @@ using GLTF.Schema;
 using Newtonsoft.Json.Linq;
 using GLTF.Extensions;
 using UnityGLTF.Extensions;
-using GLTF.Schema;
 
 namespace CKUnityGLTF
 {

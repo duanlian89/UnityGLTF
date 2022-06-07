@@ -14,6 +14,38 @@ public class ModelLoader
 		public GameObject model;
 		public string configJson;
 	}
+
+	public static ModelImporter GetImporter(string absoluteStreamingPath)
+	{
+		string directoryPath = URIHelper.GetDirectoryName(absoluteStreamingPath);
+
+		UnityGLTF.ImportOptions importOptions = new UnityGLTF.ImportOptions();
+		importOptions.DataLoader = new UnityGLTF.Loader.FileLoader(directoryPath);
+
+		var sceneImporter = new ModelImporter(System.IO.Path.GetFileName(absoluteStreamingPath), importOptions);
+		sceneImporter.Collider = UnityGLTF.GLTFSceneImporter.ColliderType.None;
+		//await sceneImporter.LoadSceneAsync();
+		return sceneImporter;
+	}
+
+	public static ModelImporter GetImporter(string fileName, byte[] data)
+	{
+		//string directoryPath = URIHelper.GetDirectoryName(absoluteStreamingPath);
+
+		UnityGLTF.ImportOptions importOptions = new UnityGLTF.ImportOptions();
+		importOptions.DataLoader = new VirtualStreamLoader() { data = data };
+
+		ModelImporter sceneImporter = new ModelImporter(fileName, importOptions);
+		sceneImporter.Collider = UnityGLTF.GLTFSceneImporter.ColliderType.None;
+		return sceneImporter;
+
+		//await sceneImporter.LoadSceneAsync(-1, true, (go, e) =>
+		//{
+		//	onLoadComplete.Invoke(go, sceneImporter.ConfigJson, e);
+		//});
+	}
+
+	/*
 	public static async Task<GLTFSceneImporter> LoadI(string absoluteStreamingPath)
 	{
 		string directoryPath = URIHelper.GetDirectoryName(absoluteStreamingPath);
@@ -26,6 +58,8 @@ public class ModelLoader
 		await sceneImporter.LoadSceneAsync();
 		return sceneImporter;
 	}
+
+	
 
 	public static async Task<Result> Load(string absoluteStreamingPath)
 	{
@@ -137,4 +171,5 @@ public class ModelLoader
 			});
 		}
 	}
+	*/
 }

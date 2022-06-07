@@ -7,7 +7,9 @@ using System.Threading;
 using Newtonsoft.Json.Linq;
 using GLTF.Extensions;
 using System;
+using System.Linq;
 using UnityGLTF;
+using System.Runtime.ExceptionServices;
 
 namespace CKUnityGLTF
 {
@@ -23,8 +25,62 @@ namespace CKUnityGLTF
 		{
 			GLTFMaterial.RegisterExtension(new MToonMaterialExtensionFactory());
 			GLTFMaterial.RegisterExtension(new ConfigJsonExtensionFactory());
-			Node.RegisterExtension(new XXXXComponentExtensionFactory());
+			Node.RegisterExtension(new XXXXComponentExtensionFactory()); // TODO: 传入 this
 			Node.RegisterExtension(new XXXXComponentExtensionFactory2());
+		}
+
+		/// <summary>
+		/// info.json
+		/// </summary>
+		public string ConfigJson { get; protected set; }
+
+		// 创建GameObject
+		public async Task Load()
+		{
+			await base.LoadSceneAsync(-1, true, (go, e) =>
+			{
+				if (e != null)
+					Debug.LogException(e.SourceException);
+
+				_assetCache.NodeCache = new GameObject[_gltfRoot.Nodes?.Count ?? 0];
+			});
+		}
+
+		public async Task Load(Action<GameObject, string> onLoadComplete)
+		{
+			await base.LoadSceneAsync(-1, true, (go, e) =>
+			{
+				_assetCache.NodeCache = new GameObject[_gltfRoot.Nodes?.Count ?? 0];
+
+				if (e != null)
+					Debug.LogException(e.SourceException);
+				else
+				{
+					onLoadComplete(this.CreatedObject, this.ConfigJson);
+				}
+			});
+		}
+
+		/// <summary>
+		/// 根据GameObjext获取其在Cache中的索引
+		/// </summary>
+		public int GetGameObjectIndex(GameObject gameObject)
+		{
+			return _assetCache.NodeCache.ToList().IndexOf(gameObject);
+		}
+
+		/// <summary>
+		/// 根据索引获取Cache中对应位置的GameObjext
+		/// </summary>
+		public GameObject GetGameObject(int index)
+		{
+			if (index < _assetCache.NodeCache.Length)
+				return _assetCache.NodeCache[index];
+			else
+			{
+				Debug.LogException(new IndexOutOfRangeException(string.Format("index:{0},_assetCache.NodeCache.Length:{1}", index, _assetCache.NodeCache.Length)));
+				return null;
+			}
 		}
 
 		protected override async Task ConstructScene(GLTFScene scene, bool showSceneObj, CancellationToken cancellationToken)
@@ -129,37 +185,42 @@ namespace CKUnityGLTF
 		}
 		protected override async Task<IUniformMap> ConstructMaterial(GLTFMaterial def, int materialIndex)
 		{
-			IUniformMap mapper = await base.ConstructMaterial(def, materialIndex);
-
-			if (def.Extensions != null)
+			if (_assetCache.MaterialCache[materialIndex] == null)
 			{
-				foreach (var ext in def.Extensions)
+				IUniformMap mapper = await base.ConstructMaterial(def, materialIndex);
+
+				if (def.Extensions != null)
 				{
-					MaterialExtensionFactory factory = GLTFMaterial.TryGetExtension(ext.Key) as MaterialExtensionFactory;
-					mapper.Material = await ConstructMToonMaterial(factory, def.Extensions[ext.Key]);
+					foreach (var ext in def.Extensions)
+					{
+						MaterialExtensionFactory factory = GLTFMaterial.TryGetExtension(ext.Key) as MaterialExtensionFactory;
+						mapper.Material = await ConstructMToonMaterial(factory, def.Extensions[ext.Key]);
+					}
 				}
+
+				var vertColorMapper = mapper.Clone();
+				vertColorMapper.VertexColorsEnabled = true;
+
+				MaterialCacheData materialWrapper = new MaterialCacheData
+				{
+					UnityMaterial = mapper.Material,
+					UnityMaterialWithVertexColor = vertColorMapper.Material,
+					GLTFMaterial = def
+				};
+
+				if (materialIndex >= 0)
+				{
+					_assetCache.MaterialCache[materialIndex] = materialWrapper;
+				}
+				else
+				{
+					_defaultLoadedMaterial = materialWrapper;
+				}
+
+				return mapper;
 			}
 
-			var vertColorMapper = mapper.Clone();
-			vertColorMapper.VertexColorsEnabled = true;
-
-			MaterialCacheData materialWrapper = new MaterialCacheData
-			{
-				UnityMaterial = mapper.Material,
-				UnityMaterialWithVertexColor = vertColorMapper.Material,
-				GLTFMaterial = def
-			};
-
-			if (materialIndex >= 0)
-			{
-				_assetCache.MaterialCache[materialIndex] = materialWrapper;
-			}
-			else
-			{
-				_defaultLoadedMaterial = materialWrapper;
-			}
-
-			return mapper;
+			return null;
 		}
 
 		private async Task<Material> ConstructMToonMaterial(MaterialExtensionFactory factory, IExtension extension)

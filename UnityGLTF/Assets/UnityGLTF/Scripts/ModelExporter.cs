@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEditor;
 using GLTF.Schema;
 using System.IO;
-using System.Text;
+using System.Linq;
 using UnityGLTF;
 using System.Reflection;
 
@@ -13,7 +13,7 @@ namespace CKUnityGLTF
 	{
 		protected string gltfFileName;
 
-		private Dictionary<Transform, int> _exportedTransforms;
+		private Dictionary<GameObject, int> exportedGameObjects; //TODO: 
 
 		public System.IO.BinaryWriter BufferWriter
 		{
@@ -29,7 +29,7 @@ namespace CKUnityGLTF
 		public ModelExporter(Transform parent, string configJson) :
 			base(new[] { parent }, new ExportOptions() { TexturePathRetriever = RetrieveTexturePath, ExportInactivePrimitives = true })
 		{
-			_exportedTransforms = new Dictionary<Transform, int>();
+			exportedGameObjects = new Dictionary<GameObject, int>();
 
 			gltfFileName = parent.name;
 
@@ -80,6 +80,31 @@ namespace CKUnityGLTF
 			_root.Extensions.Add(ConfigJsonExtensionFactory.Extension_Name, configJsonExtension);
 		}
 
+		/// <summary>
+		/// 根据GameObjext获取其在Cache中的索引
+		/// </summary>
+		public int GetGameObjectIndex(GameObject gameObject)
+		{
+			return exportedGameObjects[gameObject];
+		}
+
+		/// <summary>
+		/// 根据索引获取Cache中对应位置的GameObjext
+		/// </summary>
+		public GameObject GetGameObject(int index)
+		{
+			var tor = exportedGameObjects.GetEnumerator();
+			while (tor.MoveNext())
+			{
+				if (tor.Current.Value == index)
+					return tor.Current.Key;
+			}
+
+			Debug.LogException(new DirectoryNotFoundException (string.Format("index:{0},exportedGameObjects.Count:{1}", index, exportedGameObjects.Count)));
+			return null;
+		}
+
+
 		public void Export(string path, string gltfFileName = "")
 		{
 			if (!string.IsNullOrEmpty(gltfFileName))
@@ -117,17 +142,15 @@ namespace CKUnityGLTF
 				scene.Name = name;
 			}
 
-			//RecurGameObject(rootObjTransforms[0].gameObject); // TODO: 默认只有一个根节点
-
 			scene.Nodes = new List<NodeId>(rootObjTransforms.Length);
 			foreach (var transform in rootObjTransforms)
 			{
 				scene.Nodes.Add(ExportNode(transform));
 			}
 
-			foreach (var kv in _exportedTransforms)
+			foreach (var kv in exportedGameObjects)
 			{
-				ExportComponent(kv.Value, kv.Key);
+				ExportComponent(kv.Value, kv.Key.transform);
 			}
 
 			_root.Scenes.Add(scene);
@@ -143,7 +166,9 @@ namespace CKUnityGLTF
 		{
 			NodeId id = base.ExportNode(nodeTransform);
 
-			_exportedTransforms.Add(nodeTransform, id.Id);
+			exportedGameObjects.Add(nodeTransform.gameObject, id.Id);
+
+			//TODO: mesh filter & mesh collider
 
 			return id;
 		}
@@ -170,18 +195,6 @@ namespace CKUnityGLTF
 					}
 					node.Extensions.Add(extensionName, ext);
 				}
-			}
-		}
-
-		// TODO: 应该是不需要了
-		private void RecurGameObject(GameObject go)
-		{
-			(_root as MyGLTFRoot).gameObjects.Add(go);
-
-			int childCount = go.transform.childCount;
-			for (var i = 0; i < childCount; i++)
-			{
-				RecurGameObject(go.transform.GetChild(i).gameObject);
 			}
 		}
 
