@@ -14,7 +14,7 @@ namespace CKUnityGLTF
 	{
 		protected string gltfFileName;
 
-		private Dictionary<GameObject, int> exportedGameObjects; //TODO: 
+		// private Dictionary<GameObject, int> exportedGameObjects; //TODO: 
 
 		public System.IO.BinaryWriter BufferWriter
 		{
@@ -30,7 +30,7 @@ namespace CKUnityGLTF
 		public ModelExporter(Transform parent, string configJson) :
 			base(new[] { parent }, new ExportOptions() { TexturePathRetriever = RetrieveTexturePath, ExportInactivePrimitives = true })
 		{
-			exportedGameObjects = new Dictionary<GameObject, int>();
+			//exportedGameObjects = new Dictionary<GameObject, int>();
 
 			gltfFileName = parent.name;
 
@@ -83,26 +83,62 @@ namespace CKUnityGLTF
 		}
 
 		/// <summary>
-		/// 根据GameObjext获取其在Cache中的索引
+		/// 根据Transform的InstanceID获取其在Cache中的索引
 		/// </summary>
-		public int GetGameObjectIndex(GameObject gameObject)
+		public int GetTransformIndex(int transformIID)
 		{
-			return exportedGameObjects[gameObject];
+			//return exportedGameObjects[gameObject];
+			int index = -1;
+			bool exist = _exportedTransforms.TryGetValue(transformIID, out index);
+			if (exist)
+			{
+				Debug.LogException(new System.Exception(string.Format("can't find Object from InstanceID:{0}", transformIID)));
+			}
+			return index;
+
 		}
 
 		/// <summary>
-		/// 根据索引获取Cache中对应位置的GameObjext
+		/// 根据索引获取Cache中对应位置的Transform
 		/// </summary>
-		public GameObject GetGameObject(int index)
+		public Transform GetTransForm(int index)
 		{
-			var tor = exportedGameObjects.GetEnumerator();
+			//var tor = exportedGameObjects.GetEnumerator();
+			//while (tor.MoveNext())
+			//{
+			//	if (tor.Current.Value == index)
+			//		return tor.Current.Key;
+			//}
+
+			//Debug.LogException(new DirectoryNotFoundException(string.Format("index:{0},exportedGameObjects.Count:{1}", index, exportedGameObjects.Count)));
+
+			bool exist = false;
+			int transformIID = 0;
+			var tor = _exportedTransforms.GetEnumerator();
 			while (tor.MoveNext())
 			{
 				if (tor.Current.Value == index)
-					return tor.Current.Key;
+				{
+					transformIID = tor.Current.Key;
+					exist = true;
+					break;
+				}
 			}
-
-			Debug.LogException(new DirectoryNotFoundException(string.Format("index:{0},exportedGameObjects.Count:{1}", index, exportedGameObjects.Count)));
+			if (exist)
+			{
+				Transform transform = (Utils.FindObjectFromInstanceID(transformIID) as Transform);
+				if (transform != null)
+					return transform;
+				else
+				{
+					Debug.LogException(new System.Exception(string.Format("can't find Object from InstanceID:{0}", transformIID)));
+					return null;
+				}
+			}
+			else
+			{
+				Debug.LogException(new DirectoryNotFoundException(string.Format("index:{0} not exist in _exportedTransforms. _exportedTransforms.Count:{1}", index, _exportedTransforms.Count)));
+			}
 			return null;
 		}
 
@@ -150,9 +186,16 @@ namespace CKUnityGLTF
 				scene.Nodes.Add(ExportNode(transform));
 			}
 
-			foreach (var kv in exportedGameObjects)
+			//foreach (var kv in exportedGameObjects)
+			//{
+			//	ExportComponent(kv.Value, kv.Key.transform);
+			//}
+
+			foreach (var kv in _exportedTransforms)
 			{
-				ExportComponent(kv.Value, kv.Key.transform);
+				GameObject gameObject = Utils.FindObjectFromInstanceID(kv.Key) as GameObject;
+				if (gameObject != null)
+					ExportComponent(kv.Value, gameObject.transform);
 			}
 
 			_root.Scenes.Add(scene);
@@ -168,7 +211,7 @@ namespace CKUnityGLTF
 		{
 			NodeId id = base.ExportNode(nodeTransform);
 
-			exportedGameObjects.Add(nodeTransform.gameObject, id.Id);
+			//exportedGameObjects.Add(nodeTransform.gameObject, id.Id);
 
 			//TODO: mesh filter & mesh collider
 			MeshFilter meshFilter = nodeTransform.GetComponent<MeshFilter>();
@@ -466,7 +509,6 @@ namespace CKUnityGLTF
 				}
 			}
 		}
-
 
 	}
 }

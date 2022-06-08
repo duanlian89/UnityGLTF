@@ -119,7 +119,7 @@ namespace UnityGLTF
 		protected Dictionary<Material, int> _materials;
 		private List<AnimationClip> _animationClips;
 		protected bool _shouldUseInternalBufferForImages;
-		private Dictionary<int, int> _exportedTransforms;
+		protected Dictionary<int, int> _exportedTransforms;
 		private List<Transform> _animatedNodes;
 		private List<Transform> _skinnedNodes;
 		private Dictionary<SkinnedMeshRenderer, UnityEngine.Mesh> _bakedMeshes;
@@ -1186,12 +1186,12 @@ namespace UnityGLTF
 		}
 
 #if UNITY_EDITOR
-		protected const string MakeMeshReadableDialogueDecisionKey = nameof(MakeMeshReadableDialogueDecisionKey);
+		private const string MakeMeshReadableDialogueDecisionKey = nameof(MakeMeshReadableDialogueDecisionKey);
 		private static PropertyInfo canAccessProperty =
 			typeof(Mesh).GetProperty("canAccess", BindingFlags.Instance | BindingFlags.Default | BindingFlags.NonPublic);
 #endif
 
-		protected static bool MeshIsReadable(Mesh mesh)
+		private static bool MeshIsReadable(Mesh mesh)
 		{
 #if UNITY_EDITOR
 			return mesh.isReadable || (bool)(canAccessProperty?.GetMethod?.Invoke(mesh, null) ?? true);

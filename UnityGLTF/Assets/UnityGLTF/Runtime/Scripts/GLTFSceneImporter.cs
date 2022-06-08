@@ -1333,7 +1333,6 @@ namespace UnityGLTF
 		{
 			try
 			{
-				// TODO:节点需要从新创建，否则父会改变。但是资源公用。那这个 assetCache 就需要有多分。
 				if (_assetCache.NodeCache[nodeId] == null)
 				{
 					if (nodeId >= _gltfRoot.Nodes.Count)

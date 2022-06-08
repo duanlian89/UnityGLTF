@@ -125,7 +125,7 @@ namespace CKUnityGLTF
 					if (configJson != null) ConfigJson = configJson.configJson;
 				}
 
-				//TODO: node's component
+				//node's component
 				for (int i = 0; i < _gltfRoot.Nodes.Count; ++i)
 				{
 					Node node = _gltfRoot.Nodes[i];

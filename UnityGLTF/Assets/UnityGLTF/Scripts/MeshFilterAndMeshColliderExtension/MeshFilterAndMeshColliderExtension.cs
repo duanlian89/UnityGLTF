@@ -11,7 +11,7 @@ namespace CKUnityGLTF
 	public class MeshFilterAndMeshColliderExtension : IExtension
 	{
 		/// <summary>
-		/// The index of the mesh in this node.
+		/// The index of the mesh in this node's Extensions
 		/// </summary>
 		public MeshId Mesh;
 
