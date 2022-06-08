@@ -193,9 +193,9 @@ namespace CKUnityGLTF
 
 			foreach (var kv in _exportedTransforms)
 			{
-				GameObject gameObject = Utils.FindObjectFromInstanceID(kv.Key) as GameObject;
-				if (gameObject != null)
-					ExportComponent(kv.Value, gameObject.transform);
+				Transform transform = Utils.FindObjectFromInstanceID(kv.Key) as Transform;
+				if (transform != null)
+					ExportComponent(kv.Value, transform);
 			}
 
 			_root.Scenes.Add(scene);

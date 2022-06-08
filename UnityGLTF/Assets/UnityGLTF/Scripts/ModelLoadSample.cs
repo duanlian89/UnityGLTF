@@ -44,8 +44,8 @@ namespace CKUnityGLTF
 
 			assetCache = importer.AssetCache;
 
-			importer.Dispose();
-			importer = null;
+			//importer.Dispose();
+			//importer = null;
 		}
 
 

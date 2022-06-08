@@ -135,16 +135,15 @@ namespace CKUnityGLTF
 
 					if (node.Extensions != null)
 					{
-						foreach (var ext in node.Extensions)
+						var extensions = node.Extensions.ToList().
+							FindAll(e => { return e.Value is IComponentExtension; });
+
+						extensions.ForEach(ext =>
 						{
-							var componentExtension = ext.Value as IComponentExtension;
-							if (componentExtension != null)
-							{
-								System.Type t = System.Type.GetType(ext.Key);
-								Component component = sceneObj.AddComponent(t);// _assetCache.NodeCache[i].AddComponent(t);
-								(ext.Value as IComponentExtension).SetComponentParam(component);
-							}
-						}
+							System.Type t = System.Type.GetType(ext.Key);
+							Component component = sceneObj.AddComponent(t);// _assetCache.NodeCache[i].AddComponent(t);
+							(ext.Value as IComponentExtension).SetComponentParam(component);
+						});
 					}
 				}
 			}
@@ -299,16 +298,20 @@ namespace CKUnityGLTF
 
 			if (node.Extensions != null)
 			{
-				var extension = node.Extensions.Values.ToList().
-					Find(e => { return e is MeshFilterAndMeshColliderExtension; });
-				MeshId mesh = (extension as MeshFilterAndMeshColliderExtension).Mesh;
-				if (mesh != null)
+				var extensions = node.Extensions.Values.ToList().
+					FindAll(e => { return e is MeshFilterAndMeshColliderExtension; });
+
+				extensions.ForEach(async (e) =>
 				{
-					if (mesh.Value.Primitives != null)
+					MeshId mesh = (e as MeshFilterAndMeshColliderExtension).Mesh;
+					if (mesh != null)
 					{
-						await ConstructMeshAttributes(mesh.Value, mesh);
+						if (mesh.Value.Primitives != null)
+						{
+							await ConstructMeshAttributes(mesh.Value, mesh);
+						}
 					}
-				}
+				});
 			}
 		}
 	}
