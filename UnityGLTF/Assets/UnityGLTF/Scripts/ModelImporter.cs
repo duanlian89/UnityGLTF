@@ -314,5 +314,43 @@ namespace CKUnityGLTF
 				});
 			}
 		}
+
+		public void Dispose(bool destory = false)
+		{
+			if (destory)
+			{
+				for (int i = 0; i < _assetCache.MeshCache.Length; i++)
+				{
+					_assetCache.MeshCache[i]?.Dispose();
+					_assetCache.MeshCache[i] = null;
+				}
+
+				// Destroy the cached textures
+				for (int i = 0; i < _assetCache.TextureCache.Length; i++)
+				{
+					_assetCache.TextureCache[i]?.Dispose();
+					_assetCache.TextureCache[i] = null;
+				}
+
+				// Destroy the cached materials
+				for (int i = 0; i < _assetCache.MaterialCache.Length; i++)
+				{
+					_assetCache.MaterialCache[i]?.Dispose();
+					_assetCache.MaterialCache[i] = null;
+				}
+
+				// Destroy the cached images
+				for (int i = 0; i < _assetCache.ImageCache.Length; i++)
+				{
+					if (_assetCache.ImageCache[i] != null)
+					{
+						UnityEngine.Object.Destroy(_assetCache.ImageCache[i]);
+						_assetCache.ImageCache[i] = null;
+					}
+				}
+			}
+
+			base.Dispose();
+		}
 	}
 }

@@ -448,8 +448,8 @@ namespace CKUnityGLTF
 					if (extensionFactory != null)
 					{
 						ext = extensionFactory.ConstructExtension(component);
+						node.Extensions.Add(extensionName, ext);
 					}
-					node.Extensions.Add(extensionName, ext);
 				}
 			}
 		}
@@ -461,12 +461,15 @@ namespace CKUnityGLTF
 			GLTFMaterial gltfMaterial = GetRoot().Materials[id.Id];
 			MaterialExtensionFactory factory = GLTFMaterial.TryGetExtension(materialObj.shader.name) as MaterialExtensionFactory;
 
-			if (gltfMaterial.Extensions == null) gltfMaterial.Extensions = new Dictionary<string, IExtension>();
+			if (factory != null)
+			{
+				if (gltfMaterial.Extensions == null)
+					gltfMaterial.Extensions = new Dictionary<string, IExtension>();
 
-			IPropExtension ext = factory.GetExtension() as IPropExtension;
-			ExportMaterialExtension(ext, materialObj, factory);
-			gltfMaterial.Extensions[MToonMaterialExtensionFactory.Extension_Name] = ext;
-
+				IPropExtension ext = factory.GetExtension() as IPropExtension;
+				ExportMaterialExtension(ext, materialObj, factory);
+				gltfMaterial.Extensions[MToonMaterialExtensionFactory.Extension_Name] = ext;
+			}
 			return id;
 		}
 
