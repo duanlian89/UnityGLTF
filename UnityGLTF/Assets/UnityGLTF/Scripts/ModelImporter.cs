@@ -141,8 +141,22 @@ namespace CKUnityGLTF
 						extensions.ForEach(ext =>
 						{
 							System.Type t = System.Type.GetType(ext.Key);
+							if (t == null)
+							{
+								string key = ext.Key;
+								string[] sps = key.Split('.');
+								t = System.Reflection.Assembly.Load(sps[0]).GetType(key);
+							}
+
+							if (t != null)
+							{
 							Component component = sceneObj.AddComponent(t);// _assetCache.NodeCache[i].AddComponent(t);
 							(ext.Value as IComponentExtension).SetComponentParam(component);
+							}
+							else
+							{
+								Debug.LogException(new Exception(string.Format("can't get type by extension's key:{0}", ext.Key)));
+							}
 						});
 					}
 				}
