@@ -466,7 +466,7 @@ namespace CKUnityGLTF
 				if (gltfMaterial.Extensions == null)
 					gltfMaterial.Extensions = new Dictionary<string, IExtension>();
 
-				IPropExtension ext = factory.GetExtension() as IPropExtension;
+				IPropExtension ext = factory.ConstructExtension() as IPropExtension;
 				ExportMaterialExtension(ext, materialObj, factory);
 				gltfMaterial.Extensions[MToonMaterialExtensionFactory.Extension_Name] = ext;
 			}

@@ -127,7 +127,7 @@ namespace CKUnityGLTF
 			return ext;
 		}
 
-		public override IExtension GetExtension()
+		public override IExtension ConstructExtension()
 		{
 			MToonMaterialExtension ext = new MToonMaterialExtension();
 			return ext;

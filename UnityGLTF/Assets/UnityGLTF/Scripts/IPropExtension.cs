@@ -32,7 +32,7 @@ namespace CKUnityGLTF
 
 		public string[] TextureProperties = new string[] { };
 
-		public abstract IExtension GetExtension();
+		public abstract IExtension ConstructExtension();
 
 	}
 }

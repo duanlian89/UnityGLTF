@@ -25,7 +25,7 @@ namespace CKUnityGLTF
 		{
 			GLTFMaterial.RegisterExtension(new MToonMaterialExtensionFactory());
 			GLTFMaterial.RegisterExtension(new ConfigJsonExtensionFactory());
-			Node.RegisterExtension(new XXXXComponentExtensionFactory()); // TODO: 传入 this
+			Node.RegisterExtension(new XXXXComponentExtensionFactory());
 			Node.RegisterExtension(new XXXXComponentExtensionFactory2());
 			Node.RegisterExtension(new MeshFilterAndMeshColliderExtensionFactory());
 		}
@@ -150,8 +150,8 @@ namespace CKUnityGLTF
 
 							if (t != null)
 							{
-							Component component = sceneObj.AddComponent(t);// _assetCache.NodeCache[i].AddComponent(t);
-							(ext.Value as IComponentExtension).SetComponentParam(component);
+								Component component = sceneObj.AddComponent(t);// _assetCache.NodeCache[i].AddComponent(t);
+								(ext.Value as IComponentExtension).SetComponentParam(component);
 							}
 							else
 							{
