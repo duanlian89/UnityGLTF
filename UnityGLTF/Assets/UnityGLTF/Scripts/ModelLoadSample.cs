@@ -12,12 +12,15 @@ namespace CKUnityGLTF
 		//public string glbPath = @"C:\WorkSpace\ForkUnityGLTF\UnityGLTF\www\M_Upper_Ugc_016_01_01.glb";
 		public string glbPath = @"http://127.0.0.1:8080/M_Upper_Ugc_016_01_01.glb";
 
+
 		public GameObject go1;
 		public string config1;
 		public GameObject go2;
 		public string config2;
 
 		public UnityGLTF.Cache.AssetCache assetCache;
+
+		ModelImporter importer;
 
 		void Start()
 		{
@@ -33,29 +36,24 @@ namespace CKUnityGLTF
 			//Debug.Log(stream.CanSeek);
 
 			//await ModelLoader.LoadStream(glbPath);
-			var importer = ModelLoader.GetImporter(glbPath);
-			await importer.Load();
-			go1 = importer.CreatedObject;
-			config1 = importer.ConfigJson;
+			importer = ModelLoader.GetImporter(glbPath);
+				await importer.Load();
+				go1 = importer.CreatedObject;
+				config1 = importer.ConfigJson;
 
-			await importer.Load();
-			go2 = importer.CreatedObject;
-			config2 = importer.ConfigJson;
+				//await importer.Load();
+				//go2 = importer.CreatedObject;
+				//config2 = importer.ConfigJson;
 
-			assetCache = importer.AssetCache;
-
-			//importer.Dispose();
-			//importer = null;
+				//assetCache = importer.AssetCache;
 		}
-
-
 
 		async void Load1()
 		{
 			string glbName = "";
 			byte[] bytes = null;
 
-			var importer = ModelLoader.GetImporter(glbName, bytes);
+			importer = ModelLoader.GetImporter(glbName, bytes);
 
 			await importer.Load((go, config) =>
 			{
@@ -112,6 +110,12 @@ namespace CKUnityGLTF
 
 		public void Again()
 		{
+			importer.Dispose(true);
+			importer = null;
+			/*
+			var obj = typeof(UnityEngine.Object).GetMethod("DoesObjectWithInstanceIDExist", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
+				.Invoke(null, new object[] { go1.GetInstanceID() });
+
 			bool b = Utils.DoesObjectWithInstanceIDExist(go1.GetInstanceID());
 
 			var obj1 = Utils.FindObjectFromInstanceID(go1.GetInstanceID());
@@ -129,6 +133,7 @@ namespace CKUnityGLTF
 			obj1 = Utils.ForceLoadFromInstanceID(go1.GetInstanceID());
 			obj2 = Utils.ForceLoadFromInstanceID(go2.GetInstanceID());
 			Debug.Log(obj1 == obj2);
+			*/
 		}
 	}
 }
