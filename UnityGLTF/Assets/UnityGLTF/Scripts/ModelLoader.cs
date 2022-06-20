@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using UnityGLTF;
 using CKUnityGLTF;
 using GLTF.Schema;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 public class ModelLoader
 {
