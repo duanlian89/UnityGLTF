@@ -28,7 +28,7 @@ namespace CKUnityGLTF
 		/// <summary>
 		/// info.json
 		/// </summary>
-		public string ConfigJson { get; protected set; }
+		public string ConfigJson { get; set; }
 
 		// 创建GameObject
 		public async Task Load()
