@@ -6,6 +6,7 @@ using UnityEngine;
 using System.Threading.Tasks;
 using UnityGLTF;
 using CKUnityGLTF;
+using GLTF.Schema;
 
 public class ModelLoader
 {
@@ -13,6 +14,13 @@ public class ModelLoader
 	{
 		public GameObject model;
 		public string configJson;
+	}
+
+	static ModelLoader()
+	{
+		GLTFMaterial.RegisterExtension(new MToonMaterialExtensionFactory());
+		GLTFMaterial.RegisterExtension(new ConfigJsonExtensionFactory());
+		Node.RegisterExtension(new MeshFilterAndMeshColliderExtensionFactory());
 	}
 
 	public static ModelImporter GetImporter(string absoluteStreamingPath)

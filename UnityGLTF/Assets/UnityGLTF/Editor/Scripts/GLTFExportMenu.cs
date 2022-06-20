@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 using CKUnityGLTF;
-
+using GLTF.Schema;
 
 namespace UnityGLTF
 {
@@ -160,6 +160,11 @@ namespace UnityGLTF
 
 			var exportOptions = new ExportOptions { TexturePathRetriever = RetrieveTexturePath };
 			var exporter = new ModelExporter(Selection.transforms[0], "");
+
+			GLTFMaterial.RegisterExtension(new MToonMaterialExtensionFactory());
+			GLTFMaterial.RegisterExtension(new ConfigJsonExtensionFactory());
+			Node.RegisterExtension(new MeshFilterAndMeshColliderExtensionFactory());
+
 			var path = EditorUtility.OpenFolderPanel("glTF Export Path", "", "");
 			exporter.Export(path, name);
 		}

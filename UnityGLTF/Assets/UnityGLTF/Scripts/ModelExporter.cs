@@ -34,12 +34,6 @@ namespace CKUnityGLTF
 
 			gltfFileName = parent.name;
 
-			GLTFMaterial.RegisterExtension(new MToonMaterialExtensionFactory());
-			GLTFMaterial.RegisterExtension(new ConfigJsonExtensionFactory());
-			Node.RegisterExtension(new XXXXComponentExtensionFactory());
-			Node.RegisterExtension(new XXXXComponentExtensionFactory2());
-			Node.RegisterExtension(new MeshFilterAndMeshColliderExtensionFactory());
-
 			// 重写部分属性
 			_root = new MyGLTFRoot
 			{

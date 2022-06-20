@@ -23,11 +23,6 @@ namespace CKUnityGLTF
 		public ModelImporter(string gltfFileName, ImportOptions options)
 			: base(gltfFileName, options)
 		{
-			GLTFMaterial.RegisterExtension(new MToonMaterialExtensionFactory());
-			GLTFMaterial.RegisterExtension(new ConfigJsonExtensionFactory());
-			Node.RegisterExtension(new XXXXComponentExtensionFactory());
-			Node.RegisterExtension(new XXXXComponentExtensionFactory2());
-			Node.RegisterExtension(new MeshFilterAndMeshColliderExtensionFactory());
 		}
 
 		/// <summary>
