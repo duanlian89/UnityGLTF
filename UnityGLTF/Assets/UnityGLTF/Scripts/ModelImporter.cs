@@ -177,25 +177,90 @@ namespace CKUnityGLTF
 
 			var tasks = new List<Task>();
 
-			const string Extension_Name = MToonMaterialExtensionFactory.Extension_Name;
+			string Extension_Name = MToonMaterialExtensionFactory.Extension_Name;
 			if (def.Extensions != null && def.Extensions.ContainsKey(Extension_Name))
 			{
-				var ext = (MToonMaterialExtension)def.Extensions[Extension_Name];
-				if (ext._MainTex != null)
-				{
-					var textureId = ext._MainTex.Index;
-					tasks.Add(ConstructImageBuffer(textureId.Value, textureId.Id));
-				}
+				return ConstructMToonMaterialImageBuffer(def);
+			}
 
-				if (ext._ShadeTexture != null)
-				{
-					var textureId = ext._ShadeTexture.Index;
-					tasks.Add(ConstructImageBuffer(textureId.Value, textureId.Id));
-				}
+			Extension_Name = StandardRoughnessMaterialExtensionFactory.Extension_Name;
+			if (def.Extensions != null && def.Extensions.ContainsKey(Extension_Name))
+			{
+				return ConstructStandardRoughnessMaterialImageBuffer(def);
 			}
 
 			return Task.WhenAll(tasks);
 		}
+
+		private Task ConstructMToonMaterialImageBuffer(GLTFMaterial def)
+		{
+			var tasks = new List<Task>();
+
+			const string Extension_Name = MToonMaterialExtensionFactory.Extension_Name;
+
+			var ext = (MToonMaterialExtension)def.Extensions[Extension_Name];
+			if (ext._MainTex != null)
+			{
+				var textureId = ext._MainTex.Index;
+				tasks.Add(ConstructImageBuffer(textureId.Value, textureId.Id));
+			}
+
+			if (ext._ShadeTexture != null)
+			{
+				var textureId = ext._ShadeTexture.Index;
+				tasks.Add(ConstructImageBuffer(textureId.Value, textureId.Id));
+			}
+
+			return Task.WhenAll(tasks);
+		}
+
+		private Task ConstructStandardRoughnessMaterialImageBuffer(GLTFMaterial def)
+		{
+			var tasks = new List<Task>();
+
+			const string Extension_Name = StandardRoughnessMaterialExtensionFactory.Extension_Name;
+
+			var ext = (StandardRoughnessMaterialExtension)def.Extensions[Extension_Name];
+
+			if (ext._Normal != null)
+			{
+				var textureId = ext._Normal.Index;
+				tasks.Add(ConstructImageBuffer(textureId.Value, textureId.Id));
+			}
+
+			if (ext._Diffuse != null)
+			{
+				var textureId = ext._Diffuse.Index;
+				tasks.Add(ConstructImageBuffer(textureId.Value, textureId.Id));
+			}
+
+			if (ext._Height != null)
+			{
+				var textureId = ext._Height.Index;
+				tasks.Add(ConstructImageBuffer(textureId.Value, textureId.Id));
+			}
+
+			if (ext._Roughness != null)
+			{
+				var textureId = ext._Roughness.Index;
+				tasks.Add(ConstructImageBuffer(textureId.Value, textureId.Id));
+			}
+
+			if (ext._Emission != null)
+			{
+				var textureId = ext._Emission.Index;
+				tasks.Add(ConstructImageBuffer(textureId.Value, textureId.Id));
+			}
+
+			if (ext._Metallic != null)
+			{
+				var textureId = ext._Metallic.Index;
+				tasks.Add(ConstructImageBuffer(textureId.Value, textureId.Id));
+			}
+
+			return Task.WhenAll(tasks);
+		}
+
 		protected override async Task<IUniformMap> ConstructMaterial(GLTFMaterial def, int materialIndex)
 		{
 			if (materialIndex >= 0 && materialIndex < _assetCache.MaterialCache.Length && _assetCache.MaterialCache[materialIndex] == null)
@@ -207,7 +272,7 @@ namespace CKUnityGLTF
 					foreach (var ext in def.Extensions)
 					{
 						MaterialExtensionFactory factory = GLTFMaterial.TryGetExtension(ext.Key) as MaterialExtensionFactory;
-						mapper.Material = await ConstructMToonMaterial(factory, def.Extensions[ext.Key]);
+						mapper.Material = await ConstructMaterial(factory, def.Extensions[ext.Key]);
 					}
 				}
 
@@ -236,7 +301,7 @@ namespace CKUnityGLTF
 			return null;
 		}
 
-		private async Task<Material> ConstructMToonMaterial(MaterialExtensionFactory factory, IExtension extension)
+		private async Task<Material> ConstructMaterial(MaterialExtensionFactory factory, IExtension extension)
 		{
 			Shader shader = Shader.Find(factory.ExtensionName);
 			var material = new Material(shader);
