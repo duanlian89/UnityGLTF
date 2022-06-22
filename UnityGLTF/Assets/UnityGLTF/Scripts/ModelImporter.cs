@@ -270,13 +270,15 @@ namespace CKUnityGLTF
 			if (materialIndex >= 0 && materialIndex < _assetCache.MaterialCache.Length && _assetCache.MaterialCache[materialIndex] == null)
 			{
 				IUniformMap mapper = await base.ConstructMaterial(def, materialIndex);
-
+				//TODO:记录原有的 mapper.Material，在新的创建完成后，销毁原材质
 				if (def.Extensions != null)
 				{
 					foreach (var ext in def.Extensions)
 					{
 						MaterialExtensionFactory factory = GLTFMaterial.TryGetExtension(ext.Key) as MaterialExtensionFactory;
-						mapper.Material = await ConstructMaterial(factory, def.Extensions[ext.Key]);
+
+						if (factory != null && Shader.Find(factory.ExtensionName) != null)
+							mapper.Material = await ConstructMaterial(factory, def.Extensions[ext.Key]);
 					}
 				}
 
