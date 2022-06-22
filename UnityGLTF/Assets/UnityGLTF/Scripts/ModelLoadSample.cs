@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Net;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace CKUnityGLTF
 {
@@ -37,15 +38,20 @@ namespace CKUnityGLTF
 
 			//await ModelLoader.LoadStream(glbPath);
 			importer = ModelLoader.GetImporter(glbPath);
-				await importer.Load();
-				go1 = importer.CreatedObject;
-				config1 = importer.ConfigJson;
+			config1 = importer.ConfigJson;
 
-				//await importer.Load();
-				//go2 = importer.CreatedObject;
-				//config2 = importer.ConfigJson;
+			await Task.Delay(3000);
 
-				//assetCache = importer.AssetCache;
+			await importer.Load();
+			go1 = importer.CreatedObject;
+
+			await Task.Delay(3000);
+
+			await importer.Load();
+			go2 = importer.CreatedObject;
+			config2 = importer.ConfigJson;
+
+			//assetCache = importer.AssetCache;
 		}
 
 		async void Load1()

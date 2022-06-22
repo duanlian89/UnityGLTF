@@ -9,7 +9,7 @@ using GLTF.Extensions;
 using System;
 using System.Linq;
 using UnityGLTF;
-using System.Runtime.ExceptionServices;
+using GLTF;
 
 namespace CKUnityGLTF
 {
@@ -23,6 +23,16 @@ namespace CKUnityGLTF
 		public ModelImporter(string gltfFileName, ImportOptions options)
 			: base(gltfFileName, options)
 		{
+			_gltfStream.Stream = options.DataLoader.LoadStreamAsync(gltfFileName).GetAwaiter().GetResult();
+			_gltfStream.StartPosition = 0;
+			GLTFParser.ParseJson(_gltfStream.Stream, out _gltfRoot, _gltfStream.StartPosition);
+
+			if (_gltfRoot != null && _gltfRoot.Extensions != null && _gltfRoot.Extensions.Count > 0 && _gltfRoot.Extensions[ConfigJsonExtensionFactory.Extension_Name] != null)
+			{
+				ConfigJsonExtension configJson = _gltfRoot.Extensions[ConfigJsonExtensionFactory.Extension_Name] as ConfigJsonExtension;
+				if (configJson != null)
+					ConfigJson = configJson.configJson;
+			}
 		}
 
 		/// <summary>
@@ -113,12 +123,6 @@ namespace CKUnityGLTF
 				}
 
 				CreatedObject = sceneObj;
-				ConfigJson = "";
-				if (_gltfRoot.Extensions != null && _gltfRoot.Extensions.Count > 0 && _gltfRoot.Extensions[ConfigJsonExtensionFactory.Extension_Name] != null)
-				{
-					ConfigJsonExtension configJson = _gltfRoot.Extensions[ConfigJsonExtensionFactory.Extension_Name] as ConfigJsonExtension;
-					if (configJson != null) ConfigJson = configJson.configJson;
-				}
 
 				//node's component
 				for (int i = 0; i < _gltfRoot.Nodes.Count; ++i)

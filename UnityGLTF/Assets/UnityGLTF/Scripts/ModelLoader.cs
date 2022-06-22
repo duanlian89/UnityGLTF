@@ -35,7 +35,7 @@ public class ModelLoader
 		var sceneImporter = new ModelImporter(System.IO.Path.GetFileName(absoluteStreamingPath), importOptions);
 		sceneImporter.Collider = UnityGLTF.GLTFSceneImporter.ColliderType.None;
 
-		sceneImporter.ConfigJson = ParseConfigJson(System.IO.File.ReadAllBytes(absoluteStreamingPath));
+		//sceneImporter.ConfigJson = ParseConfigJson(System.IO.File.ReadAllBytes(absoluteStreamingPath));
 
 		//await sceneImporter.LoadSceneAsync();
 		return sceneImporter;
@@ -51,7 +51,7 @@ public class ModelLoader
 		ModelImporter sceneImporter = new ModelImporter(fileName, importOptions);
 		sceneImporter.Collider = UnityGLTF.GLTFSceneImporter.ColliderType.None;
 
-		sceneImporter.ConfigJson = ParseConfigJson(data);
+		//sceneImporter.ConfigJson = ParseConfigJson(data);
 
 		return sceneImporter;
 
