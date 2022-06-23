@@ -21,6 +21,7 @@ public class ModelLoader
 	static ModelLoader()
 	{
 		GLTFMaterial.RegisterExtension(new MToonMaterialExtensionFactory());
+		GLTFMaterial.RegisterExtension(new StandardMaterialExtensionFactory());
 		GLTFMaterial.RegisterExtension(new StandardRoughnessMaterialExtensionFactory());
 		GLTFMaterial.RegisterExtension(new ConfigJsonExtensionFactory());
 		Node.RegisterExtension(new MeshFilterAndMeshColliderExtensionFactory());

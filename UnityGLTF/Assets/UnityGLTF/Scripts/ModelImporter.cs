@@ -181,25 +181,28 @@ namespace CKUnityGLTF
 
 			var tasks = new List<Task>();
 
-			var tor = def.Extensions.GetEnumerator();
-			while (tor.MoveNext())
+			if (def.Extensions != null && def.Extensions.Count > 0)
 			{
-				var current = tor.Current;
-				string Extension_Name = current.Key;
-				IExtension extension = current.Value;
-
-				MaterialExtensionFactory factory = GLTFProperty.TryGetExtension(current.Key) as MaterialExtensionFactory;
-
-				if (factory != null)
+				var tor = def.Extensions.GetEnumerator();
+				while (tor.MoveNext())
 				{
-					var t = extension.GetType();
-					for (int j = 0; j < factory.TextureProperties.Length; j++)
+					var current = tor.Current;
+					string Extension_Name = current.Key;
+					IExtension extension = current.Value;
+
+					MaterialExtensionFactory factory = GLTFProperty.TryGetExtension(current.Key) as MaterialExtensionFactory;
+
+					if (factory != null)
 					{
-						System.Reflection.FieldInfo fileInfo = t.GetField(factory.TextureProperties[j]);
-						if (fileInfo != null && fileInfo.GetValue(extension) != null)
+						var t = extension.GetType();
+						for (int j = 0; j < factory.TextureProperties.Length; j++)
 						{
-							TextureId textureId = (fileInfo.GetValue(extension) as TextureInfo).Index;
-							tasks.Add(ConstructImageBuffer(textureId.Value, textureId.Id));
+							System.Reflection.FieldInfo fileInfo = t.GetField(factory.TextureProperties[j]);
+							if (fileInfo != null && fileInfo.GetValue(extension) != null)
+							{
+								TextureId textureId = (fileInfo.GetValue(extension) as TextureInfo).Index;
+								tasks.Add(ConstructImageBuffer(textureId.Value, textureId.Id));
+							}
 						}
 					}
 				}
@@ -207,7 +210,7 @@ namespace CKUnityGLTF
 
 			return Task.WhenAll(tasks);
 		}
-		
+
 		protected override async Task<IUniformMap> ConstructMaterial(GLTFMaterial def, int materialIndex)
 		{
 			if (materialIndex >= 0 && materialIndex < _assetCache.MaterialCache.Length && _assetCache.MaterialCache[materialIndex] == null)
