@@ -109,7 +109,7 @@ namespace CKUnityGLTF
 
 
 		// properties to json
-		// ÓÃÓÚµ¼³öÊ±ĞòÁĞ»¯ÊôĞÔÃûºÍÊôĞÔÖµ
+		// ç”¨äºå¯¼å‡ºæ—¶åºåˆ—åŒ–å±æ€§åå’Œå±æ€§å€¼
 		public JProperty Serialize()
 		{
 			JObject ext = new JObject();
@@ -253,7 +253,17 @@ namespace CKUnityGLTF
 
 			if (shaderKeywords.Length > 0)
 			{
-				string keywords = JsonConvert.SerializeObject(shaderKeywords);
+				System.Text.StringBuilder str = new System.Text.StringBuilder();
+				for (int i = 0; i < shaderKeywords.Length; i++)
+				{
+					if (i > 0)
+					{
+						//åˆ†å‰²ç¬¦å¯æ ¹æ®éœ€è¦è‡ªè¡Œä¿®æ”¹
+						str.Append(",");
+					}
+					str.Append(shaderKeywords[i]);
+				}
+				string keywords = str.ToString();
 				ext.Add(new JProperty(StandardMaterialExtensionFactory.shaderKeywords, keywords));
 			}
 
@@ -345,7 +355,12 @@ namespace CKUnityGLTF
 			_ZWrite = token != null ? (float)token.DeserializeAsDouble() : _ZWrite_Default;
 
 			token = extensionToken.Value[StandardMaterialExtensionFactory.shaderKeywords];
-			shaderKeywords = token != null ? JsonConvert.DeserializeObject<string[]>(token.ToString()) : shaderKeywords;
+			string[] reps = new string[] { "\\", "[", "]", "\"" };
+			foreach (string s in reps)
+			{
+				token = token.ToString().Replace(s, "");
+			}
+			shaderKeywords = token != null ? token.ToString().Split(',') : shaderKeywords;
 		}
 	}
 }

@@ -18,7 +18,7 @@ MonoBehaviour:
   useMainCameraVisibility: 1
   exportDisabledGameObjects: 0
   tryExportTexturesFromDisk: 0
-  useTextureFileTypeHeuristic: 1
+  useTextureFileTypeHeuristic: 0
   defaultJpegQuality: 90
   exportAnimations: 1
   uniqueAnimationNames: 0
