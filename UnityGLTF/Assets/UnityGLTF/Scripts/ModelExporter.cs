@@ -497,7 +497,7 @@ namespace CKUnityGLTF
 						//{
 						TextureInfo textureInfo = ExportTextureInfo(Tex, TextureMapType.Main);
 						t.GetField(prop).SetValue(ext, textureInfo);
-						ExportTextureTransform(textureInfo, materialObj, MToonMaterialExtensionFactory._MainTex);
+						ExportTextureTransform(textureInfo, materialObj, prop);
 					}
 					else
 					{
@@ -505,7 +505,10 @@ namespace CKUnityGLTF
 					}
 				}
 			}
-		}
 
+			if (materialObj.GetType().GetProperty(MaterialExtensionFactory.shaderKeywords) != null)
+				t.GetField(MaterialExtensionFactory.shaderKeywords).SetValue(ext, materialObj.shaderKeywords);
+
+		}
 	}
 }

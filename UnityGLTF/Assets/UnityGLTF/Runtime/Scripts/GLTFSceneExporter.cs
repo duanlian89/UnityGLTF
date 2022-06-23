@@ -1973,7 +1973,8 @@ namespace UnityGLTF
 
 				if (mrTex)
 				{
-					pbr.MetallicRoughnessTexture = ExportTextureInfo(mrTex, (isGltfPbrMetallicRoughnessShader || isGlTFastShader) ? TextureMapType.MetallicGloss_DontConvert : TextureMapType.MetallicGloss);
+					// TODO: add by duanlian,use to make MetallicGlossMap contain alpha chanel
+					pbr.MetallicRoughnessTexture = ExportTextureInfo(mrTex, (isGltfPbrMetallicRoughnessShader || isGlTFastShader ||!settings.UseTextureFileTypeHeuristic) ? TextureMapType.MetallicGloss_DontConvert : TextureMapType.MetallicGloss);
 					// in the Standard shader, _METALLICGLOSSMAP replaces _Metallic and so we need to set the multiplier to 1;
 					// that's not true for the gltf shaders though, so we keep the value there.
 					if (ignoreMetallicFactor)

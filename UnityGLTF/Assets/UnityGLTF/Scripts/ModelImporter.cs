@@ -181,90 +181,33 @@ namespace CKUnityGLTF
 
 			var tasks = new List<Task>();
 
-			string Extension_Name = MToonMaterialExtensionFactory.Extension_Name;
-			if (def.Extensions != null && def.Extensions.ContainsKey(Extension_Name))
+			var tor = def.Extensions.GetEnumerator();
+			while (tor.MoveNext())
 			{
-				return ConstructMToonMaterialImageBuffer(def);
-			}
+				var current = tor.Current;
+				string Extension_Name = current.Key;
+				IExtension extension = current.Value;
 
-			Extension_Name = StandardRoughnessMaterialExtensionFactory.Extension_Name;
-			if (def.Extensions != null && def.Extensions.ContainsKey(Extension_Name))
-			{
-				return ConstructStandardRoughnessMaterialImageBuffer(def);
-			}
+				MaterialExtensionFactory factory = GLTFProperty.TryGetExtension(current.Key) as MaterialExtensionFactory;
 
-			return Task.WhenAll(tasks);
-		}
-
-		private Task ConstructMToonMaterialImageBuffer(GLTFMaterial def)
-		{
-			var tasks = new List<Task>();
-
-			const string Extension_Name = MToonMaterialExtensionFactory.Extension_Name;
-
-			var ext = (MToonMaterialExtension)def.Extensions[Extension_Name];
-			if (ext._MainTex != null)
-			{
-				var textureId = ext._MainTex.Index;
-				tasks.Add(ConstructImageBuffer(textureId.Value, textureId.Id));
-			}
-
-			if (ext._ShadeTexture != null)
-			{
-				var textureId = ext._ShadeTexture.Index;
-				tasks.Add(ConstructImageBuffer(textureId.Value, textureId.Id));
+				if (factory != null)
+				{
+					var t = extension.GetType();
+					for (int j = 0; j < factory.TextureProperties.Length; j++)
+					{
+						System.Reflection.FieldInfo fileInfo = t.GetField(factory.TextureProperties[j]);
+						if (fileInfo != null && fileInfo.GetValue(extension) != null)
+						{
+							TextureId textureId = (fileInfo.GetValue(extension) as TextureInfo).Index;
+							tasks.Add(ConstructImageBuffer(textureId.Value, textureId.Id));
+						}
+					}
+				}
 			}
 
 			return Task.WhenAll(tasks);
 		}
-
-		private Task ConstructStandardRoughnessMaterialImageBuffer(GLTFMaterial def)
-		{
-			var tasks = new List<Task>();
-
-			const string Extension_Name = StandardRoughnessMaterialExtensionFactory.Extension_Name;
-
-			var ext = (StandardRoughnessMaterialExtension)def.Extensions[Extension_Name];
-
-			if (ext._Normal != null)
-			{
-				var textureId = ext._Normal.Index;
-				tasks.Add(ConstructImageBuffer(textureId.Value, textureId.Id));
-			}
-
-			if (ext._Diffuse != null)
-			{
-				var textureId = ext._Diffuse.Index;
-				tasks.Add(ConstructImageBuffer(textureId.Value, textureId.Id));
-			}
-
-			if (ext._Height != null)
-			{
-				var textureId = ext._Height.Index;
-				tasks.Add(ConstructImageBuffer(textureId.Value, textureId.Id));
-			}
-
-			if (ext._Roughness != null)
-			{
-				var textureId = ext._Roughness.Index;
-				tasks.Add(ConstructImageBuffer(textureId.Value, textureId.Id));
-			}
-
-			if (ext._Emission != null)
-			{
-				var textureId = ext._Emission.Index;
-				tasks.Add(ConstructImageBuffer(textureId.Value, textureId.Id));
-			}
-
-			if (ext._Metallic != null)
-			{
-				var textureId = ext._Metallic.Index;
-				tasks.Add(ConstructImageBuffer(textureId.Value, textureId.Id));
-			}
-
-			return Task.WhenAll(tasks);
-		}
-
+		
 		protected override async Task<IUniformMap> ConstructMaterial(GLTFMaterial def, int materialIndex)
 		{
 			if (materialIndex >= 0 && materialIndex < _assetCache.MaterialCache.Length && _assetCache.MaterialCache[materialIndex] == null)
@@ -317,27 +260,55 @@ namespace CKUnityGLTF
 			for (int i = 0; i < factory.FloatProperties.Length; i++)
 			{
 				string prop = factory.FloatProperties[i];
-				material.SetFloat(prop, (float)t.GetField(prop).GetValue(extension));
+				if (t.GetField(prop) != null)
+				{
+					material.SetFloat(prop, (float)t.GetField(prop).GetValue(extension));
+				}
+				else
+				{
+					Debug.Log(string.Format("can not get Field by name:{0}", prop));
+				}
 			}
 
 			for (int i = 0; i < factory.ColorProperties.Length; i++)
 			{
 				string prop = factory.ColorProperties[i];
-				Color c = (Color)t.GetField(prop).GetValue(extension);
-				material.SetColor(prop, c);
+				if (t.GetField(prop) != null)
+				{
+					Color c = (Color)t.GetField(prop).GetValue(extension);
+					material.SetColor(prop, c);
+				}
+				else
+				{
+					Debug.Log(string.Format("can not get Field by name:{0}", prop));
+				}
 			}
 
 			for (int i = 0; i < factory.TextureProperties.Length; i++)
 			{
 				string prop = factory.TextureProperties[i];
-				System.Object obj = t.GetField(prop).GetValue(extension);
-				if (obj != null)
+				if (t.GetField(prop) != null && t.GetField(prop).GetValue(extension) != null)
 				{
+					System.Object obj = t.GetField(prop).GetValue(extension);
 					TextureId textureId = (obj as TextureInfo).Index;
 					await ConstructTexture(textureId.Value, textureId.Id, !KeepCPUCopyOfTexture, false);
 					Texture tex = _assetCache.TextureCache[textureId.Id].Texture;
 					material.SetTexture(prop, tex);
 				}
+				else
+				{
+					Debug.Log(string.Format("can not get Field by name:{0}", prop));
+				}
+			}
+
+			if (t.GetField(MaterialExtensionFactory.shaderKeywords) != null)
+			{
+				System.Object obj = t.GetField(MaterialExtensionFactory.shaderKeywords).GetValue(extension);
+				material.shaderKeywords = obj as String[];
+			}
+			else
+			{
+				Debug.Log(string.Format("can not get Field by name:{0}", MaterialExtensionFactory.shaderKeywords));
 			}
 
 			return material;

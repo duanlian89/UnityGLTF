@@ -4,6 +4,7 @@ using UnityEngine;
 using CKUnityGLTF;
 using GLTF.Schema;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 using GLTF.Extensions;
 using UnityGLTF.Extensions;
 
@@ -12,6 +13,7 @@ namespace CKUnityGLTF
 	public class StandardMaterialExtension : IPropExtension
 	{
 		#region properties and default value
+		public string[] shaderKeywords = new string[] { };
 
 		public Color _Color = Color.white;
 		public static readonly UnityEngine.Color _Color_Default = UnityEngine.Color.white;
@@ -249,6 +251,12 @@ namespace CKUnityGLTF
 				ext.Add(new JProperty(StandardMaterialExtensionFactory._ZWrite, _ZWrite));
 			}
 
+			if (shaderKeywords.Length > 0)
+			{
+				string keywords = JsonConvert.SerializeObject(shaderKeywords);
+				ext.Add(new JProperty(StandardMaterialExtensionFactory.shaderKeywords, keywords));
+			}
+
 			return new JProperty(StandardMaterialExtensionFactory.Extension_Name, ext);
 		}
 
@@ -335,6 +343,9 @@ namespace CKUnityGLTF
 
 			token = extensionToken.Value[StandardMaterialExtensionFactory._ZWrite];
 			_ZWrite = token != null ? (float)token.DeserializeAsDouble() : _ZWrite_Default;
+
+			token = extensionToken.Value[StandardMaterialExtensionFactory.shaderKeywords];
+			shaderKeywords = token != null ? JsonConvert.DeserializeObject<string[]>(token.ToString()) : shaderKeywords;
 		}
 	}
 }

@@ -32,6 +32,8 @@ namespace CKUnityGLTF
 
 		public string[] TextureProperties = new string[] { };
 
+		public static string shaderKeywords = "shaderKeywords";
+
 		public abstract IExtension ConstructExtension();
 
 	}
