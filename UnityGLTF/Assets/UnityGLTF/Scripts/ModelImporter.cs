@@ -23,22 +23,44 @@ namespace CKUnityGLTF
 		public ModelImporter(string gltfFileName, ImportOptions options)
 			: base(gltfFileName, options)
 		{
-			_gltfStream.Stream = options.DataLoader.LoadStreamAsync(gltfFileName).GetAwaiter().GetResult();
+
+		}
+
+		string configJson;
+		/// <summary>
+		/// info.json
+		/// </summary>
+		public string ConfigJson
+		{
+			get
+			{
+				if (string.IsNullOrEmpty(configJson))
+				{
+					GetConfigJson();
+				}
+
+				return configJson;
+			}
+
+			set
+			{
+				configJson = value;
+			}
+		}
+
+		private void GetConfigJson()
+		{
+			_gltfStream.Stream = _options.DataLoader.LoadStreamAsync(_gltfFileName).GetAwaiter().GetResult();
 			_gltfStream.StartPosition = 0;
 			GLTFParser.ParseJson(_gltfStream.Stream, out _gltfRoot, _gltfStream.StartPosition);
 
 			if (_gltfRoot != null && _gltfRoot.Extensions != null && _gltfRoot.Extensions.Count > 0 && _gltfRoot.Extensions[ConfigJsonExtensionFactory.Extension_Name] != null)
 			{
-				ConfigJsonExtension configJson = _gltfRoot.Extensions[ConfigJsonExtensionFactory.Extension_Name] as ConfigJsonExtension;
-				if (configJson != null)
-					ConfigJson = configJson.configJson;
+				ConfigJsonExtension extension = _gltfRoot.Extensions[ConfigJsonExtensionFactory.Extension_Name] as ConfigJsonExtension;
+				if (extension != null)
+					configJson = extension.configJson;
 			}
 		}
-
-		/// <summary>
-		/// info.json
-		/// </summary>
-		public string ConfigJson { get; set; }
 
 		// 创建GameObject
 		public async Task Load()
@@ -304,7 +326,7 @@ namespace CKUnityGLTF
 				}
 			}
 
-			if(factory.ExtensionName == StandardMaterialExtensionFactory.Extension_Name)
+			if (factory.ExtensionName == StandardMaterialExtensionFactory.Extension_Name)
 				material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.BakedEmissive;
 
 			if (t.GetField(MaterialExtensionFactory.shaderKeywords) != null)
