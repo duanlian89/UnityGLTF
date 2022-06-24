@@ -6,22 +6,20 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-namespace Rathian
+public class UnityPackageExporter
 {
-	public class UnityPackageExporter
-	{
 #if UNITY_EDITOR
-		[MenuItem("Tools/UnityPackageExporter/Export UnityGLTF")]
-		private static void ExportLobby()
+	[MenuItem("Tools/UnityPackageExporter/Export UnityGLTF")]
+	private static void ExportLobby()
+	{
+		var path = EditorUtility.SaveFilePanel("Save unitypackage", "", "UnityGLTF", "unitypackage");
+		if (path == "")
 		{
-			var path = EditorUtility.SaveFilePanel("Save unitypackage", "", "UnityGLTF", "unitypackage");
-			if (path == "")
-			{
-				return;
-			}
+			return;
+		}
 
-			string[] assetPaths = new string[]
-			{
+		string[] assetPaths = new string[]
+		{
 				"Assets/UnityGLTF/CKUnityGLTF.asmdef",
 				"Assets/UnityGLTF/Runtime",
 				"Assets/UnityGLTF/Scripts/ConfigJsonExtension",
@@ -36,13 +34,12 @@ namespace Rathian
 				"Assets/UnityGLTF/Scripts/MyGLTFRoot.cs",
 				"Assets/UnityGLTF/Scripts/Utils.cs",
 				"Assets/UnityGLTF/Scripts/VirtualStreamLoader.cs",
-            };
+		};
 
-			//var allPaths = AssetDatabase.GetDependencies(assetPaths);
+		//var allPaths = AssetDatabase.GetDependencies(assetPaths);
 
-			AssetDatabase.ExportPackage(assetPaths, path, ExportPackageOptions.Interactive | ExportPackageOptions.Recurse /*| ExportPackageOptions.IncludeDependencies*/);
-		}
-#endif
+		AssetDatabase.ExportPackage(assetPaths, path, ExportPackageOptions.Interactive | ExportPackageOptions.Recurse /*| ExportPackageOptions.IncludeDependencies*/);
 	}
+#endif
 }
 

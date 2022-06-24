@@ -304,6 +304,9 @@ namespace CKUnityGLTF
 				}
 			}
 
+			if(factory.ExtensionName == StandardMaterialExtensionFactory.Extension_Name)
+				material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.BakedEmissive;
+
 			if (t.GetField(MaterialExtensionFactory.shaderKeywords) != null)
 			{
 				System.Object obj = t.GetField(MaterialExtensionFactory.shaderKeywords).GetValue(extension);
