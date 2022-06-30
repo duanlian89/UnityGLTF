@@ -20,6 +20,8 @@ public class UnityPackageExporter
 
 		string[] assetPaths = new string[]
 		{
+				"Assets/UnityGLTF/Editor/Scripts/PbrShaderGUI.cs",
+				"Assets/UnityGLTF/Editor/UnityGLTFEditor.asmdef",
 				"Assets/UnityGLTF/CKUnityGLTF.asmdef",
 				"Assets/UnityGLTF/Runtime",
 				"Assets/UnityGLTF/Scripts/ConfigJsonExtension",

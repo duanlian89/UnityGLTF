@@ -11,7 +11,7 @@ namespace CKUnityGLTF
 
 	public interface IComponentExtension : IPropExtension
 	{
-		public void SetComponentParam(UnityEngine.Component com);
+		void SetComponentParam(UnityEngine.Component com);
 	}
 
 	public interface IByteComponentExtension : IComponentExtension

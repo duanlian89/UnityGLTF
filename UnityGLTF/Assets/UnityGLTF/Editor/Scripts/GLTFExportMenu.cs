@@ -146,27 +146,5 @@ namespace UnityGLTF
 				EditorUtility.RevealInFinder(resultPath);
 			}
 		}
-
-		[MenuItem(MenuPrefix + "Export Test")]
-		static void ExportTest()
-		{
-			string name;
-			if (Selection.transforms.Length > 1)
-				name = SceneManager.GetActiveScene().name;
-			else if (Selection.transforms.Length == 1)
-				name = Selection.activeGameObject.name;
-			else
-				throw new Exception("No objects selected, cannot export.");
-
-			var exportOptions = new ExportOptions { TexturePathRetriever = RetrieveTexturePath };
-			var exporter = new ModelExporter(Selection.transforms[0], "");
-
-			GLTFMaterial.RegisterExtension(new MToonMaterialExtensionFactory());
-			GLTFMaterial.RegisterExtension(new ConfigJsonExtensionFactory());
-			Node.RegisterExtension(new MeshFilterAndMeshColliderExtensionFactory());
-
-			var path = EditorUtility.OpenFolderPanel("glTF Export Path", "", "");
-			exporter.Export(path, name);
-		}
 	}
 }
