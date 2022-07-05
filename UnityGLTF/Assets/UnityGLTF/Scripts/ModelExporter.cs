@@ -218,7 +218,7 @@ namespace CKUnityGLTF
 
 				GameObject[] primitives;
 				FilterPrimitives(nodeTransform, out primitives);
-				MeshId meshId = ExportMesh(nodeTransform.name, primitives);
+				MeshId meshId = ExportMeshFilterAndMeshCollider(nodeTransform.name, primitives);
 				_primOwner[new PrimKey { Mesh = nodeTransform.GetComponent<MeshFilter>().sharedMesh }] = meshId;
 
 				ExtensionFactory extFactory = Node.TryGetExtension(MeshFilterAndMeshColliderExtensionFactory.Extension_Name);
@@ -244,7 +244,7 @@ namespace CKUnityGLTF
 			primitives = prims.ToArray();
 		}
 
-		private MeshId ExportMesh(string name, GameObject[] primitives)
+		private MeshId ExportMeshFilterAndMeshCollider(string name, GameObject[] primitives)
 		{
 			// check if this set of primitives is already a mesh
 			MeshId existingMeshId = null;
@@ -283,7 +283,7 @@ namespace CKUnityGLTF
 			mesh.Primitives = new List<MeshPrimitive>(primitives.Length);
 			foreach (var prim in primitives)
 			{
-				MeshPrimitive[] meshPrimitives = ExportPrimitive(prim, mesh);
+				MeshPrimitive[] meshPrimitives = ExportPrimitiveOnlyHaveMeshWhthOutRender(prim, mesh);
 				if (meshPrimitives != null)
 				{
 					mesh.Primitives.AddRange(meshPrimitives);
@@ -305,7 +305,7 @@ namespace CKUnityGLTF
 			return null;
 		}
 
-		private MeshPrimitive[] ExportPrimitive(GameObject gameObject, GLTFMesh mesh)
+		private MeshPrimitive[] ExportPrimitiveOnlyHaveMeshWhthOutRender(GameObject gameObject, GLTFMesh mesh)
 		{
 			Mesh meshObj = null;
 			SkinnedMeshRenderer smr = null;
