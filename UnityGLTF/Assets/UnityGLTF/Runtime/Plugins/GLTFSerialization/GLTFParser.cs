@@ -143,7 +143,7 @@ namespace GLTF
 			return allChunks;
 		}
 
-		private static void ParseJsonChunk(Stream stream, long startPosition)
+		public static void ParseJsonChunk(Stream stream, long startPosition)
 		{
 			GLBHeader header = ParseGLBHeader(stream);  // 4, 8
 			if (header.Version != 2)

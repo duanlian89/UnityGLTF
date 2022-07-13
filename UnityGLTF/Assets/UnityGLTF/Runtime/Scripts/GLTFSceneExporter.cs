@@ -625,7 +625,7 @@ namespace UnityGLTF
 		/// <param name="absolutePathThatMayHaveExtension">Absolute path that may or may not already have the required extension</param>
 		/// <param name="requiredExtension">The extension to ensure, with leading dot</param>
 		/// <returns>An absolute path that has the required extension</returns>
-		private static string GetFileName(string directory, string fileNameThatMayHaveExtension, string requiredExtension)
+		protected static string GetFileName(string directory, string fileNameThatMayHaveExtension, string requiredExtension)
 		{
 			var absolutePathThatMayHaveExtension = Path.Combine(directory, EnsureValidFileName(fileNameThatMayHaveExtension));
 

@@ -97,6 +97,9 @@ namespace GLTF.Schema
 			writer.WritePropertyName("version");
 			writer.WriteValue(Version);
 
+			writer.WritePropertyName("minVersion");
+			writer.WriteValue(MinVersion);
+
 			base.Serialize(writer);
 
 			writer.WriteEndObject();

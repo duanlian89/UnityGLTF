@@ -42,8 +42,9 @@ namespace CKUnityGLTF
 				Animations = new List<GLTFAnimation>(),
 				Asset = new Asset
 				{
-					Version = "2.0",
-					Generator = "UnityGLTF"
+					Version = "2.0.1",
+					Generator = "UnityGLTF",
+					MinVersion = Application.version
 				},
 				Buffers = new List<GLTFBuffer>(),
 				BufferViews = new List<BufferView>(),
@@ -136,27 +137,25 @@ namespace CKUnityGLTF
 			return null;
 		}
 
-
-		public void Export(string path, string gltfFileName = "")
+		public void Export(string path, string gltfFileName, string sceneName)
 		{
-			if (!string.IsNullOrEmpty(gltfFileName))
-				this.gltfFileName = gltfFileName;
-
-			//var path = EditorUtility.OpenFolderPanel("glTF Export Path", "", "");
 			if (!string.IsNullOrEmpty(path))
 			{
-				base.SaveGLB(path, gltfFileName);
+				SaveGLB(path, gltfFileName, sceneName);
 			}
 		}
 
-		public override void SaveGLB(string path, string fileName)
+		public void SaveGLB(string path, string fileName, string sceneName)
 		{
-			_shouldUseInternalBufferForImages = false;
-			string fullPath = Path.Combine(path, Path.ChangeExtension(fileName, "glb"));
+			var fullPath = GetFileName(path, fileName, ".glb");
+			var dirName = Path.GetDirectoryName(fullPath);
+			if (dirName != null && !Directory.Exists(dirName))
+				Directory.CreateDirectory(dirName);
+			_shouldUseInternalBufferForImages = true;
 
 			using (FileStream glbFile = new FileStream(fullPath, FileMode.Create))
 			{
-				SaveGLBToStream(glbFile, fileName);
+				SaveGLBToStream(glbFile, sceneName);
 			}
 
 			if (!_shouldUseInternalBufferForImages)
