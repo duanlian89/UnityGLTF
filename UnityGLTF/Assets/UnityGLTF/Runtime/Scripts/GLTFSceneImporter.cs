@@ -2423,7 +2423,7 @@ namespace UnityGLTF
 
 		}
 
-		protected virtual BufferCacheData ConstructBufferFromGLB(int bufferIndex)
+		public virtual BufferCacheData ConstructBufferFromGLB(int bufferIndex)
 		{
 			GLTFParser.SeekToBinaryChunk(_gltfStream.Stream, bufferIndex, _gltfStream.StartPosition);  // sets stream to correct start position
 			return new BufferCacheData

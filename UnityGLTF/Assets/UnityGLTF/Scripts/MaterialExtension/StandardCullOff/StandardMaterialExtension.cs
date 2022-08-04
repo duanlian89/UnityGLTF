@@ -277,7 +277,7 @@ namespace CKUnityGLTF
 			_Cutoff = token != null ? (float)token.DeserializeAsDouble() : _Cutoff_Default;
 
 			token = extensionToken.Value[StandardMaterialExtensionFactory._Color];
-			_Color = token != null ? token.DeserializeAsColor().ToUnityColorRaw() : _Color_Default;
+			_Color = token != null ? token.DeserializeAsColor().ToUnityColorLinear() : _Color_Default;
 
 			token = extensionToken.Value[StandardMaterialExtensionFactory._MainTex];
 			_MainTex = token != null ? token.DeserializeAsTexture(root) : _MainTex_Default;
@@ -322,7 +322,7 @@ namespace CKUnityGLTF
 			_OcclusionMap = token != null ? token.DeserializeAsTexture(root) : _OcclusionMap_Default;
 
 			token = extensionToken.Value[StandardMaterialExtensionFactory._EmissionColor];
-			_EmissionColor = token != null ? token.DeserializeAsColor().ToUnityColorRaw() : _EmissionColor_Default;
+			_EmissionColor = token != null ? token.DeserializeAsColor().ToUnityColorLinear() : _EmissionColor_Default;
 
 			token = extensionToken.Value[StandardMaterialExtensionFactory._EmissionMap];
 			_EmissionMap = token != null ? token.DeserializeAsTexture(root) : _EmissionMap_Default;

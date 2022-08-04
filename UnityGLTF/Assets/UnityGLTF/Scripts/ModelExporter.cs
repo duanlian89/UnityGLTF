@@ -461,7 +461,7 @@ namespace CKUnityGLTF
 
 				IPropExtension ext = factory.ConstructExtension() as IPropExtension;
 				ExportMaterialExtension(ext, materialObj, factory);
-				gltfMaterial.Extensions[MToonMaterialExtensionFactory.Extension_Name] = ext;
+				gltfMaterial.Extensions[factory.ExtensionName] = ext;
 			}
 			return id;
 		}

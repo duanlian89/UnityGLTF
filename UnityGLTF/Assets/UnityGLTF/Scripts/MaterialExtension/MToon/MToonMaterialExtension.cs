@@ -404,13 +404,13 @@ namespace CKUnityGLTF
 			_Cutoff = token != null ? (float)token.DeserializeAsDouble() : _Cutoff_Default;
 
 			token = extensionToken.Value[MToonMaterialExtensionFactory._Color];
-			_Color = token != null ? token.DeserializeAsColor().ToUnityColorRaw() : _Color_Default;
+			_Color = token != null ? token.DeserializeAsColor().ToUnityColorLinear() : _Color_Default;
 
 			token = extensionToken.Value[MToonMaterialExtensionFactory._ColorOL];
-			_ColorOL = token != null ? token.DeserializeAsColor().ToUnityColorRaw() : _ColorOL_Default;
+			_ColorOL = token != null ? token.DeserializeAsColor().ToUnityColorLinear() : _ColorOL_Default;
 
 			token = extensionToken.Value[MToonMaterialExtensionFactory._ShadeColor];
-			_ShadeColor = token != null ? token.DeserializeAsColor().ToUnityColorRaw() : _ShadeColor_Default;
+			_ShadeColor = token != null ? token.DeserializeAsColor().ToUnityColorLinear() : _ShadeColor_Default;
 
 			token = extensionToken.Value[MToonMaterialExtensionFactory._MainTex];
 			_MainTex = token != null ? token.DeserializeAsTexture(root) : _MainTex_Default;
@@ -452,7 +452,7 @@ namespace CKUnityGLTF
 			_IndirectLightIntensity = token != null ? (float)token.DeserializeAsDouble() : _IndirectLightIntensity_Default;
 
 			token = extensionToken.Value[MToonMaterialExtensionFactory._RimColor];
-			_RimColor = token != null ? token.DeserializeAsColor().ToUnityColorRaw() : _RimColor_Default;
+			_RimColor = token != null ? token.DeserializeAsColor().ToUnityColorLinear() : _RimColor_Default;
 
 			token = extensionToken.Value[MToonMaterialExtensionFactory._RimTexture];
 			_RimTexture = token != null ? token.DeserializeAsTexture(root) : _RimTexture_Default;
@@ -470,7 +470,7 @@ namespace CKUnityGLTF
 			_SphereAdd = token != null ? token.DeserializeAsTexture(root) : _SphereAdd_Default;
 
 			token = extensionToken.Value[MToonMaterialExtensionFactory._EmissionColor];
-			_EmissionColor = token != null ? token.DeserializeAsColor().ToUnityColorRaw() : _EmissionColor_Default;
+			_EmissionColor = token != null ? token.DeserializeAsColor().ToUnityColorLinear() : _EmissionColor_Default;
 
 			token = extensionToken.Value[MToonMaterialExtensionFactory._EmissionMap];
 			_EmissionMap = token != null ? token.DeserializeAsTexture(root) : _EmissionMap_Default;
@@ -485,7 +485,7 @@ namespace CKUnityGLTF
 			_OutlineScaledMaxDistance = token != null ? (float)token.DeserializeAsDouble() : _OutlineScaledMaxDistance_Default;
 
 			token = extensionToken.Value[MToonMaterialExtensionFactory._OutlineColor];
-			_OutlineColor = token != null ? token.DeserializeAsColor().ToUnityColorRaw() : _OutlineColor_Default;
+			_OutlineColor = token != null ? token.DeserializeAsColor().ToUnityColorLinear() : _OutlineColor_Default;
 
 			token = extensionToken.Value[MToonMaterialExtensionFactory._OutlineLightingMix];
 			_OutlineLightingMix = token != null ? (float)token.DeserializeAsDouble() : _OutlineLightingMix_Default;
