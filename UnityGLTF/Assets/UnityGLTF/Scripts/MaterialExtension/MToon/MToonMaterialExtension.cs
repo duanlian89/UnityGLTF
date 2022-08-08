@@ -152,7 +152,7 @@ namespace CKUnityGLTF
 
 		}
 
-		public IExtension Clone(GLTFRoot root)
+		public virtual IExtension Clone(GLTFRoot root)
 		{
 			return new MToonMaterialExtension();
 		}
@@ -160,7 +160,7 @@ namespace CKUnityGLTF
 
 		// properties to json
 		// 用于导出时序列化属性名和属性值
-		public JProperty Serialize()
+		public virtual JProperty Serialize()
 		{
 			JObject ext = new JObject();
 
@@ -396,7 +396,7 @@ namespace CKUnityGLTF
 		}
 
 		// json to MToonMaterialExtension
-		public void Deserialize(GLTFRoot root, JProperty extensionToken)
+		public virtual void Deserialize(GLTFRoot root, JProperty extensionToken)
 		{
 			//MToonMaterialExtension ext = new MToonMaterialExtension();
 
