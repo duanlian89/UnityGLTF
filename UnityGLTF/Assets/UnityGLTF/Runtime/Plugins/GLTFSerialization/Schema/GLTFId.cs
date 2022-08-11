@@ -244,9 +244,11 @@ namespace GLTF.Schema
 
 			while (reader.Read() && reader.TokenType != JsonToken.EndArray)
 			{
+				int _id;
+				int.TryParse(reader.Value.ToString(), out _id);
 				var node = new NodeId
 				{
-					Id = int.Parse(reader.Value.ToString()),
+					Id = _id,
 					Root = root
 				};
 

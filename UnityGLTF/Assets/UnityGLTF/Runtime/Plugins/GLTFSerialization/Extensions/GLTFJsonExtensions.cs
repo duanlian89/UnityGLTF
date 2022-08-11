@@ -37,7 +37,9 @@ namespace GLTF.Extensions
 
 			while (reader.Read() && reader.TokenType != JsonToken.EndArray)
 			{
-				list.Add(double.Parse(reader.Value.ToString()));
+				Double d;
+				double.TryParse(reader.Value.ToString(), out d);
+				list.Add(d);
 			}
 
 			return list;
@@ -54,7 +56,9 @@ namespace GLTF.Extensions
 
 			while (reader.Read() && reader.TokenType != JsonToken.EndArray)
 			{
-				list.Add(int.Parse(reader.Value.ToString()));
+				int i;
+				int.TryParse(reader.Value.ToString(), out i);
+				list.Add(i);
 			}
 
 			return list;
