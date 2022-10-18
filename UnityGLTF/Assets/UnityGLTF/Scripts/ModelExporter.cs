@@ -509,6 +509,8 @@ namespace CKUnityGLTF
 				t.GetField(MaterialExtensionFactory.shaderKeywords) != null)
 				t.GetField(MaterialExtensionFactory.shaderKeywords).SetValue(ext, materialObj.shaderKeywords);
 
+			if (t.GetField(MaterialExtensionFactory.renderQueue) != null)
+				t.GetField(MaterialExtensionFactory.renderQueue).SetValue(ext, materialObj.renderQueue);
 		}
 	}
 }

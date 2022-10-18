@@ -9,6 +9,9 @@ namespace CKUnityGLTF
 	public class MToonMaterialExtension : IPropExtension
 	{
 		#region properties and default value
+		public int renderQueue;
+
+		public string[] shaderKeywords = new string[] { };
 
 		public float _Cutoff = 0.0f;
 		public static readonly float _Cutoff_Default = 0.5f;
@@ -392,6 +395,24 @@ namespace CKUnityGLTF
 				ext.Add(new JProperty(MToonMaterialExtensionFactory._AlphaToMask, _AlphaToMask));
 			}
 
+			if (shaderKeywords.Length > 0)
+			{
+				System.Text.StringBuilder str = new System.Text.StringBuilder();
+				for (int i = 0; i < shaderKeywords.Length; i++)
+				{
+					if (i > 0)
+					{
+						//分割符可根据需要自行修改
+						str.Append(",");
+					}
+					str.Append(shaderKeywords[i]);
+				}
+				string keywords = str.ToString();
+				ext.Add(new JProperty(MToonMaterialExtensionFactory.shaderKeywords, keywords));
+			}
+
+			ext.Add(new JProperty(MToonMaterialExtensionFactory.renderQueue, renderQueue));
+
 			return new JProperty(MToonMaterialExtensionFactory.Extension_Name, ext);
 		}
 
@@ -537,7 +558,16 @@ namespace CKUnityGLTF
 			token = extensionToken.Value[MToonMaterialExtensionFactory._AlphaToMask];
 			_AlphaToMask = token != null ? (float)token.DeserializeAsDouble() : _AlphaToMask_Default;
 
+			token = extensionToken.Value[MToonMaterialExtensionFactory.shaderKeywords];
+			string[] reps = new string[] { "\\", "[", "]", "\"" };
+			foreach (string s in reps)
+			{
+				token = token.ToString().Replace(s, "");
+			}
+			shaderKeywords = token != null ? token.ToString().Split(',') : shaderKeywords;
 
+			token = extensionToken.Value[MToonMaterialExtensionFactory.renderQueue];
+			renderQueue = token != null ? token.DeserializeAsInt() : renderQueue;
 		}
 	}
 }

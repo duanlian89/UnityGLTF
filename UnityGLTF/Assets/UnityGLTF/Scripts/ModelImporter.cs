@@ -10,6 +10,7 @@ using System;
 using System.Linq;
 using UnityGLTF;
 using GLTF;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace CKUnityGLTF
 {
@@ -331,14 +332,24 @@ namespace CKUnityGLTF
 
 			if (t.GetField(MaterialExtensionFactory.shaderKeywords) != null)
 			{
-				System.Object obj = t.GetField(MaterialExtensionFactory.shaderKeywords).GetValue(extension);
-				material.shaderKeywords = obj as String[];
+				System.Object shaderKeywords = t.GetField(MaterialExtensionFactory.shaderKeywords).GetValue(extension);
+				material.shaderKeywords = shaderKeywords as String[];
 			}
 			else
 			{
 				Debug.Log(string.Format("can not get Field by name:{0}", MaterialExtensionFactory.shaderKeywords));
 			}
 
+			if (t.GetField(MaterialExtensionFactory.renderQueue) != null)
+			{
+				System.Object renderQueue = t.GetField(MaterialExtensionFactory.renderQueue).GetValue(extension);
+				Debug.Log(string.Format("render queue {0}", renderQueue));
+				material.renderQueue = (int)renderQueue;
+			}
+			else
+			{
+				Debug.Log(string.Format("can not get Field by name:{0}", MaterialExtensionFactory.renderQueue));
+			}
 			return material;
 		}
 
