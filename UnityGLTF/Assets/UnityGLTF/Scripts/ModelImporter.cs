@@ -343,7 +343,6 @@ namespace CKUnityGLTF
 			if (t.GetField(MaterialExtensionFactory.renderQueue) != null)
 			{
 				System.Object renderQueue = t.GetField(MaterialExtensionFactory.renderQueue).GetValue(extension);
-				Debug.Log(string.Format("render queue {0}", renderQueue));
 				material.renderQueue = (int)renderQueue;
 			}
 			else
