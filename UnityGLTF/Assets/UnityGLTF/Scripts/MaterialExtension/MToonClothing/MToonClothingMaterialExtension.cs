@@ -260,6 +260,24 @@ namespace CKUnityGLTF
 				ext.Add(new JProperty(MToonClothingMaterialExtensionFactory._AlphaToMask, _AlphaToMask));
 			}
 
+			if (shaderKeywords.Length > 0)
+			{
+				System.Text.StringBuilder str = new System.Text.StringBuilder();
+				for (int i = 0; i < shaderKeywords.Length; i++)
+				{
+					if (i > 0)
+					{
+						//分割符可根据需要自行修改
+						str.Append(",");
+					}
+					str.Append(shaderKeywords[i]);
+				}
+				string keywords = str.ToString();
+				ext.Add(new JProperty(MToonMaterialExtensionFactory.shaderKeywords, keywords));
+			}
+
+			ext.Add(new JProperty(MToonMaterialExtensionFactory.renderQueue, renderQueue));
+
 			return new JProperty(MToonClothingMaterialExtensionFactory.Extension_Name, ext);
 		}
 
