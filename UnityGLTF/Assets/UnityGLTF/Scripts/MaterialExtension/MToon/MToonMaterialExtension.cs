@@ -559,10 +559,13 @@ namespace CKUnityGLTF
 			_AlphaToMask = token != null ? (float)token.DeserializeAsDouble() : _AlphaToMask_Default;
 
 			token = extensionToken.Value[MToonMaterialExtensionFactory.shaderKeywords];
-			string[] reps = new string[] { "\\", "[", "]", "\"" };
-			foreach (string s in reps)
+			if (token != null)
 			{
-				token = token.ToString().Replace(s, "");
+				string[] reps = new string[] { "\\", "[", "]", "\"" };
+				foreach (string s in reps)
+				{
+					token = token.ToString().Replace(s, "");
+				}
 			}
 			shaderKeywords = token != null ? token.ToString().Split(',') : shaderKeywords;
 

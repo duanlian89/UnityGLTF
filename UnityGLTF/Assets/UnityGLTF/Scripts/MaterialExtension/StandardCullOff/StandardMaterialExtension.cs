@@ -355,10 +355,13 @@ namespace CKUnityGLTF
 			_ZWrite = token != null ? (float)token.DeserializeAsDouble() : _ZWrite_Default;
 
 			token = extensionToken.Value[StandardMaterialExtensionFactory.shaderKeywords];
-			string[] reps = new string[] { "\\", "[", "]", "\"" };
-			foreach (string s in reps)
+			if (token != null)
 			{
-				token = token.ToString().Replace(s, "");
+				string[] reps = new string[] { "\\", "[", "]", "\"" };
+				foreach (string s in reps)
+				{
+					token = token.ToString().Replace(s, "");
+				}
 			}
 			shaderKeywords = token != null ? token.ToString().Split(',') : shaderKeywords;
 		}
