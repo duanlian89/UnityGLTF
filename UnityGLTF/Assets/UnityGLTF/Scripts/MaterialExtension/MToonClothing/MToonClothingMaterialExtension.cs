@@ -278,6 +278,16 @@ namespace CKUnityGLTF
 
 			ext.Add(new JProperty(MToonMaterialExtensionFactory.renderQueue, renderQueue));
 
+			if (_LinearLitColor != _LinearLitColor_Default)
+			{
+				ext.Add(new JProperty(MToonClothingMaterialExtensionFactory._LinearLitColor, new JArray(_LinearLitColor.r, _LinearLitColor.g, _LinearLitColor.b, _LinearLitColor.a)));
+			}
+
+			if (_SpecTexture != _SpecTexture_Default)
+			{
+				ext.Add(new JProperty(MToonClothingMaterialExtensionFactory._SpecTexture, new JObject(new JProperty(TextureInfo.INDEX, _SpecTexture.Index.Id))));
+			}
+
 			return new JProperty(MToonClothingMaterialExtensionFactory.Extension_Name, ext);
 		}
 

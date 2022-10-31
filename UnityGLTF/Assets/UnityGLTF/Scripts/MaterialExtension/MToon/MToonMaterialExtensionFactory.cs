@@ -13,6 +13,9 @@ namespace CKUnityGLTF
 
 		public const string _Color = "_Color";
 
+		public const string _LinearLitColor = "_LinearLitColor";
+		public const string _SpecTexture = "_SpecTexture";
+
 		public const string _ColorOL = "_ColorOL";
 
 		public const string _ShadeColor = "_ShadeColor";
@@ -112,11 +115,11 @@ namespace CKUnityGLTF
 		_DebugMode ,_BlendMode ,_OutlineWidthMode ,_OutlineColorMode ,_CullMode ,
 		_OutlineCullMode,_SrcBlend ,_DstBlend ,_ZWrite,_AlphaToMask   };
 
-			ColorProperties = new string[] { _Color, _ColorOL, _ShadeColor, _RimColor, _EmissionColor, _OutlineColor };
+			ColorProperties = new string[] { _Color, _ColorOL, _ShadeColor, _RimColor, _EmissionColor, _OutlineColor, _LinearLitColor };
 
 			TextureProperties = new string[] { _MainTex, _MainTex2, _ShadeTexture , _BumpMap ,
 		_ReceiveShadowTexture, _ShadingGradeTexture ,_RimTexture,_SphereAdd,_EmissionMap,
-		_OutlineWidthTexture,_UvAnimMaskTexture };
+		_OutlineWidthTexture,_UvAnimMaskTexture ,_SpecTexture};
 		}
 
 		// 从extensionToken读出属性，初始化 MToonMaterialExtension

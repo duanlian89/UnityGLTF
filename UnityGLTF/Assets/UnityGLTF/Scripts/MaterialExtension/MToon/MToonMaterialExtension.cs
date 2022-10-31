@@ -19,6 +19,9 @@ namespace CKUnityGLTF
 		public Color _Color = Color.white;
 		public static readonly UnityEngine.Color _Color_Default = UnityEngine.Color.white;
 
+		public Color _LinearLitColor = new Color(0.5f, 0.5f, 0.5f, 1);
+		public static readonly Color _LinearLitColor_Default = new Color(0.5f, 0.5f, 0.5f, 1);
+
 		public Color _ColorOL = Color.white;
 		public static readonly Color _ColorOL_Default = new Color(1, 1, 1, 0);
 
@@ -39,6 +42,9 @@ namespace CKUnityGLTF
 
 		public TextureInfo _BumpMap;
 		public static readonly TextureInfo _BumpMap_Default = null;
+
+		public TextureInfo _SpecTexture;
+		public static readonly TextureInfo _SpecTexture_Default = null;
 
 		public float _ReceiveShadowRate = 1.0f;
 		public static readonly float _ReceiveShadowRate_Default = 1.0f;
@@ -413,6 +419,16 @@ namespace CKUnityGLTF
 
 			ext.Add(new JProperty(MToonMaterialExtensionFactory.renderQueue, renderQueue));
 
+			if (_LinearLitColor != _LinearLitColor_Default)
+			{
+				ext.Add(new JProperty(MToonClothingMaterialExtensionFactory._LinearLitColor, new JArray(_LinearLitColor.r, _LinearLitColor.g, _LinearLitColor.b, _LinearLitColor.a)));
+			}
+
+			if (_SpecTexture != _SpecTexture_Default)
+			{
+				ext.Add(new JProperty(MToonClothingMaterialExtensionFactory._SpecTexture, new JObject(new JProperty(TextureInfo.INDEX, _SpecTexture.Index.Id))));
+			}
+
 			return new JProperty(MToonMaterialExtensionFactory.Extension_Name, ext);
 		}
 
@@ -571,6 +587,13 @@ namespace CKUnityGLTF
 
 			token = extensionToken.Value[MToonMaterialExtensionFactory.renderQueue];
 			renderQueue = token != null ? token.DeserializeAsInt() : renderQueue;
+
+
+			token = extensionToken.Value[MToonMaterialExtensionFactory._LinearLitColor];
+			_LinearLitColor = token != null ? token.DeserializeAsColor().ToUnityColorLinear() : _RimColor_Default;
+
+			token = extensionToken.Value[MToonMaterialExtensionFactory._SpecTexture];
+			_SpecTexture = token != null ? token.DeserializeAsTexture(root) : _SpecTexture_Default;
 		}
 	}
 }
