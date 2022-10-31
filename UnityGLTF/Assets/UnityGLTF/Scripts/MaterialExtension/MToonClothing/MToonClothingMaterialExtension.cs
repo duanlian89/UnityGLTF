@@ -28,6 +28,21 @@ namespace CKUnityGLTF
 		{
 			JObject ext = new JObject();
 
+			if (_SpecMulti != _SpecMulti_Default)
+			{
+				ext.Add(new JProperty(MToonMaterialExtensionFactory._SpecMulti, _SpecMulti));
+			}
+
+			if (_SpecRange != _SpecRange_Default)
+			{
+				ext.Add(new JProperty(MToonMaterialExtensionFactory._SpecRange, _SpecRange));
+			}
+
+			if (_SpecSoftness != _SpecSoftness_Default)
+			{
+				ext.Add(new JProperty(MToonMaterialExtensionFactory._SpecSoftness, _SpecSoftness));
+			}
+
 			if (_Cutoff != _Cutoff_Default)
 			{
 				ext.Add(new JProperty(MToonClothingMaterialExtensionFactory._Cutoff, _Cutoff));

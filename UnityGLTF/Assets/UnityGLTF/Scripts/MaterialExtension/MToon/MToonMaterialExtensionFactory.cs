@@ -102,6 +102,12 @@ namespace CKUnityGLTF
 
 		public const string _AlphaToMask = "_AlphaToMask";
 
+		public const string _SpecMulti = "_SpecMulti";
+
+		public const string _SpecRange = "_SpecRange";
+
+		public const string _SpecSoftness = "_SpecSoftness";
+
 		#endregion
 
 		public MToonMaterialExtensionFactory()
@@ -113,13 +119,13 @@ namespace CKUnityGLTF
 		_IndirectLightIntensity,_RimLightingMix,_RimFresnelPower    ,_RimLift,_OutlineWidth,_OutlineScaledMaxDistance,
 		_OutlineLightingMix,_UvAnimScrollX,_UvAnimScrollY,_UvAnimRotation,_MToonVersion ,
 		_DebugMode ,_BlendMode ,_OutlineWidthMode ,_OutlineColorMode ,_CullMode ,
-		_OutlineCullMode,_SrcBlend ,_DstBlend ,_ZWrite,_AlphaToMask   };
+		_OutlineCullMode,_SrcBlend ,_DstBlend ,_ZWrite,_AlphaToMask,_SpecMulti,_SpecRange ,_SpecSoftness };
 
 			ColorProperties = new string[] { _Color, _ColorOL, _ShadeColor, _RimColor, _EmissionColor, _OutlineColor, _LinearLitColor };
 
 			TextureProperties = new string[] { _MainTex, _MainTex2, _ShadeTexture , _BumpMap ,
 		_ReceiveShadowTexture, _ShadingGradeTexture ,_RimTexture,_SphereAdd,_EmissionMap,
-		_OutlineWidthTexture,_UvAnimMaskTexture ,_SpecTexture};
+		_OutlineWidthTexture,_UvAnimMaskTexture,_SpecTexture};
 		}
 
 		// 从extensionToken读出属性，初始化 MToonMaterialExtension

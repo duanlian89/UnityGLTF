@@ -154,6 +154,15 @@ namespace CKUnityGLTF
 		public float _AlphaToMask = 0.0f;
 		public static readonly float _AlphaToMask_Default = 0.0f;
 
+		public float _SpecMulti = 0.0f;
+		public static readonly float _SpecMulti_Default = 0.0f;
+
+		public float _SpecRange = 1.0f;
+		public static readonly float _SpecRange_Default = 1.0f;
+
+		public float _SpecSoftness = 0.0f;
+		public static readonly float _SpecSoftness_Default = 0.0f;
+
 		#endregion
 
 		public MToonMaterialExtension()
@@ -172,6 +181,21 @@ namespace CKUnityGLTF
 		public virtual JProperty Serialize()
 		{
 			JObject ext = new JObject();
+
+			if (_SpecMulti != _SpecMulti_Default)
+			{
+				ext.Add(new JProperty(MToonMaterialExtensionFactory._SpecMulti, _SpecMulti));
+			}
+
+			if (_SpecRange != _SpecRange_Default)
+			{
+				ext.Add(new JProperty(MToonMaterialExtensionFactory._SpecRange, _SpecRange));
+			}
+
+			if (_SpecSoftness != _SpecSoftness_Default)
+			{
+				ext.Add(new JProperty(MToonMaterialExtensionFactory._SpecSoftness, _SpecSoftness));
+			}
 
 			if (_Cutoff != _Cutoff_Default)
 			{
@@ -440,6 +464,15 @@ namespace CKUnityGLTF
 			JToken token = extensionToken.Value[MToonMaterialExtensionFactory._Cutoff];
 			_Cutoff = token != null ? (float)token.DeserializeAsDouble() : _Cutoff_Default;
 
+			token = extensionToken.Value[MToonMaterialExtensionFactory._SpecMulti];
+			_SpecMulti = token != null ? (float)token.DeserializeAsDouble() : _SpecMulti_Default;
+
+			token = extensionToken.Value[MToonMaterialExtensionFactory._SpecRange];
+			_SpecRange = token != null ? (float)token.DeserializeAsDouble() : _SpecRange_Default;
+
+			token = extensionToken.Value[MToonMaterialExtensionFactory._SpecSoftness];
+			_SpecSoftness = token != null ? (float)token.DeserializeAsDouble() : _SpecSoftness_Default;
+
 			token = extensionToken.Value[MToonMaterialExtensionFactory._Color];
 			_Color = token != null ? token.DeserializeAsColor().ToUnityColorLinear() : _Color_Default;
 
@@ -590,7 +623,7 @@ namespace CKUnityGLTF
 
 
 			token = extensionToken.Value[MToonMaterialExtensionFactory._LinearLitColor];
-			_LinearLitColor = token != null ? token.DeserializeAsColor().ToUnityColorLinear() : _RimColor_Default;
+			_LinearLitColor = token != null ? token.DeserializeAsColor().ToUnityColorLinear() : _LinearLitColor_Default;
 
 			token = extensionToken.Value[MToonMaterialExtensionFactory._SpecTexture];
 			_SpecTexture = token != null ? token.DeserializeAsTexture(root) : _SpecTexture_Default;
