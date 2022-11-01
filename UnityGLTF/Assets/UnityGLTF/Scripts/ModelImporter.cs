@@ -157,11 +157,15 @@ namespace CKUnityGLTF
 					Stream stream = new SubStream(bufferContents.Stream, 0, data.Length);
 					byte[] buffer = new byte[stream.Length];
 					stream.Read(buffer, 0, (int)stream.Length);
+					stream.Dispose();
 
 					Texture2D texture = new Texture2D(0, 0, TextureFormat.RGBA32, false, false);
 					texture.name = string.IsNullOrEmpty(image.Name) ? _gltfRoot.Textures[index].Name : image.Name;
 					texture.LoadImage(buffer, false);
 					texture.Apply();
+
+					buffer = null;
+
 					return texture;
 				}
 
