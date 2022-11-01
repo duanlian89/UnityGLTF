@@ -4,19 +4,18 @@ using GLTF.Schema;
 using UnityGLTF.Cache;
 using System.Threading.Tasks;
 using System.Threading;
-using Newtonsoft.Json.Linq;
-using GLTF.Extensions;
 using System;
 using System.Linq;
 using UnityGLTF;
 using GLTF;
-using static System.Net.Mime.MediaTypeNames;
+using GLTF.Utilities;
+using System.IO;
 
 namespace CKUnityGLTF
 {
 	public class ModelImporter : GLTFSceneImporter
 	{
-		public UnityGLTF.Cache.AssetCache AssetCache
+		internal UnityGLTF.Cache.AssetCache AssetCache
 		{
 			get { return _assetCache; }
 		}
@@ -88,6 +87,91 @@ namespace CKUnityGLTF
 					onLoadComplete(this.CreatedObject, this.ConfigJson);
 				}
 			});
+		}
+
+		//public async Task<Texture2D> GetTexture2DByIndexAsync(int index)
+		//{
+		//	await ConstructTexture(_gltfRoot.Textures[index], index, false, true);
+		//	Texture2D texture2D = _assetCache.TextureCache[index].Texture as Texture2D;
+		//	return texture2D;
+		//}
+
+		/// <summary>
+		/// 根据名字获取对应的贴图
+		/// </summary>
+		public Texture2D GetTexture2DByName(string name)
+		{
+			try
+			{
+				_gltfStream.Stream = _options.DataLoader.LoadStreamAsync(_gltfFileName).GetAwaiter().GetResult();
+				_gltfStream.StartPosition = 0;
+				GLTFParser.ParseJson(_gltfStream.Stream, out _gltfRoot, _gltfStream.StartPosition);
+
+				for (int i = 0; i < _gltfRoot.Textures.Count; i++)
+				{
+					if (_gltfRoot.Textures[i].Name == name)
+					{
+						return GetTexture2DByIndex(i);
+					}
+				}
+
+				return null;
+			}
+			catch (Exception e)
+			{
+				Debug.LogWarning(string.Format("Found Exception Whene GetTexture2DByName,{0}{1}{2}", e.Message, Environment.NewLine, e.StackTrace));
+				return null;
+			}
+		}
+
+		/// <summary>
+		/// 根据索引获取对应的贴图
+		/// </summary>
+		public Texture2D GetTexture2DByIndex(int index)
+		{
+			try
+			{
+				_gltfStream.Stream = _options.DataLoader.LoadStreamAsync(_gltfFileName).GetAwaiter().GetResult();
+				_gltfStream.StartPosition = 0;
+				GLTFParser.ParseJson(_gltfStream.Stream, out _gltfRoot, _gltfStream.StartPosition);
+
+				if (_gltfRoot != null)
+				{
+					_gltfStream.StartPosition = 0;
+
+					var tor = _gltfRoot.Meshes[0].Primitives[0].Attributes.GetEnumerator();
+					tor.MoveNext();
+					int bufferIndex = tor.Current.Value.Value.BufferView.Value.Buffer.Id;
+
+					GLTFParser.SeekToBinaryChunk(_gltfStream.Stream, bufferIndex, _gltfStream.StartPosition);  // sets stream to correct start position
+					BufferCacheData bufferContents = new BufferCacheData
+					{
+						Stream = _gltfStream.Stream,
+						ChunkOffset = (uint)_gltfStream.Stream.Position
+					};
+
+					var image = _gltfRoot.Images[_gltfRoot.Textures[index].Source.Id];
+					var bufferView = image.BufferView.Value;
+					var data = new byte[bufferView.ByteLength];
+					bufferContents.Stream.Position = bufferView.ByteOffset + bufferContents.ChunkOffset;
+					Stream stream = new SubStream(bufferContents.Stream, 0, data.Length);
+					byte[] buffer = new byte[stream.Length];
+					stream.Read(buffer, 0, (int)stream.Length);
+
+					Texture2D texture = new Texture2D(0, 0, TextureFormat.RGBA32, false, false);
+					texture.name = string.IsNullOrEmpty(image.Name) ? _gltfRoot.Textures[index].Name : image.Name;
+					texture.LoadImage(buffer, false);
+					texture.Apply();
+					return texture;
+				}
+
+				return null;
+			}
+			catch (Exception e)
+			{
+				Debug.LogWarning(string.Format("Found Exception Whene GetTexture2DByIndex,{0}{1}{2}", e.Message, Environment.NewLine, e.StackTrace));
+				return null;
+			}
 		}
 
 		/// <summary>
