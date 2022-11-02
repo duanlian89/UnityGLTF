@@ -512,5 +512,21 @@ namespace CKUnityGLTF
 			if (t.GetField(MaterialExtensionFactory.renderQueue) != null)
 				t.GetField(MaterialExtensionFactory.renderQueue).SetValue(ext, materialObj.renderQueue);
 		}
+
+		protected override void ExportSkinFromNode(Transform transform)
+		{
+			base.ExportSkinFromNode(transform);
+
+			SkinnedMeshRenderer skinMeshRender = transform.GetComponent<SkinnedMeshRenderer>();
+			if (skinMeshRender.rootBone != null)
+			{
+				Skin skin = _root.Skins[_root.Skins.Count - 1];
+				skin.Skeleton = new GLTF.Schema.NodeId
+				{
+					Id = _exportedTransforms[skinMeshRender.rootBone.GetInstanceID()],
+					Root = _root
+				};
+			}
+		}
 	}
 }

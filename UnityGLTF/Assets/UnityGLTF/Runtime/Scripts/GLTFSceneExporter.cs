@@ -4283,7 +4283,7 @@ namespace UnityGLTF
 			return null;
 		}
 
-		private void ExportSkinFromNode(Transform transform)
+		protected virtual void ExportSkinFromNode(Transform transform)
 		{
 			PrimKey key = new PrimKey();
 			UnityEngine.Mesh mesh = GetMeshFromGameObject(transform.gameObject);
