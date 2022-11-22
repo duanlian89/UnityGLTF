@@ -494,7 +494,7 @@ namespace CKUnityGLTF
 
 		public void Dispose(bool destory = false)
 		{
-			if (destory)
+			if (destory && _assetCache != null)
 			{
 				for (int i = 0; i < _assetCache.MeshCache.Length; i++)
 				{
