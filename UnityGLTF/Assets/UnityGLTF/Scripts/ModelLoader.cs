@@ -64,6 +64,7 @@ public class ModelLoader
 		//});
 	}
 
+	/*
 	private static string ParseConfigJson(byte[] data)
 	{
 		string regStr = "\"ConfigJson\".*\"}\"";
@@ -87,4 +88,5 @@ public class ModelLoader
 			return "";
 		}
 	}
+	*/
 }

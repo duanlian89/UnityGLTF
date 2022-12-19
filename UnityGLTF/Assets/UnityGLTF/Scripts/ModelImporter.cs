@@ -62,6 +62,37 @@ namespace CKUnityGLTF
 			}
 		}
 
+		string clothesInfoJson;
+		/// <summary>
+		/// ClothesInfo 结构的反序列
+		/// </summary>
+		public string ClothesInfoJson
+		{
+			get
+			{
+				if (string.IsNullOrEmpty(clothesInfoJson))
+				{
+					GetClothesInfoJson();
+				}
+
+				return clothesInfoJson;
+			}
+		}
+
+		private void GetClothesInfoJson()
+		{
+			_gltfStream.Stream = _options.DataLoader.LoadStreamAsync(_gltfFileName).GetAwaiter().GetResult();
+			_gltfStream.StartPosition = 0;
+			GLTFParser.ParseJson(_gltfStream.Stream, out _gltfRoot, _gltfStream.StartPosition);
+
+			if (_gltfRoot != null && _gltfRoot.Extensions != null && _gltfRoot.Extensions.Count > 0 && _gltfRoot.Extensions[ClothesInfoJsonExtensionFactory.Extension_Name] != null)
+			{
+				ClothesInfoJsonExtension extension = _gltfRoot.Extensions[ClothesInfoJsonExtensionFactory.Extension_Name] as ClothesInfoJsonExtension;
+				if (extension != null)
+					clothesInfoJson = extension.clothesInfoJson;
+			}
+		}
+
 		// 创建GameObject
 		public async Task Load()
 		{

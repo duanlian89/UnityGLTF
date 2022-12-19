@@ -27,7 +27,13 @@ namespace CKUnityGLTF
 		}
 
 		//var exportOptions = new ExportOptions { TexturePathRetriever = RetrieveTexturePath };
-		public ModelExporter(Transform parent, string configJson) :
+		/// <summary>
+		/// 将模型导出成glb
+		/// </summary>
+		/// <param name="parent">模型根节点</param>
+		/// <param name="configJson">info配置</param>
+		/// <param name="clothesInfoJson">服饰配置[用于白模导出的glb,上传商城时需要的参数]</param>
+		public ModelExporter(Transform parent, string configJson, string clothesInfoJson = "") :
 			base(new[] { parent }, new ExportOptions() { TexturePathRetriever = RetrieveTexturePath, ExportInactivePrimitives = true })
 		{
 			//exportedGameObjects = new Dictionary<GameObject, int>();
@@ -75,6 +81,12 @@ namespace CKUnityGLTF
 
 			var configJsonExtension = new ConfigJsonExtension() { configJson = configJson };
 			_root.Extensions.Add(ConfigJsonExtensionFactory.Extension_Name, configJsonExtension);
+
+			if (!string.IsNullOrEmpty(clothesInfoJson))
+			{
+				var clothesinfoJsonExtension = new ClothesInfoJsonExtension() { clothesInfoJson = clothesInfoJson };
+				_root.Extensions.Add(ClothesInfoJsonExtensionFactory.Extension_Name, clothesinfoJsonExtension);
+			}
 		}
 
 		/// <summary>
