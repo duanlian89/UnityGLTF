@@ -16,7 +16,7 @@ namespace GLTF.Schema
 		/// <summary>
 		/// Minification filter. All valid values correspond to WebGL enums.
 		/// </summary>
-		public MinFilterMode MinFilter = MinFilterMode.NearestMipmapLinear;
+		public MinFilterMode MinFilter = MinFilterMode.LinearMipmapNearest;
 
 		/// <summary>
 		/// s wrapping mode.  All valid values correspond to WebGL enums.
@@ -83,7 +83,7 @@ namespace GLTF.Schema
 				writer.WriteValue((int)MagFilter);
 			}
 
-			if (MinFilter != MinFilterMode.NearestMipmapLinear && MinFilter != MinFilterMode.None)
+			if (MinFilter != MinFilterMode.LinearMipmapNearest && MinFilter != MinFilterMode.None)
 			{
 				writer.WritePropertyName("minFilter");
 				writer.WriteValue((int)MinFilter);

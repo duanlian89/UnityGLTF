@@ -44,11 +44,12 @@ public class ModelLoader
 		return sceneImporter;
 	}
 
-	public static ModelImporter GetImporter(string fileName, byte[] data)
+	public static ModelImporter GetImporter(string fileName, byte[] data, float scaleFactor = 0.5f)
 	{
 		//string directoryPath = URIHelper.GetDirectoryName(absoluteStreamingPath);
 
-		UnityGLTF.ImportOptions importOptions = new UnityGLTF.ImportOptions();
+		ImportOptionsExtension importOptions = new ImportOptionsExtension();
+		importOptions.scaleFactor = scaleFactor;
 		importOptions.DataLoader = new VirtualStreamLoader() { data = data };
 
 		ModelImporter sceneImporter = new ModelImporter(fileName, importOptions);

@@ -13,6 +13,14 @@ using System.IO;
 
 namespace CKUnityGLTF
 {
+	public class ImportOptionsExtension : ImportOptions
+	{
+		/// <summary>
+		/// 纹理缩放比例
+		/// </summary>
+		public float scaleFactor = 0.5f;
+	}
+
 	public class ModelImporter : GLTFSceneImporter
 	{
 		internal UnityGLTF.Cache.AssetCache AssetCache
@@ -20,10 +28,15 @@ namespace CKUnityGLTF
 			get { return _assetCache; }
 		}
 
+		/// <summary>
+		/// 纹理缩放比例
+		/// </summary>
+		float scaleFactor = 1.0f;
 		public ModelImporter(string gltfFileName, ImportOptions options)
 			: base(gltfFileName, options)
 		{
-
+			ImportOptionsExtension optionsExtension = options as ImportOptionsExtension;
+			scaleFactor = (float)optionsExtension?.scaleFactor;
 		}
 
 		string configJson;
@@ -492,8 +505,15 @@ namespace CKUnityGLTF
 						//	(morphTargets != null ? new List<double>(morphTargets.Select(mt => 0.0)) : null);
 						//if (weights != null)
 						//{
-						_assetCache.NodeCache[nodeIndex].AddComponent<MeshFilter>().sharedMesh = unityMesh;
-						_assetCache.NodeCache[nodeIndex].AddComponent<MeshCollider>().sharedMesh = unityMesh;
+						var meshFilter = _assetCache.NodeCache[nodeIndex].GetComponent<MeshFilter>();
+						if (!meshFilter)
+							meshFilter = _assetCache.NodeCache[nodeIndex].AddComponent<MeshFilter>();
+						meshFilter.sharedMesh = unityMesh;
+
+						var meshCollider = _assetCache.NodeCache[nodeIndex].GetComponent<MeshCollider>();
+						if (!meshCollider)
+							meshCollider = _assetCache.NodeCache[nodeIndex].AddComponent<MeshCollider>();
+						meshCollider.sharedMesh = unityMesh;
 						//}
 					}
 				}
@@ -520,6 +540,23 @@ namespace CKUnityGLTF
 						}
 					}
 				});
+			}
+		}
+
+		protected override async Task ConstructUnityTexture(Stream stream, bool markGpuOnly, bool isLinear, GLTFImage image, int imageCacheIndex)
+		{
+			await base.ConstructUnityTexture(stream, markGpuOnly, isLinear, image, imageCacheIndex);
+
+			Texture2D originalTexture2d = _assetCache.ImageCache[imageCacheIndex];
+
+			if (scaleFactor != 1.0f)
+			{
+				var scaleTexture2D = TextureUtil.ResizeTexture(originalTexture2d, (int)(originalTexture2d.width * scaleFactor), (int)(originalTexture2d.height * scaleFactor));
+				if (scaleTexture2D)
+				{
+					_assetCache.ImageCache[imageCacheIndex] = scaleTexture2D;
+					UnityEngine.Object.Destroy(originalTexture2d);
+				}
 			}
 		}
 
