@@ -27,6 +27,7 @@ public class UnityPackageExporter
 				"Assets/UnityGLTF/Scripts/ConfigJsonExtension",
 				"Assets/UnityGLTF/Scripts/MaterialExtension",
 				"Assets/UnityGLTF/Scripts/MeshFilterAndMeshColliderExtension",
+				"Assets/UnityGLTF/Scripts/ClothesInfoJsonExtension",
 				"Assets/UnityGLTF/Scripts/Server",
 				"Assets/UnityGLTF/Scripts/IPropExtension.cs",
 				"Assets/UnityGLTF/Scripts/ModelExporter.cs",
@@ -36,6 +37,7 @@ public class UnityPackageExporter
 				"Assets/UnityGLTF/Scripts/MyGLTFRoot.cs",
 				"Assets/UnityGLTF/Scripts/Utils.cs",
 				"Assets/UnityGLTF/Scripts/VirtualStreamLoader.cs",
+				"Assets/UnityGLTF/Scripts/TextureUtil.cs"
 		};
 
 		//var allPaths = AssetDatabase.GetDependencies(assetPaths);

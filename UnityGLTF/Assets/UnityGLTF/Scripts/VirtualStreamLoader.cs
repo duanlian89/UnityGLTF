@@ -13,8 +13,10 @@ namespace CKUnityGLTF
 		public async Task<Stream> LoadStreamAsync(string relativeFilePath)
 		{
 			var stream = new MemoryStream(data, 0, data.Length, false, true);
-			await Task.Yield();
-			return stream;
+
+			TaskCompletionSource<Stream> taskCompletionSource = new TaskCompletionSource<Stream>();
+			taskCompletionSource.SetResult(stream);
+			return await taskCompletionSource.Task;
 		}
 	}
 }
