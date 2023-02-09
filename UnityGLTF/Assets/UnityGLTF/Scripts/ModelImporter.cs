@@ -560,6 +560,96 @@ namespace CKUnityGLTF
 			}
 		}
 
+		// 重写此方法，使TextureCache和ImageCache存储同样的内容以减少占用内存。
+		protected override async Task ConstructTexture(GLTFTexture texture, int textureIndex,
+			bool markGpuOnly, bool isLinear)
+		{
+			if (_assetCache.TextureCache[textureIndex].Texture == null)
+			{
+				int sourceId = GetTextureSourceId(texture);
+				GLTFImage image = _gltfRoot.Images[sourceId];
+				await ConstructImage(image, sourceId, markGpuOnly, isLinear);
+
+				var source = _assetCache.ImageCache[sourceId];
+				FilterMode desiredFilterMode;
+				TextureWrapMode desiredWrapModeS, desiredWrapModeT;
+
+				if (texture.Sampler != null)
+				{
+					var sampler = texture.Sampler.Value;
+					switch (sampler.MinFilter)
+					{
+						case MinFilterMode.Nearest:
+						case MinFilterMode.NearestMipmapNearest:
+						case MinFilterMode.NearestMipmapLinear:
+							desiredFilterMode = FilterMode.Point;
+							break;
+						case MinFilterMode.Linear:
+						case MinFilterMode.LinearMipmapNearest:
+							desiredFilterMode = FilterMode.Bilinear;
+							break;
+						case MinFilterMode.LinearMipmapLinear:
+							desiredFilterMode = FilterMode.Trilinear;
+							break;
+						default:
+							Debug.LogWarning("Unsupported Sampler.MinFilter: " + sampler.MinFilter);
+							desiredFilterMode = FilterMode.Trilinear;
+							break;
+					}
+
+					TextureWrapMode UnityWrapMode(GLTF.Schema.WrapMode gltfWrapMode)
+					{
+						switch (gltfWrapMode)
+						{
+							case GLTF.Schema.WrapMode.ClampToEdge:
+								return TextureWrapMode.Clamp;
+							case GLTF.Schema.WrapMode.Repeat:
+								return TextureWrapMode.Repeat;
+							case GLTF.Schema.WrapMode.MirroredRepeat:
+								return TextureWrapMode.Mirror;
+							default:
+								Debug.LogWarning("Unsupported Sampler.Wrap: " + gltfWrapMode);
+								return TextureWrapMode.Repeat;
+						}
+					}
+
+					desiredWrapModeS = UnityWrapMode(sampler.WrapS);
+					desiredWrapModeT = UnityWrapMode(sampler.WrapT);
+				}
+				else
+				{
+					desiredFilterMode = FilterMode.Trilinear;
+					desiredWrapModeS = TextureWrapMode.Repeat;
+					desiredWrapModeT = TextureWrapMode.Repeat;
+				}
+
+				var matchSamplerState = source.filterMode == desiredFilterMode && source.wrapModeU == desiredWrapModeS && source.wrapModeV == desiredWrapModeT;
+				//if (matchSamplerState || markGpuOnly)
+				//{
+				Debug.Assert(_assetCache.TextureCache[textureIndex].Texture == null, "Texture should not be reset to prevent memory leaks");
+				_assetCache.TextureCache[textureIndex].Texture = source;
+				source.filterMode = desiredFilterMode;
+				source.wrapModeU = desiredWrapModeS;
+				source.wrapModeV = desiredWrapModeT;
+
+				if (!matchSamplerState)
+				{
+					Debug.LogWarning($"Ignoring sampler; filter mode: source {source.filterMode}, desired {desiredFilterMode}; wrap mode: source {source.wrapModeU}x{source.wrapModeV}, desired {desiredWrapModeS}x{desiredWrapModeT}");
+				}
+				//}
+				//else
+				//{
+				//	var unityTexture = Object.Instantiate(source);
+				//	unityTexture.name = string.IsNullOrEmpty(image.Name) ? Path.GetFileNameWithoutExtension(image.Uri) : image.Name;
+				//	unityTexture.filterMode = desiredFilterMode;
+				//	unityTexture.wrapModeU = desiredWrapModeS;
+				//	unityTexture.wrapModeV = desiredWrapModeT;
+
+				//	Debug.Assert(_assetCache.TextureCache[textureIndex].Texture == null, "Texture should not be reset to prevent memory leaks");
+				//	_assetCache.TextureCache[textureIndex].Texture = unityTexture;
+				//}
+			}
+		}
 		public void Dispose(bool destory = false)
 		{
 			if (destory && _assetCache != null)
