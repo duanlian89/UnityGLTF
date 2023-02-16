@@ -25,6 +25,7 @@ using Object = UnityEngine.Object;
 using UnityGLTF.Loader;
 using GLTF.Schema;
 using GLTF;
+using Unity.Collections;
 #if UNITY_2020_2_OR_NEWER
 using UnityEditor.AssetImporters;
 #else
@@ -35,26 +36,80 @@ namespace UnityGLTF
 {
 #if UNITY_2020_2_OR_NEWER
 #if ENABLE_DEFAULT_GLB_IMPORTER
-    [ScriptedImporter(2, new[] { "glb", "gltf" })]
+    [ScriptedImporter(ImporterVersion, new[] { "glb", "gltf" })]
 #else
-    [ScriptedImporter(2, null, overrideExts: new[] { "glb", "gltf" })]
+    [ScriptedImporter(ImporterVersion, null, overrideExts: new[] { "glb", "gltf" })]
 #endif
 #else
-	[ScriptedImporter(2, new[] { "glb" })]
+	[ScriptedImporter(ImporterVersion, new[] { "glb" })]
 #endif
     public class GLTFImporter : ScriptedImporter
     {
+	    private const int ImporterVersion = 7;
+
+	    private static void EnsureShadersAreLoaded()
+	    {
+		    const string PackagePrefix = "Packages/org.khronos.unitygltf/";
+		    var shaders = new string[] {
+			    PackagePrefix + "Runtime/Shaders/ShaderGraph/PBRGraph.shadergraph",
+			    PackagePrefix + "Runtime/Shaders/ShaderGraph/UnlitGraph.shadergraph",
+			    PackagePrefix + "Runtime/Shaders/PbrMetallicRoughness.shader",
+			    PackagePrefix + "Runtime/Shaders/PbrSpecularGlossiness.shader",
+			    PackagePrefix + "Runtime/Shaders/Unlit.shader",
+		    };
+
+		    foreach (var shaderPath in shaders)
+		    {
+			    AssetDatabase.LoadAssetAtPath<Shader>(shaderPath);
+		    }
+	    }
+
 	    [Tooltip("Turn this off to create an explicit GameObject for the glTF scene. A scene root will always be created if there's more than one root node.")]
-        [SerializeField] private bool _removeEmptyRootObjects = true;
-        [SerializeField] private float _scaleFactor = 1.0f;
-        [SerializeField] private int _maximumLod = 300;
-        [SerializeField] private bool _readWriteEnabled = true;
-        [SerializeField] private bool _generateColliders = false;
-        [SerializeField] private bool _swapUvs = false;
-        [SerializeField] private bool _generateLightmapUVs = false;
-        [SerializeField] private GLTFImporterNormals _importNormals = GLTFImporterNormals.Import;
-        [SerializeField] private bool _importMaterials = true;
-        // [SerializeField] private bool _useJpgTextures = false;
+        [SerializeField] internal bool _removeEmptyRootObjects = true;
+        [SerializeField] internal float _scaleFactor = 1.0f;
+        [SerializeField] internal int _maximumLod = 300;
+        [SerializeField] internal bool _readWriteEnabled = true;
+        [SerializeField] internal bool _generateColliders = false;
+        [SerializeField] internal bool _swapUvs = false;
+        [SerializeField] internal bool _generateLightmapUVs = false;
+        [SerializeField] internal GLTFImporterNormals _importNormals = GLTFImporterNormals.Import;
+        [SerializeField] internal GLTFImporterNormals _importTangents = GLTFImporterNormals.Import;
+        [SerializeField] internal AnimationMethod _importAnimations = AnimationMethod.Mecanim;
+        [SerializeField] internal bool _animationLoopTime = true;
+        [SerializeField] internal bool _animationLoopPose = false;
+        [SerializeField] internal bool _importMaterials = true;
+        [Tooltip("Enable this to get the same main asset identifiers as glTFast uses. This is recommended for new asset imports. Note that changing this for already imported assets will break their scene references and require manually re-adding the affected assets.")]
+        [SerializeField] internal bool _useSceneNameIdentifier = false;
+
+        // material remapping
+        [SerializeField] private Material[] m_Materials = new Material[0];
+
+        [Serializable]
+        internal class ExtensionInfo
+        {
+	        public string name;
+	        public bool supported;
+	        public bool used;
+	        public bool required;
+        }
+
+        [Serializable]
+        public class TextureInfo
+        {
+	        public Texture2D texture;
+	        public bool shouldBeLinear;
+        }
+
+#if !UNIYT_2020_2_OR_NEWER
+	    private class NonReorderableAttribute : Attribute {}
+#endif
+
+        // Import messages (extensions, warnings, errors, ...)
+        [NonReorderable] [SerializeField] internal List<ExtensionInfo> _extensions;
+        [NonReorderable] [SerializeField] private List<TextureInfo> _textures;
+        [SerializeField] internal string _mainAssetIdentifier;
+
+        internal List<TextureInfo> Textures => _textures;
 
         public override void OnImportAsset(AssetImportContext ctx)
         {
@@ -63,6 +118,7 @@ namespace UnityGLTF
             UnityEngine.Mesh[] meshes = null;
 
             var uniqueNames = new List<string>() { "main asset" };
+            EnsureShadersAreLoaded();
 
             string GetUniqueName(string desiredName)
             {
@@ -87,7 +143,9 @@ namespace UnityGLTF
                         gltfScene.GetComponents<Component>().Length == 1)
                     {
                         var parent = gltfScene;
+                        var importName = parent.name;
                         gltfScene = gltfScene.transform.GetChild(0).gameObject;
+                        gltfScene.name = importName; // root name is always name of the file anyways
                         t = gltfScene.transform;
                         t.parent = null; // To keep transform information in the new parent
                         DestroyImmediate(parent); // Get rid of the parent
@@ -119,22 +177,33 @@ namespace UnityGLTF
                 meshes = meshFilters.Select(mf =>
                 {
                     var mesh = mf.sharedMesh;
+
                     if (meshHash.Contains(mesh))
 	                    return null;
                     meshHash.Add(mesh);
 
-                    vertexBuffer.Clear();
-                    mesh.GetVertices(vertexBuffer);
-                    for (var i = 0; i < vertexBuffer.Count; ++i)
+                    if (!Mathf.Approximately(_scaleFactor, 1.0f))
                     {
-                        vertexBuffer[i] *= _scaleFactor;
+	                    vertexBuffer.Clear();
+	                    mesh.GetVertices(vertexBuffer);
+	                    for (var i = 0; i < vertexBuffer.Count; ++i)
+	                    {
+	                        vertexBuffer[i] *= _scaleFactor;
+	                    }
+	                    mesh.SetVertices(vertexBuffer);
                     }
-                    mesh.SetVertices(vertexBuffer);
                     if (_generateLightmapUVs)
                     {
 	                    var uv2 = mesh.uv2;
 	                    if(uv2 == null || uv2.Length < 1)
+	                    {
+		                    // uv2 = Unwrapping.GeneratePerTriangleUV(mesh);
+		                    // mesh.SetUVs(1, uv2);
+
+		                    // There seems to be a bug in Unity's splitting code:
+		                    // for some meshes, the result is broken after splitting.
 		                    Unwrapping.GenerateSecondaryUVSet(mesh);
+	                    }
                     }
                     if (_swapUvs)
                     {
@@ -144,24 +213,28 @@ namespace UnityGLTF
                         if(uv.Length > 0)
 							mesh.uv2 = uv;
                     }
+
                     if (_importNormals == GLTFImporterNormals.None)
-                    {
                         mesh.normals = new Vector3[0];
-                    }
-                    if (_importNormals == GLTFImporterNormals.Calculate && mesh.GetTopology(0) == MeshTopology.Triangles)
-                    {
+                    else if (_importNormals == GLTFImporterNormals.Calculate && mesh.GetTopology(0) == MeshTopology.Triangles)
                         mesh.RecalculateNormals();
-                    }
-                    mesh.UploadMeshData(!_readWriteEnabled);
+                    else if (_importNormals == GLTFImporterNormals.Import && mesh.normals.Length == 0)
+	                    mesh.RecalculateNormals();
+
+					if (_importTangents == GLTFImporterNormals.None)
+						mesh.tangents = new Vector4[0];
+					else if (_importTangents == GLTFImporterNormals.Calculate && mesh.GetTopology(0) == MeshTopology.Triangles)
+						mesh.RecalculateTangents();
+					else if (_importTangents == GLTFImporterNormals.Import && mesh.tangents.Length == 0)
+						mesh.RecalculateTangents();
+
+					mesh.UploadMeshData(!_readWriteEnabled);
 
                     if (_generateColliders)
                     {
                         var collider = mf.gameObject.AddComponent<MeshCollider>();
                         collider.sharedMesh = mesh;
                     }
-
-	                var meshName = string.IsNullOrEmpty(mesh.name) ? mf.gameObject.name : mesh.name;
-	                mesh.name = meshName;
 
                     return mesh;
                 }).Where(x => x).ToArray();
@@ -173,11 +246,28 @@ namespace UnityGLTF
 	                ctx.AddObjectToAsset(GetUniqueName(clip.name), clip);
                 }
 
+                var animators = gltfScene.GetComponentsInChildren<Animator>();
+                var clips2 = animators.SelectMany(x => AnimationUtility.GetAnimationClips(x.gameObject));
+                foreach (var clip in clips2)
+                {
+	                ctx.AddObjectToAsset(GetUniqueName(clip.name), clip);
+                }
+                // we can't add the Animators as subassets here, since they require their state machines to be direct subassets themselves.
+                // foreach (var anim in animators)
+                // {
+	            //     ctx.AddObjectToAsset(GetUniqueName(anim.runtimeAnimatorController.name), anim.runtimeAnimatorController as AnimatorController);
+	            //     foreach (var layer in (anim.runtimeAnimatorController as AnimatorController).layers)
+	            //     {
+		        //         ctx.AddObjectToAsset(GetUniqueName(layer.name + "-state"), layer.stateMachine);
+	            //     }
+                // }
+
                 var renderers = gltfScene.GetComponentsInChildren<Renderer>();
 
                 if (_importMaterials)
                 {
                     // Get materials
+                    var map = GetExternalObjectMap();
                     var materialHash = new HashSet<UnityEngine.Material>();
                     var materials = renderers.SelectMany(r =>
                     {
@@ -190,15 +280,26 @@ namespace UnityGLTF
                                 {
                                     matName = matName.Substring(Mathf.Min(matName.LastIndexOf("/", StringComparison.Ordinal) + 1, matName.Length - 1));
                                 }
-
-                                // Ensure name is unique
-                                matName = ObjectNames.NicifyVariableName(matName);
                                 mat.name = matName;
                             }
 
                             return mat;
                         });
                     }).Distinct().ToArray();
+
+                    // apply material remap
+                    foreach(var r in renderers)
+                    {
+	                    // remap materials to external objects
+	                    var m = r.sharedMaterials;
+	                    for (var i = 0; i < m.Length; i++)
+	                    {
+		                    var si = new SourceAssetIdentifier(m[i]);
+		                    if (map.ContainsKey(si))
+			                    m[i] = map[si] as Material;
+	                    }
+	                    r.sharedMaterials = m;
+                    };
 
                     // Get textures
                     var textureHash = new HashSet<Texture2D>();
@@ -223,12 +324,8 @@ namespace UnityGLTF
                                         if (string.IsNullOrEmpty(texName))
                                         {
                                             if (propertyName.StartsWith("_")) texName = propertyName.Substring(Mathf.Min(1, propertyName.Length - 1));
+                                            tex.name = texName;
                                         }
-
-                                        // Ensure name is unique
-                                        texName = string.Format("{0} {1}", sceneName, ObjectNames.NicifyVariableName(texName));
-
-                                        tex.name = texName;
                                         matTextures.Add(tex);
                                     }
 
@@ -239,7 +336,7 @@ namespace UnityGLTF
                                         texMaterialMap.Add(tex, materialMaps);
                                     }
 
-                                    materialMaps.Add(new TexMaterialMap(mat, propertyName, propertyName == "_BumpMap"));
+                                    materialMaps.Add(new TexMaterialMap(mat, propertyName, propertyName == "_BumpMap" || propertyName == "normalTexture" || propertyName.EndsWith("NormalTexture")));
                                 }
                             }
                         }
@@ -252,23 +349,46 @@ namespace UnityGLTF
                     {
                         foreach (var tex in textures)
                         {
-                            ctx.AddObjectToAsset(GetUniqueName(tex.name), tex);
+	                        if (AssetDatabase.Contains(tex) && AssetDatabase.GetAssetPath(tex) != ctx.assetPath)
+	                        {
+#if UNITY_2020_2_OR_NEWER
+		                        ctx.DependsOnArtifact(
+#else
+		                        ctx.DependsOnSourceAsset(
+#endif
+			                        AssetDatabase.GetAssetPath(tex));
+	                        }
+	                        else
+	                        {
+		                        ctx.AddObjectToAsset(GetUniqueName(tex.name), tex);
+	                        }
                         }
                     }
 
+#if !UNITY_2022_1_OR_NEWER
 					AssetDatabase.Refresh();
+#endif
 
                     // Save materials as separate assets and rewrite refs
                     if (materials.Length > 0)
                     {
                         foreach (var mat in materials)
                         {
-                            ctx.AddObjectToAsset(GetUniqueName(mat.name), mat);
+	                        // ensure materials that are overriden aren't shown in the hierarchy.
+	                        var si = new SourceAssetIdentifier(mat);
+	                        if (map.ContainsKey(si))
+		                        mat.hideFlags = HideFlags.HideInHierarchy | HideFlags.HideInInspector;
+
+	                        ctx.AddObjectToAsset(GetUniqueName(mat.name), mat);
                         }
                     }
 
-					AssetDatabase.SaveAssets();
+                    m_Materials = materials;
+
+#if !UNITY_2022_1_OR_NEWER
+			        AssetDatabase.SaveAssets();
 					AssetDatabase.Refresh();
+#endif
 				}
                 else
                 {
@@ -289,18 +409,31 @@ namespace UnityGLTF
                 throw;
             }
 
-
-
 #if UNITY_2017_3_OR_NEWER
-#if !UNITYGLTF_IMPORT_IDENTIFIER_V2
-			// Set main asset
-			ctx.AddObjectToAsset("main asset", gltfScene);
-#else
-			// This will be a breaking change, but would be aligned to the import naming from glTFast - allows switching back and forth between importers.
-			ctx.AddObjectToAsset($"scenes/{gltfScene.name}", gltfScene);
-#endif
+	        // We explicitly turn the new identifier on for new imports, that is, when no meta file existed before this import.
+	        if (!_useSceneNameIdentifier)
+	        {
+		        var importer = GetAtPath(ctx.assetPath);
+		        if (importer.importSettingsMissing)
+		        {
+			        _useSceneNameIdentifier = true;
+		        }
+	        }
 
-			// Add meshes
+	        if (!_useSceneNameIdentifier)
+	        {
+		        // Set main asset
+		        _mainAssetIdentifier = "main asset";
+		        ctx.AddObjectToAsset(_mainAssetIdentifier, gltfScene);
+	        }
+	        else
+	        {
+		        // This will be a breaking change, but would be aligned to the import naming from glTFast - allows switching back and forth between importers.
+		        _mainAssetIdentifier = $"scenes/{gltfScene.name}";
+		        ctx.AddObjectToAsset(_mainAssetIdentifier, gltfScene);
+	        }
+
+	        // Add meshes
 			foreach (var mesh in meshes)
 			{
 				try
@@ -311,6 +444,9 @@ namespace UnityGLTF
 				}
 			}
 
+#if UNITY_2020_2_OR_NEWER
+			ctx.DependsOnCustomDependency(ColorSpaceDependency);
+#endif
 			ctx.SetMainObject(gltfScene);
 #else
             // Set main asset
@@ -328,11 +464,24 @@ namespace UnityGLTF
 #endif
 		}
 
+        private const string ColorSpaceDependency = nameof(GLTFImporter) + "_" + nameof(PlayerSettings.colorSpace);
+
+#if UNITY_2020_2_OR_NEWER
+        [InitializeOnLoadMethod]
+        private static void UpdateColorSpace()
+        {
+	        AssetDatabase.RegisterCustomDependency(ColorSpaceDependency, Hash128.Compute((int) PlayerSettings.colorSpace));
+        }
+#endif
+
 		private GameObject CreateGLTFScene(string projectFilePath)
         {
 			var importOptions = new ImportOptions
 			{
 				DataLoader = new FileLoader(Path.GetDirectoryName(projectFilePath)),
+				AnimationMethod = _importAnimations,
+				AnimationLoopTime = _animationLoopTime,
+				AnimationLoopPose = _animationLoopPose,
 			};
 			using (var stream = File.OpenRead(projectFilePath))
 			{
@@ -344,6 +493,29 @@ namespace UnityGLTF
 				loader.IsMultithreaded = true;
 
 				loader.LoadSceneAsync().Wait();
+
+				if (gLTFRoot.ExtensionsUsed != null)
+				{
+					_extensions = gLTFRoot.ExtensionsUsed
+						.Select(x => new ExtensionInfo()
+						{
+							name = x,
+							supported = true,
+							used = true,
+							required = gLTFRoot.ExtensionsRequired?.Contains(x) ?? false,
+						})
+						.ToList();
+				}
+				else
+				{
+					_extensions = new List<ExtensionInfo>();
+				}
+
+				_textures = loader.TextureCache
+					.Where(x => x != null)
+					.Select(x => new TextureInfo() { texture = x.Texture, shouldBeLinear = x.IsLinear })
+					.ToList();
+
 				return loader.LastLoadedScene;
 			}
         }
@@ -373,6 +545,13 @@ namespace UnityGLTF
                 Property = property;
                 IsNormalMap = isNormalMap;
             }
+        }
+
+        public override bool SupportsRemappedAssetType(Type type)
+        {
+	        if (type == typeof(Material))
+		        return true;
+	        return base.SupportsRemappedAssetType(type);
         }
     }
 }

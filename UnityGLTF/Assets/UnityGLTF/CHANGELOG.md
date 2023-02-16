@@ -4,6 +4,264 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [1.22.0-pre] - 2022-02-01
+- feat: expose ExportNode API
+- feat: optionally calculate and place bounds markers in GltfRecorder for viewers that don't caclulate bounds from animated skinned meshes properly
+
+## [1.21.1-pre] - 2022-01-20
+fix: animator being disabled after exporting humanoid animationclip
+fix: ignore MotionT and MotionQ on animator, can't be resolved for KHR_animation, seems to be a magic unity name
+fix: build error by accessing imageContentHash
+change: export HDR textures with zip compression by default
+
+## [1.21.0-pre] - 2022-01-14
+- feat: allow aborting export when not in Play Mode and meshes are not readable - seems to be a random Unity synchronization context issue
+- fix: don't export unsupported light types (e.g. area light has type "rectangle" which is not supported in glTF)
+- fix: Export human motion translation
+- fix: prevent exporting the same baked humanoid clip for different avatars, needs individual clips since we're baking them (not retargeting at runtime)
+- fix: reusing animation clips between objects with different hierarchies caused some targets to be missing, depending on export order
+- change: remove warning for KHR_animation_pointer resolving when the unresolved object is a transform, that's part of core
+
+## [1.20.3-pre] - 2022-01-13
+- fix: wrong texture name in Texture Transform check
+- fix: better check if a texture is a normal map and needs the right import settings
+- fix: uris with escaped characters didn't correctly import in the editor
+
+## [1.20.2-pre] - 2022-01-12
+- fix: export of color animations where only one channel is animated
+- fix: order of animationcurve properties when exporing animated colors in component where e.g. a user started by animating a single channel first (e.g. alpha) and later added keyframes for other channels
+
+## [1.20.1-pre] - 2022-01-10
+- fix: issue with exporting shared texture samplers in some cases
+- fix: weights on skinned meshes shouldn't be resolved by custom KHR_animation_pointer resolvers as they're part of the core spec
+- change: remove logs when caching data
+- change: move cache clear button into settings
+- add: KHR_materials_clearcoat roundtrip support (no in-editor visualization yet)
+
+## [1.20.0-pre] - 2022-01-04
+- add: caching of texture bytes on disc for faster export (can be disabled in UnityGLTFSettings)
+
+## [1.19.1-pre] - 2022-01-03
+- add: AfterPrimitiveExport event
+
+## [1.19.0-pre] - 2022-12-14
+- add: spritesheet keyframe animation export
+- change: print warning when animation pointer cant be resolved and add filtering of objects that cant be resolved before building animation data
+- fix: index discrepancy between _exportedMaterials and _root.Materials lead to wrong texture indices being returned in some cases
+- fix: don't write and declare IOR when it's at the default value
+- fix: importing textures with names resulted in those names not being used (only image names were used)
+- fix: importing files without baseMap but using texture transforms for normal or emissive would result in texture transforms not being used
+
+## [1.18.5-pre] - 2022-12-02
+- fix: default material was missing in build
+
+## [1.18.4-pre] - 2022-12-02
+- fix: GLTFRecorder didn't properly record with animation pointer off anymore
+- fix: unified access to SkinnedMeshRenderer weights on export
+- fix: nullrefs in ExportPlan with missing SkinnedMeshRenderer
+- feat: allow passing custom settings into GLTFRecorder
+
+## [1.18.3-pre] - 2022-11-14
+- fix: disabled MeshRenderers and SkinnedMeshRenderers were not exported despite ExportDisabledGameObjects being on
+- fix: sample root transform as well in Humanoid export to prevent shifting it around when recording
+
+## [1.18.2-pre] - 2022-11-10
+- fix: exception thrown when trying to add a material instance id twice
+
+## [1.18.1-pre] - 2022-11-09
+- fix: ExportMeshes was not exporting new meshes since the internal material check didn't let it through
+
+## [1.18.0-pre] - 2022-11-07
+- fix: blend shape weight animation wasn't properly exported in some cases
+- fix: IOR extension may end up as null when IOR was animated
+- fix: rough refracton LOD access is now affected by alpha blending
+- feat: HDR render textures can be exported now
+- feat: add ExportMesh(Mesh) API as convenience helper
+- feat: add material remapping to glTF/GLB importer
+- chore: code cleanup for rough refraction and material inspector
+- change: animation export code paths have been consolidated, less differences between KHR_animation_pointer and regular export
+- change: bumped min Unity version to 2019.4
+
+## [1.17.2-pre] - 2022-10-21
+- fix: set linear export setting before accessing texture exporter settings for unknown textures
+
+## [1.17.1-pre] - 2022-10-19
+- fix: glb export now using utf8 (no BOM)
+- fix: simplify and fix normals export
+
+## [1.17.0-pre] - 2022-10-12
+- add: import options for animation loop and re-enable by default for Mecanim
+- fix: reimport assets when colorspace changes
+- fix: texture map type needs to be passed into UniqueTexture, otherwise textures used for different things don't get exported correctly
+- fix: bake smoothness values into roughness map if there's no good conversion
+- fix: alpha cutout export on BiRP
+- fix: base color warning should only be shown for transparent objects
+- fix: improve alpha cutout inspector for 2020.3
+- fix: smoothness was inverted / removed even if no smoothness map existed
+- change: refactor TextureMapType to contain options for conversion to clean up export and introduce ability to convert smoothness
+- change: refactor textureSlots, usage of textureSlot names and how they should be called
+
+## [1.16.3-pre] - 2022-10-06
+- fix: KHR_animation_pointer bug with re-used animations targeting properties on nodes
+
+## [1.16.2-pre] - 2022-09-30
+- fix: blend shapes and blend shape animations were not imported (note: sparse accessor import not working yet)
+- fix: allow doublesided and transparent import on 2020.3 URP with PBRGraph
+- fix: make RegisterPrimitivesWithNode API public, belongs to ExportMesh
+- fix: UnlitGraph used wrong texture transform in some cases
+- fix: BiRP texture import on legacy shaders in < 2020.3 had flipped texture transforms
+- fix: ExporterMaterials compilation issue on 2018.x
+- fix: some TMPro materials were exported incorrectly
+
+## [1.16.1-pre] - 2022-09-25
+- fix: first-time import was failing to find shaders on 2020.x in some cases
+- fix: TMPro texture conversion one export was blurry at the bottom of the texture
+- fix: transmission/volume mat was incorrectly imported
+- fix: transparency was incorrectly imported on 2020.x
+- fix: material validation on 2021.x wasn't properly turning transparency on for some imports
+- fix: no compilation errors on 2018.4 + 2019.4
+
+## [1.16.0-pre] - 2022-09-21
+- fix: checking materials for _ST shader properties was failing on specific Unity versions
+- fix: AnimationPointerResolver was warning in cases that are allowed / no warning needed
+- fix: build compilation issues on 2022+
+- fix: default scene name differed from glTFast, which broke switching importers. Both use "Scene" now
+- fix: import warnings for metallicRoughness texture swizzling only print when a metallicRoughness texture is actually used
+- feat: tangents are recalculated on import now
+- feat: TMPro meshes export with baked texture now instead of SDF texture
+- feat: added AfterTextureExportDelegate/BeforeTextureExportDelegate and UniqueTexture hash for modifying textures on export
+- change: explicit bool option to turn KHR_materials_volume export on and off
+- change: removed outdated samples from package
+- change: if a mesh in the glTF doesn't specify a name it will import without name now instead of using a default name
+
+## [1.15.0-pre] - 2022-09-13
+- fix: workaround for ShaderGraph bug on 2021.2+ that breaks defining baseColorTexture_ST manually
+- fix: workaround for Unity regression in 2022.1+ where checking material properties returns wrong results in some cases
+- feat: allow exporting of Humanoid animation clips (get baked to generic)
+- change: texture aniso values >= 1 now result in LinearMipmapLinear filtering to match visual result in Unity better
+
+## [1.14-0-pre] - 2022-09-11
+- fix: log error instead of exception for missing textures on export
+- feat: allow referencing GameObjects for `KHR_animation_pointer`
+- change: animated fields with `KHR_animation_pointer` now try to find their correct Unity properties instead of the serialized field (m_ prefix disappears)
+
+## [1.13.0-pre] - 2022-09-05
+- add: preliminary HDR texture export in EXT_texture_exr extension
+- fix: Unity Editor module related issues
+- fix: wrongly exporting two keyframes for animations with only one keyframe
+- fix: children of lights and cameras were inverted
+
+## [1.12.2-pre] - 2022-08-29
+- fix: KHR_animation_pointer export where member is declared on base type
+
+## [1.12.1-pre] - 2022-08-23
+- fix: nullref in export of missing mesh
+
+## [1.12.0-pre] - 2022-08-23
+- fix: emissive color alpha was set to 1 in some roundtrip cases when it should have been 0
+- fix: nullref in import when glTF had null textures (against the spec, but other viewers tolerate it)
+- fix: unlit double sided was incorrectly imported in BiRP
+- fix: PBRGraphUI didn't properly draw infos for SkinnedMeshRenderer
+- fix: added safeguards against Shader.Find not working in first imports (fixes #51)
+- fix: textures without mipmaps should export closer to intended now
+- fix: missing pbrMetallicRoughness property was treated incorrectly
+- fix: BeforeSceneExport was missing from gltf+bin exports
+- feat: warn in PBRGraphGUI when UV0 isn't present (fixes #52)
+- feat: texture channel swizzling on URP/Lit > PBRGraph material conversion in 2022.1+
+- feat: expose ExportMesh API using UniquePrimitive array to export arbitrary meshes from extensions (#55, thanks @robertlong)
+- feat: GLTFSettings can now be passed into GLTFSceneExporter directly, falls back to project settings if none are provided
+- remove: public settings API on GLTFSceneExporter is now gone. Pass in custom settings via ExportOptions if needed.
+
+## [1.11.0-pre] - 2022-07-27
+- fix: converting PBRGraph and UnlitGraph to each other shouldn't warn
+- fix: multiple animators referencing the same clip exported animations incorrectly with KHR_animation_pointer on
+- fix: implemented partial animation target removal when some bindings animate missing objects
+- change: asset identifier for imported assets is now an explicit option
+- change: removed compilation flag to use new asset identifier, use the explicit option instead
+
+## [1.10.1-pre] - 2022-07-18
+- fix: accessor submesh primtives were incorrectly assigned after internal duplication
+- fix: don't add import dependency on shaders, load them by GUID instead
+- fix: URI-escaped file names weren't always resolved correctly
+- fix: some KHR_animation_pointer export type fixes (vec3 colors vs. vec4 colors)
+- feat: add color helpers to PBRGraphGUI
+- feat: add UnlitGraph for 2021.2+
+- feat: new API, GetPrimitivesForMesh to add extensions to exported meshes (e.g. KHR_materials_variants)
+
+## [1.10.0-pre] - 2022-07-06
+- fix: PBRGraph assignable again from shader dropdown
+- fix: various KHR_animation_pointer fixes to extension usage and property names
+- fix: compilation fixes for Unity 2018/2019
+- feat: add helper, callbacks and script generator for shader conversion
+- change: Importer/Exporter are now multiple partials
+- change: change GetAnimationTargetIdFrom[..] to Get[..]Index to clarify what it does
+
+## [1.9.0-pre] - 2022-06-22
+- fix: properly set BiRP ShaderGraph transparency keywords
+- feat: PBRGraph property names now match glTF names directly (breaking change from 1.7.0+)
+- feat: PBRGraph now has a custom shader GUI that also validates keywords
+
+## [1.8.1-pre] - 2022-06-22
+- fixed: same animation used on different objects should result in different pointer values with KHR_animation_pointer used
+- fixed: nullref when adding animation data for null object (e.g. unused property clip)
+- fixed: too many nodes get overwritten by duplicate animations with animation pointer
+- changed: GetAnimationId now takes root transform parameter
+- fixed: previously seen KHR_animation_pointer is now added to resolve list (e.g. when using animations on multiple objects and animating component values)
+
+## [1.8.0-pre.2] - 2022-06-14
+- fixed: OcclusionTexture tiling now defaults to (1,1)
+- fixed: build errors on certain platforms
+
+## [1.8.0-pre] - 2022-06-10
+- fixed: fixed package version, color space changes require minor version bump, not just patch
+- fixed: C# version error on 2020.3
+
+## [1.7.1-pre.3] - 2022-06-10
+- feat: show extensions and textures in importer inspector
+- feat: export texture coord (UV0 / UV1) separately for "occlusionTexture" and "everything else", same as three.js
+- fixed: editor import of .gltf files with textures now uses those textures directly instead of creating new ones
+- fixed: exporting only includes extensions that are actually used or explicitly enabled
+- fixed: no more differences in color space between exporting glTF + textures or glb with embedded textures
+- fixed: importer properly declares shaders as dependencies, fixes library reimport errors
+
+## [1.7.1-pre.2] - 2022-06-08
+- fixed: animation clip import in Editor working again
+
+## [1.7.1-pre] - 2022-06-07
+- feat: sparse accessors import (partial)
+- feat: UV rotation import/export (for baseColorTexture only right now)
+- fixed: GLTFRecorderComponent error in play mode when only new input system is present
+- fixed: animation export with KHR_animation_pointer and reused nodes
+- fixed: passing invalid file names to Export could result in wrong buffer paths in JSON
+
+## [1.7.0-pre] - 2022-06-01
+- feat: experimental support for KHR_animation_pointer
+- feat: experimental URP (2020.3+) & BiRP (2021.2+) Shader Graph for export and import, `UnityGLTF/PBRGraph`
+- feat: approximated support for exporting and importing KHR_materials_transmission, KHR_materials_volume, KHR_materials_ior, KHR_materials_iridescence, best used with `UnityGLTF/PBRGraph`
+- feat: renderer features and post effect for rough refraction / transmission (for URP and BiRP)
+- fixed: light and camera directions were flipped when animated
+- fixed: normal textures were exported with wrong color space in .gltf
+- fixed: WebRequestLoader edge case with relative paths
+- improved: better heuristic for PBR material export and generally better glTF-related material property export
+
+## [1.6.1-pre.3] - 2022-05-10
+- feat: allow replacing logger for GLTFSceneExporter with a custom one, allows to reduce number of logs
+- feat: added more ProfilerMarkers
+- removed: removed submodules from repository to make usage as submodule in other projects easier
+- fixed: bad performance in GLTFRecorder when recording lots of animation and/or Blendshape weights
+- fixed: some mismatched ProfilerMarker.Begin/End calls
+- fixed: less allocations when writing accessors
+
+## [1.6.1-pre.2] - 2022-05-06
+- feat: allow recording root object in worldspace in GLTFRecorder
+
+## [1.6.1-pre] - 2022-05-06
+- feat: added experimental support for KHR_animation_pointer in-editor animation export (for select properties), can be turned on in `ProjectSettings/UnityGltf`
+- feat: added scene export as GLB (fixes #22)
+- fixed: roundtrip issues with glTFast when alpha testing is used
+- fixed: no build errors in Samples anymore
+- fixed: allow exporting skinned mesh animations even when the mesh isn't readable (bone animation is then still exported)
+
 ## [1.6.0-pre] - 2022-04-28
 - feat: added WebGL import support (export was already supported)
 - feat: added WebGL animation export support
@@ -221,7 +479,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [1.0.4-pfc.4] - 2020-07-12
 - fix meta files for Tests folder
- 
+
 ## [1.0.4-pfc.2] - 2020-07-07
 - fix build errors preventing builds
 - fix PBR texture roundtrip with incorrect red channel

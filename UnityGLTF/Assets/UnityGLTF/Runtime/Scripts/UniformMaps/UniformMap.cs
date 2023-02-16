@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace UnityGLTF
 {
@@ -10,6 +6,16 @@ namespace UnityGLTF
 	{
 		Material Material { get; set; }
 
+		GLTF.Schema.AlphaMode AlphaMode { get; set; }
+		double AlphaCutoff { get; set; }
+		bool DoubleSided { get; set; }
+		bool VertexColorsEnabled { get; set; }
+
+		IUniformMap Clone();
+	}
+
+	public interface ILitMap : IUniformMap
+	{
 		Texture NormalTexture { get; set; }
 		int NormalTexCoord { get; set; }
 		double NormalTexScale { get; set; }
@@ -33,16 +39,9 @@ namespace UnityGLTF
 		double EmissiveXRotation { get; set; }
 		Vector2 EmissiveXScale { get; set; }
 		int EmissiveXTexCoord { get; set; }
-
-		GLTF.Schema.AlphaMode AlphaMode { get; set; }
-		double AlphaCutoff { get; set; }
-		bool DoubleSided { get; set; }
-		bool VertexColorsEnabled { get; set; }
-
-		IUniformMap Clone();
 	}
 
-	public interface IMetalRoughUniformMap : IUniformMap
+	public interface IMetalRoughUniformMap : ILitMap
 	{
 		Texture BaseColorTexture { get; set; }
 		int BaseColorTexCoord { get; set; }
@@ -64,7 +63,44 @@ namespace UnityGLTF
 		double RoughnessFactor { get; set; }
 	}
 
-	public interface ISpecGlossUniformMap : IUniformMap
+	public interface IVolumeMap : IMetalRoughUniformMap
+	{
+		double ThicknessFactor { get; set; }
+		Texture ThicknessTexture { get; set; }
+		double AttenuationDistance { get; set; }
+		Color AttenuationColor { get; set; }
+	}
+
+	public interface ITransmissionMap : IMetalRoughUniformMap
+	{
+		double TransmissionFactor { get; set; }
+		Texture TransmissionTexture { get; set; }
+	}
+
+	public interface IIORMap : IMetalRoughUniformMap
+	{
+		double IOR { get; set; }
+	}
+
+	public interface ISpecularMap : IMetalRoughUniformMap
+	{
+		double SpecularFactor { get; set; }
+		Texture SpecularTexture { get; set; }
+		Color SpecularColorFactor { get; set; }
+		Texture SpecularColorTexture { get; set; }
+	}
+
+	public interface IIridescenceMap : IMetalRoughUniformMap
+	{
+		double IridescenceFactor { get; set; }
+		double IridescenceIor { get; set; }
+		double IridescenceThicknessMinimum { get; set; }
+		double IridescenceThicknessMaximum { get; set; }
+		Texture IridescenceTexture { get; set; }
+		Texture IridescenceThicknessTexture { get; set; }
+	}
+
+	public interface ISpecGlossUniformMap : ILitMap
 	{
 		Texture DiffuseTexture { get; set; }
 		int DiffuseTexCoord { get; set; }
@@ -84,6 +120,15 @@ namespace UnityGLTF
 
 		Vector3 SpecularFactor { get; set; }
 		double GlossinessFactor { get; set; }
+	}
+
+	public interface IClearcoatMap : IMetalRoughUniformMap
+	{
+		double ClearcoatFactor { get; set; }
+		Texture ClearcoatTexture { get; set; }
+		double ClearcoatRoughnessFactor { get; set; }
+		Texture ClearcoatRoughnessTexture { get; set; }
+		Texture ClearcoatNormalTexture { get; set; }
 	}
 
 	public interface IUnlitUniformMap : IUniformMap

@@ -34,7 +34,7 @@ namespace CKUnityGLTF
 		/// <param name="configJson">info配置</param>
 		/// <param name="clothesInfoJson">服饰配置[用于白模导出的glb,上传商城时需要的参数]</param>
 		public ModelExporter(Transform parent, string configJson, string clothesInfoJson = "") :
-			base(new[] { parent }, new ExportOptions() { TexturePathRetriever = RetrieveTexturePath, ExportInactivePrimitives = true })
+			base(new[] { parent }, new ExportOptions() { /*TexturePathRetriever = RetrieveTexturePath, ExportInactivePrimitives = true*/ })
 		{
 			//exportedGameObjects = new Dictionary<GameObject, int>();
 
@@ -68,8 +68,8 @@ namespace CKUnityGLTF
 			};
 
 			_imageInfos = new List<ImageInfo>();
-			_materials = new Dictionary<Material, int>();
-			_textures = new List<Texture>();
+			_exportedMaterials = new Dictionary<int, int>();
+			_textures = new List<UniqueTexture>();
 
 			_buffer = new GLTFBuffer();
 			_bufferId = new BufferId
@@ -212,13 +212,18 @@ namespace CKUnityGLTF
 			};
 		}
 
+		/// <summary>
+		/// 重写此方法目的是：
+		/// 1. 记录GameObject与Node的对应关系
+		/// 2. 扩展特殊节点[只有MeshFilter没有Render]
+		/// </summary>
 		protected override NodeId ExportNode(Transform nodeTransform)
 		{
 			NodeId id = base.ExportNode(nodeTransform);
 
 			//exportedGameObjects.Add(nodeTransform.gameObject, id.Id);
 
-			//TODO: mesh filter & mesh collider
+			// mesh filter & mesh collider
 			MeshFilter meshFilter = nodeTransform.GetComponent<MeshFilter>();
 			MeshCollider meshCollider = nodeTransform.GetComponent<MeshCollider>();
 			if (meshFilter != null && meshCollider != null)
@@ -230,7 +235,12 @@ namespace CKUnityGLTF
 				GameObject[] primitives;
 				FilterPrimitives(nodeTransform, out primitives);
 				MeshId meshId = ExportMeshFilterAndMeshCollider(nodeTransform.name, primitives);
-				_primOwner[new PrimKey { Mesh = nodeTransform.GetComponent<MeshFilter>().sharedMesh }] = meshId;
+				_primOwner[new UniquePrimitive
+				{
+					Mesh = nodeTransform.GetComponent<MeshFilter>()?.sharedMesh,
+					//Materials = GetMaterialsFromGameObject(nodeTransform.gameObject),
+					//SkinnedMeshRenderer = nodeTransform.GetComponent<SkinnedMeshRenderer>()
+				}] = meshId;
 
 				ExtensionFactory extFactory = Node.TryGetExtension(MeshFilterAndMeshColliderExtensionFactory.Extension_Name);
 				node.Extensions.Add(extFactory.ExtensionName, new MeshFilterAndMeshColliderExtension() { Mesh = meshId });
@@ -244,7 +254,7 @@ namespace CKUnityGLTF
 			var prims = new List<GameObject>(childCount + 1);
 
 			// add another primitive if the root object also has a mesh
-			if (transform.gameObject.activeSelf || ExportDisabledGameObjects)
+			if (transform.gameObject.activeSelf || settings.ExportDisabledGameObjects)
 			{
 				if (transform.GetComponent<MeshFilter>() != null && transform.GetComponent<MeshCollider>() != null)
 				{
@@ -259,11 +269,13 @@ namespace CKUnityGLTF
 		{
 			// check if this set of primitives is already a mesh
 			MeshId existingMeshId = null;
-			var key = new PrimKey();
+			var key = new UniquePrimitive();
 			foreach (var prim in primitives)
 			{
 				var filter = prim.GetComponent<MeshFilter>();
 				key.Mesh = filter.sharedMesh;
+				//key.Materials = GetMaterialsFromGameObject(prim); // 肯定没有，也就没必要找了
+				//key.SkinnedMeshRenderer = prim.GetComponent<SkinnedMeshRenderer>(); // 肯定没有，也就没必要找了
 
 				MeshId tempMeshId;
 				if (_primOwner.TryGetValue(key, out tempMeshId) && (existingMeshId == null || tempMeshId == existingMeshId))
@@ -294,7 +306,7 @@ namespace CKUnityGLTF
 			mesh.Primitives = new List<MeshPrimitive>(primitives.Length);
 			foreach (var prim in primitives)
 			{
-				MeshPrimitive[] meshPrimitives = ExportPrimitiveOnlyHaveMeshWhthOutRender(prim, mesh);
+				MeshPrimitive[] meshPrimitives = ExportPrimitiveOnlyHaveMeshWhthoutRender(prim, mesh);
 				if (meshPrimitives != null)
 				{
 					mesh.Primitives.AddRange(meshPrimitives);
@@ -316,7 +328,7 @@ namespace CKUnityGLTF
 			return null;
 		}
 
-		private MeshPrimitive[] ExportPrimitiveOnlyHaveMeshWhthOutRender(GameObject gameObject, GLTFMesh mesh)
+		private MeshPrimitive[] ExportPrimitiveOnlyHaveMeshWhthoutRender(GameObject gameObject, GLTFMesh mesh)
 		{
 			Mesh meshObj = null;
 			SkinnedMeshRenderer smr = null;
@@ -360,7 +372,7 @@ namespace CKUnityGLTF
 					aTexcoord1 = ExportAccessor(SchemaExtensions.FlipTexCoordArrayVAndCopy(meshObj.uv2));
 
 				if (settings.ExportVertexColors && meshObj.colors.Length != 0)
-					aColor0 = ExportAccessor(QualitySettings.activeColorSpace == ColorSpace.Linear ? meshObj.colors : meshObj.colors.ToLinear());
+					aColor0 = ExportAccessor(QualitySettings.activeColorSpace == ColorSpace.Linear ? meshObj.colors : meshObj.colors.ToLinear(), true);
 
 				aPosition.Value.BufferView.Value.Target = BufferViewTarget.ArrayBuffer;
 				if (aNormal != null) aNormal.Value.BufferView.Value.Target = BufferViewTarget.ArrayBuffer;
@@ -424,6 +436,7 @@ namespace CKUnityGLTF
 				{
 					//Material = ExportMaterial(materialsObj[submesh]),
 				};
+				accessors.subMeshPrimitives[submesh] = prims[submesh];
 			}
 
 			//remove any prims that have empty triangles

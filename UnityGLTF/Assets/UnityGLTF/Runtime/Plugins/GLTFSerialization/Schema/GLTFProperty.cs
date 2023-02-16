@@ -15,6 +15,12 @@ namespace GLTF.Schema
 			{ KHR_MaterialsUnlitExtensionFactory.EXTENSION_NAME, new KHR_MaterialsUnlitExtensionFactory() },
 			{ KHR_lights_punctualExtensionFactory.EXTENSION_NAME, new KHR_lights_punctualExtensionFactory() },
 			{ KHR_materials_emissive_strength_Factory.EXTENSION_NAME, new KHR_materials_emissive_strength_Factory() },
+			{ KHR_materials_transmission_Factory.EXTENSION_NAME, new KHR_materials_transmission_Factory() },
+			{ KHR_materials_volume_Factory.EXTENSION_NAME, new KHR_materials_volume_Factory() },
+			{ KHR_materials_ior_Factory.EXTENSION_NAME, new KHR_materials_ior_Factory() },
+			{ KHR_materials_iridescence_Factory.EXTENSION_NAME, new KHR_materials_iridescence_Factory() },
+			{ KHR_materials_specular_Factory.EXTENSION_NAME, new KHR_materials_specular_Factory() },
+			{ KHR_materials_clearcoat_Factory.EXTENSION_NAME, new KHR_materials_clearcoat_Factory() },
       		{ MSFT_LODExtensionFactory.EXTENSION_NAME, new MSFT_LODExtensionFactory() }
 		};
 
@@ -47,6 +53,11 @@ namespace GLTF.Schema
 				}
 				return null;
 			}
+		}
+
+		public static IExtension CreateEmptyExtension(string extensionName)
+		{
+			return TryGetExtension(extensionName)?.Deserialize(null, new JProperty(extensionName, new JObject()));
 		}
 
 		public static bool TryRegisterExtension(ExtensionFactory extensionFactory)

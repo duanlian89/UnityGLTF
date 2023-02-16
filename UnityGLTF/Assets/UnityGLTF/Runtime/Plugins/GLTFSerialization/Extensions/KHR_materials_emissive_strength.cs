@@ -14,20 +14,15 @@ namespace GLTF.Schema
 			return new KHR_materials_emissive_strength(this, gltfRoot);
 		}
 
-		public override void Serialize(JsonWriter writer)
-		{
-			writer.WritePropertyName(KHR_materials_emissive_strength_Factory.EXTENSION_NAME);
-			writer.WriteStartObject();
-			writer.WritePropertyName(nameof(emissiveStrength));
-			writer.WriteValue(emissiveStrength);
-			writer.WriteEndObject();
-		}
-
 		public JProperty Serialize()
 		{
-			JTokenWriter writer = new JTokenWriter();
-			Serialize(writer);
-			return (JProperty)writer.Token;
+			var jo = new JObject();
+			JProperty jProperty = new JProperty(KHR_materials_emissive_strength_Factory.EXTENSION_NAME, jo);
+
+			if(emissiveStrength != 1.0f)
+				jo.Add(new JProperty(nameof(emissiveStrength), emissiveStrength));
+
+			return jProperty;
 		}
 
 		public float emissiveStrength = 1.0f;
@@ -46,14 +41,13 @@ namespace GLTF.Schema
 		{
 			if (extensionToken != null)
 			{
-				JToken strength = extensionToken.Value[nameof(KHR_materials_emissive_strength.emissiveStrength)];
+				var extension = new KHR_materials_emissive_strength();
 
+				JToken strength = extensionToken.Value[nameof(KHR_materials_emissive_strength.emissiveStrength)];
 				if (strength != null)
-				{
-					var extension = new KHR_materials_emissive_strength();
 					extension.emissiveStrength = strength.Value<float>();
-					return extension;
-				}
+
+				return extension;
 			}
 
 			return null;

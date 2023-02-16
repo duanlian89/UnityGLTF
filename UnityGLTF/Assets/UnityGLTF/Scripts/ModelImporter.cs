@@ -67,11 +67,12 @@ namespace CKUnityGLTF
 			_gltfStream.StartPosition = 0;
 			GLTFParser.ParseJson(_gltfStream.Stream, out _gltfRoot, _gltfStream.StartPosition);
 
-			if (_gltfRoot != null && _gltfRoot.Extensions != null && _gltfRoot.Extensions.Count > 0 && _gltfRoot.Extensions[ConfigJsonExtensionFactory.Extension_Name] != null)
+			IExtension extension = default;
+			if (_gltfRoot != null && _gltfRoot.Extensions != null && _gltfRoot.Extensions.Count > 0
+				&& _gltfRoot.Extensions.TryGetValue(ConfigJsonExtensionFactory.Extension_Name, out extension))
 			{
-				ConfigJsonExtension extension = _gltfRoot.Extensions[ConfigJsonExtensionFactory.Extension_Name] as ConfigJsonExtension;
-				if (extension != null)
-					configJson = extension.configJson;
+				if (extension is ConfigJsonExtension configJsonExtension && configJsonExtension != null)
+					configJson = configJsonExtension.configJson;
 			}
 		}
 
@@ -98,11 +99,12 @@ namespace CKUnityGLTF
 			_gltfStream.StartPosition = 0;
 			GLTFParser.ParseJson(_gltfStream.Stream, out _gltfRoot, _gltfStream.StartPosition);
 
-			if (_gltfRoot != null && _gltfRoot.Extensions != null && _gltfRoot.Extensions.Count > 0 && _gltfRoot.Extensions[ClothesInfoJsonExtensionFactory.Extension_Name] != null)
+			IExtension extension = default;
+			if (_gltfRoot != null && _gltfRoot.Extensions != null && _gltfRoot.Extensions.Count > 0
+				&& _gltfRoot.Extensions.TryGetValue(ClothesInfoJsonExtensionFactory.Extension_Name, out extension))
 			{
-				ClothesInfoJsonExtension extension = _gltfRoot.Extensions[ClothesInfoJsonExtensionFactory.Extension_Name] as ClothesInfoJsonExtension;
-				if (extension != null)
-					clothesInfoJson = extension.clothesInfoJson;
+				if (extension is ClothesInfoJsonExtension clothesInfoJsonExtension && clothesInfoJsonExtension != null)
+					clothesInfoJson = clothesInfoJsonExtension.clothesInfoJson;
 			}
 		}
 
@@ -366,12 +368,19 @@ namespace CKUnityGLTF
 			return Task.WhenAll(tasks);
 		}
 
-		protected override async Task<IUniformMap> ConstructMaterial(GLTFMaterial def, int materialIndex)
+		/// <summary>
+		/// 重写此方法，用扩展属性创建的材质球替换原有的材质球
+		/// </summary>
+		protected override async Task ConstructMaterial(GLTFMaterial def, int materialIndex)
 		{
 			if (materialIndex >= 0 && materialIndex < _assetCache.MaterialCache.Length && _assetCache.MaterialCache[materialIndex] == null)
 			{
-				IUniformMap mapper = await base.ConstructMaterial(def, materialIndex);
-				//TODO:记录原有的 mapper.Material，在新的创建完成后，销毁原材质
+				await base.ConstructMaterial(def, materialIndex);
+				MaterialCacheData materialWrapper = materialIndex >= 0 ? _assetCache.MaterialCache[materialIndex] : _defaultLoadedMaterial;
+
+				Material UnityMaterial = materialWrapper.UnityMaterial;
+				Material UnityMaterialWithVertexColor = materialWrapper.UnityMaterialWithVertexColor;
+
 				if (def.Extensions != null)
 				{
 					foreach (var ext in def.Extensions)
@@ -379,19 +388,14 @@ namespace CKUnityGLTF
 						MaterialExtensionFactory factory = GLTFMaterial.TryGetExtension(ext.Key) as MaterialExtensionFactory;
 
 						if (factory != null && Shader.Find(factory.ExtensionName) != null)
-							mapper.Material = await ConstructMaterial(factory, def.Extensions[ext.Key]);
+						{
+							materialWrapper.UnityMaterial = materialWrapper.UnityMaterialWithVertexColor = await ConstructMaterial(factory, def.Extensions[ext.Key]);
+
+							UnityEngine.Object.Destroy(UnityMaterial);
+							UnityEngine.Object.Destroy(UnityMaterialWithVertexColor);
+						}
 					}
 				}
-
-				var vertColorMapper = mapper.Clone();
-				vertColorMapper.VertexColorsEnabled = true;
-
-				MaterialCacheData materialWrapper = new MaterialCacheData
-				{
-					UnityMaterial = mapper.Material,
-					UnityMaterialWithVertexColor = vertColorMapper.Material,
-					GLTFMaterial = def
-				};
 
 				if (materialIndex >= 0)
 				{
@@ -401,11 +405,7 @@ namespace CKUnityGLTF
 				{
 					_defaultLoadedMaterial = materialWrapper;
 				}
-
-				return mapper;
 			}
-
-			return null;
 		}
 
 		private async Task<Material> ConstructMaterial(MaterialExtensionFactory factory, IExtension extension)

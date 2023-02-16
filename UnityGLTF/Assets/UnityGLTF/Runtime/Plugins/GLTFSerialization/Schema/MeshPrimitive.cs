@@ -324,7 +324,7 @@ namespace GLTF.Schema
 		public const string JOINT = "JOINT";
 		public const string WEIGHT = "WEIGHT";
 		public const string TANGENT = "TANGENT";
-		public const string INDICES = "INDICIES";
+		public const string INDICES = "INDICES";
 
 		public const string TEXCOORD_0 = "TEXCOORD_0";
 		public const string TEXCOORD_1 = "TEXCOORD_1";
@@ -336,10 +336,12 @@ namespace GLTF.Schema
 		public static readonly string[] Color = { COLOR_0 };
 
 		public const string WEIGHTS_0 = "WEIGHTS_0";
-		public static readonly string[] Weight = { WEIGHTS_0 };
+		public const string WEIGHTS_1 = "WEIGHTS_1";
+		public static readonly string[] Weight = { WEIGHTS_0, WEIGHTS_1 };
 
 		public const string JOINTS_0 = "JOINTS_0";
-		public static readonly string[] Joint = { JOINTS_0 };
+		public const string JOINTS_1 = "JOINTS_1";
+		public static readonly string[] Joint = { JOINTS_0, JOINTS_1 };
 
 		/// <summary>
 		/// Parse out the index of a given semantic property.

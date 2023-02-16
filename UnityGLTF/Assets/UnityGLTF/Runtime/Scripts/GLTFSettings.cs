@@ -5,6 +5,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using UnityEngine.UIElements;
+using UnityGLTF.Cache;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -34,6 +36,19 @@ namespace UnityGLTF
 	            do
 	            {
 			        EditorGUILayout.PropertyField(prop, true);
+			        switch (prop.name)
+			        {
+				        case nameof(GLTFSettings.UseCaching):
+					        EditorGUILayout.BeginHorizontal();
+					        if (GUILayout.Button($"Clear Cache ({(exportCacheByteLength / (1024f * 1024f)):F2} MB)")) {
+						        ExportCache.Clear();
+						        CalculateCacheStats();
+					        }
+					        if (GUILayout.Button("Open Cache Directory ↗"))
+						        ExportCache.OpenCacheDirectory();
+					        EditorGUILayout.EndHorizontal();
+					        break;
+			        }
 	            }
 	            while (prop.NextVisible(false));
             }
@@ -41,6 +56,19 @@ namespace UnityGLTF
             if(m_SerializedObject.hasModifiedProperties) {
                 m_SerializedObject.ApplyModifiedProperties();
             }
+        }
+
+        public override void OnActivate(string searchContext, VisualElement rootElement)
+        {
+	        base.OnActivate(searchContext, rootElement);
+	        CalculateCacheStats();
+        }
+
+        private long exportCacheByteLength = 0;
+        private void CalculateCacheStats()
+        {
+	        var files = new List<FileInfo>();
+	        exportCacheByteLength = ExportCache.CalculateCacheSize(files);
         }
 
         [SettingsProvider]
@@ -78,6 +106,7 @@ namespace UnityGLTF
 		private bool exportFullPath = false;
 		[SerializeField]
 		private bool requireExtensions = false;
+
 		[Header("Export Visibility")]
 		[SerializeField]
 		[Tooltip("Uses Camera.main layer settings to filter which objects are exported")]
@@ -85,6 +114,7 @@ namespace UnityGLTF
 		[SerializeField]
 		[Tooltip("glTF does not support visibility state. If this setting is true, disabled GameObjects will still be exported and be visible in the glTF file.")]
 		private bool exportDisabledGameObjects = false;
+
 		[Header("Export Textures")]
 		[SerializeField]
 		[Tooltip("(Experimental) Exports PNG/JPEG directly from disk instead of re-encoding from Unity's import result. No channel repacking will happen for these textures. Textures in other formats (PSD, TGA etc) not supported by glTF and in-memory textures (e.g. RenderTextures) are always re-encoded.")]
@@ -93,14 +123,19 @@ namespace UnityGLTF
 		private bool useTextureFileTypeHeuristic = true;
 		[SerializeField] [Tooltip("Quality setting for exported JPEG files.")]
 		private int defaultJpegQuality = 90;
+
 		[Header("Export Animation")]
 		[SerializeField]
 		private bool exportAnimations = true;
+		[Tooltip("(Experimental) Export animations using KHR_animation_pointer. Requires the viewer to also support this extension.")]
+		[SerializeField]
+		private bool useAnimationPointer = false;
 		[SerializeField]
 		[Tooltip("Some viewers can't distinguish between animation clips that have the same name. This option ensures all exported animation names are unique.")]
 		private bool uniqueAnimationNames = false;
 		[SerializeField]
 		private bool bakeSkinnedMeshes = false;
+
 		[Header("Export Mesh Data")]
 		[SerializeField]
 		private BlendShapeExportPropertyFlags blendShapeExportProperties = BlendShapeExportPropertyFlags.All;
@@ -111,172 +146,26 @@ namespace UnityGLTF
 	    [Tooltip("If off, vertex colors are not exported. Vertex Colors aren't supported in some viewers (e.g. Google's SceneViewer).")]
 		private bool exportVertexColors = true;
 
-		public bool ExportNames { get => exportNames;
-			set {
-				if(exportNames != value) {
-					exportNames = value;
-#if UNITY_EDITOR
-					EditorUtility.SetDirty(this);
-#endif
-				}
-			}
-		}
+		[Header("Export Cache")]
+		[Tooltip("When enabled textures will be cached to disc for faster export times.\n(The cache size is reduced to stay below 1024 MB when the Editor quits)")]
+		public bool UseCaching = true;
 
-		public bool ExportFullPath
-		{ get => exportFullPath;
-			set {
-				if(exportFullPath != value) {
-					exportFullPath = value;
-#if UNITY_EDITOR
-					EditorUtility.SetDirty(this);
-#endif
-				}
-			}
-		}
+		public bool ExportNames { get => exportNames; set  => exportNames = value; }
+		public bool ExportFullPath { get => exportFullPath; set => exportFullPath = value; }
+		public bool UseMainCameraVisibility { get => useMainCameraVisibility; set => useMainCameraVisibility = value; }
+		public bool RequireExtensions { get => requireExtensions; set => requireExtensions = value; }
+		public bool TryExportTexturesFromDisk { get => tryExportTexturesFromDisk; set => tryExportTexturesFromDisk = value; }
+		public bool UseTextureFileTypeHeuristic { get => useTextureFileTypeHeuristic; set => useTextureFileTypeHeuristic = value; }
+		public bool ExportVertexColors { get => exportVertexColors; set => exportVertexColors = value; }
+		public int DefaultJpegQuality { get => defaultJpegQuality; set => defaultJpegQuality = value; }
+		public bool ExportDisabledGameObjects { get => exportDisabledGameObjects; set => exportDisabledGameObjects = value; }
+		public bool ExportAnimations { get => exportAnimations; set => exportAnimations = value; }
+		public bool UseAnimationPointer { get => useAnimationPointer; set => useAnimationPointer = value; }
+		public bool UniqueAnimationNames { get => uniqueAnimationNames; set => uniqueAnimationNames = value; }
+		public bool BlendShapeExportSparseAccessors { get => blendShapeExportSparseAccessors; set => blendShapeExportSparseAccessors = value; }
+		public BlendShapeExportPropertyFlags BlendShapeExportProperties { get => blendShapeExportProperties; set => blendShapeExportProperties = value; }
+		public bool BakeSkinnedMeshes { get => bakeSkinnedMeshes; set => bakeSkinnedMeshes = value; }
 
-		public bool UseMainCameraVisibility
-		{ get => useMainCameraVisibility;
-			set {
-				if(useMainCameraVisibility != value) {
-					useMainCameraVisibility = value;
-#if UNITY_EDITOR
-					EditorUtility.SetDirty(this);
-#endif
-				}
-			}
-		}
-
-		public bool RequireExtensions
-		{ get => requireExtensions;
-			set {
-				if(requireExtensions != value) {
-					requireExtensions = value;
-#if UNITY_EDITOR
-					EditorUtility.SetDirty(this);
-#endif
-				}
-			}
-		}
-
-		public bool TryExportTexturesFromDisk
-		{ get => tryExportTexturesFromDisk;
-			set {
-				if(tryExportTexturesFromDisk != value) {
-					tryExportTexturesFromDisk = value;
-#if UNITY_EDITOR
-					EditorUtility.SetDirty(this);
-#endif
-				}
-			}
-		}
-
-		public bool UseTextureFileTypeHeuristic
-		{ get => useTextureFileTypeHeuristic;
-			set {
-				if(useTextureFileTypeHeuristic != value) {
-					useTextureFileTypeHeuristic = value;
-#if UNITY_EDITOR
-					EditorUtility.SetDirty(this);
-#endif
-				}
-			}
-		}
-
-		public bool ExportVertexColors
-		{ get => exportVertexColors;
-			set {
-				if(exportVertexColors != value) {
-					exportVertexColors = value;
-#if UNITY_EDITOR
-					EditorUtility.SetDirty(this);
-#endif
-				}
-			}
-		}
-
-		public int DefaultJpegQuality
-		{ get => defaultJpegQuality;
-			set {
-				if(defaultJpegQuality != value) {
-					defaultJpegQuality = value;
-#if UNITY_EDITOR
-					EditorUtility.SetDirty(this);
-#endif
-				}
-			}
-		}
-
-		public bool ExportDisabledGameObjects
-		{ get => exportDisabledGameObjects;
-			set {
-				if(exportDisabledGameObjects != value) {
-					exportDisabledGameObjects = value;
-#if UNITY_EDITOR
-					EditorUtility.SetDirty(this);
-#endif
-				}
-			}
-		}
-
-		public bool ExportAnimations
-		{ get => exportAnimations;
-			set {
-				if(exportAnimations != value) {
-					exportAnimations = value;
-#if UNITY_EDITOR
-					EditorUtility.SetDirty(this);
-#endif
-				}
-			}
-		}
-
-		public bool UniqueAnimationNames
-		{ get => uniqueAnimationNames;
-			set {
-				if(uniqueAnimationNames != value) {
-					uniqueAnimationNames = value;
-#if UNITY_EDITOR
-					EditorUtility.SetDirty(this);
-#endif
-				}
-			}
-		}
-
-		public bool BlendShapeExportSparseAccessors
-		{ get => blendShapeExportSparseAccessors;
-			set {
-				if (blendShapeExportSparseAccessors != value) {
-					blendShapeExportSparseAccessors = value;
-#if UNITY_EDITOR
-					EditorUtility.SetDirty(this);
-#endif
-				}
-			}
-		}
-
-		public BlendShapeExportPropertyFlags BlendShapeExportProperties
-		{ get => blendShapeExportProperties;
-			set {
-				if(blendShapeExportProperties != value) {
-					blendShapeExportProperties = value;
-#if UNITY_EDITOR
-					EditorUtility.SetDirty(this);
-#endif
-				}
-			}
-		}
-
-		public bool BakeSkinnedMeshes
-		{ get => bakeSkinnedMeshes;
-			set {
-				if(bakeSkinnedMeshes != value) {
-					bakeSkinnedMeshes = value;
-#if UNITY_EDITOR
-					EditorUtility.SetDirty(this);
-#endif
-				}
-			}
-		}
 
 #if UNITY_EDITOR
 		private const string SaveFolderPathPref = k_PreferencesPrefix + "SaveFolderPath";

@@ -1,6 +1,13 @@
+#if ENABLE_INPUT_SYSTEM && HAVE_INPUTSYSTEM
+#define NEW_INPUT
+#endif
+
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
+#if NEW_INPUT
+using UnityEngine.InputSystem;
+#endif
 using UnityGLTF.Timeline;
 
 namespace UnityGLTF
@@ -10,7 +17,14 @@ namespace UnityGLTF
 	    public string outputFile = "Assets/Recordings/Recorded_<Timestamp>.glb";
 	    public Transform exportRoot;
 	    public bool recordBlendShapes = true;
+	    public bool recordRootInWorldSpace = true;
+	    public bool recordAnimationPointer = false;
+
+#if NEW_INPUT
+		public InputAction recordingKey = new InputAction(binding: "<Keyboard>/F11");
+#else
 	    public KeyCode recordingKey = KeyCode.F11;
+#endif
 
 	    public bool IsRecording => recorder?.IsRecording ?? false;
 	    protected GLTFRecorder recorder;
@@ -38,7 +52,14 @@ namespace UnityGLTF
 				shouldRecordBlendShapes = false;
 			}
 
-			recorder = new GLTFRecorder(exportRoot, shouldRecordBlendShapes);
+			var shouldUseAnimationPointer = recordAnimationPointer;
+			if (!settings.UseAnimationPointer && recordAnimationPointer)
+			{
+				Debug.LogWarning("Attempting to record KHR_animation_pointer but that is disabled in ProjectSettings/UnityGLTF. Please enable it.");
+				shouldUseAnimationPointer = false;
+			}
+
+			recorder = new GLTFRecorder(exportRoot, shouldRecordBlendShapes, recordRootInWorldSpace, shouldUseAnimationPointer);
 			recorder.StartRecording(CurrentTime);
 			recordingStarted?.Invoke();
 
@@ -51,12 +72,6 @@ namespace UnityGLTF
 			var filename = outputFile.Replace("<Timestamp>", System.DateTime.Now.ToString("yyyyMMdd-HHmmss"));
 			recorder.EndRecording(filename);
 			recordingEnded?.Invoke(filename);
-		}
-
-		protected virtual void Update()
-		{
-			if(Input.GetKeyDown(recordingKey))
-				ToggleRecording();
 		}
 
 		private void ToggleRecording()
@@ -78,10 +93,31 @@ namespace UnityGLTF
             }
 	    }
 
-	    protected virtual void OnDisable()
+#if NEW_INPUT
+		private void Start()
+		{
+			recordingKey.performed += _ => ToggleRecording();
+		}
+
+		private void OnEnable()
+		{
+			recordingKey.Enable();
+		}
+#else
+		protected virtual void Update()
+		{
+			if(Input.GetKeyDown(recordingKey))
+				ToggleRecording();
+		}
+#endif
+
+		protected virtual void OnDisable()
 	    {
 		    if(IsRecording)
 			    StopRecording();
+#if NEW_INPUT
+		    recordingKey.Disable();
+#endif
 	    }
 
 	    protected virtual void UpdateRecording()
