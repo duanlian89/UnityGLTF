@@ -40,7 +40,7 @@ namespace UnityGLTF
 			}
 		}
 
-		private static List<UniquePrimitive> GetUniquePrimitivesFromGameObjects(IEnumerable<GameObject> primitives)
+		protected static List<UniquePrimitive> GetUniquePrimitivesFromGameObjects(IEnumerable<GameObject> primitives)
 		{
 			var primKeys = new List<UniquePrimitive>();
 
@@ -223,7 +223,7 @@ namespace UnityGLTF
 		}
 
 		// a mesh *might* decode to multiple prims if there are submeshes
-		private MeshPrimitive[] ExportPrimitive(UniquePrimitive primKey, GLTFMesh mesh)
+		protected MeshPrimitive[] ExportPrimitive(UniquePrimitive primKey, GLTFMesh mesh)
 		{
 			exportPrimitiveMarker.Begin();
 
