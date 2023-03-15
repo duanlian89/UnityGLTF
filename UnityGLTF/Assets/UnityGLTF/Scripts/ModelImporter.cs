@@ -67,9 +67,13 @@ namespace CKUnityGLTF
 			_gltfStream.StartPosition = 0;
 			GLTFParser.ParseJson(_gltfStream.Stream, out _gltfRoot, _gltfStream.StartPosition);
 
-			if (_gltfRoot != null && _gltfRoot.Extensions != null && _gltfRoot.Extensions.Count > 0 && _gltfRoot.Extensions[ConfigJsonExtensionFactory.Extension_Name] != null)
+			IExtension _extension;
+			if (_gltfRoot != null && _gltfRoot.Extensions != null
+				&& _gltfRoot.Extensions.Count > 0
+				&& _gltfRoot.Extensions.TryGetValue(ConfigJsonExtensionFactory.Extension_Name, out _extension)
+				&& _extension != null)
 			{
-				ConfigJsonExtension extension = _gltfRoot.Extensions[ConfigJsonExtensionFactory.Extension_Name] as ConfigJsonExtension;
+				ConfigJsonExtension extension = _extension as ConfigJsonExtension;
 				if (extension != null)
 					configJson = extension.configJson;
 			}
@@ -98,9 +102,13 @@ namespace CKUnityGLTF
 			_gltfStream.StartPosition = 0;
 			GLTFParser.ParseJson(_gltfStream.Stream, out _gltfRoot, _gltfStream.StartPosition);
 
-			if (_gltfRoot != null && _gltfRoot.Extensions != null && _gltfRoot.Extensions.Count > 0 && _gltfRoot.Extensions[ClothesInfoJsonExtensionFactory.Extension_Name] != null)
+			IExtension _extension;
+			if (_gltfRoot != null && _gltfRoot.Extensions != null
+				&& _gltfRoot.Extensions.Count > 0
+				&& _gltfRoot.Extensions.TryGetValue(ClothesInfoJsonExtensionFactory.Extension_Name, out _extension)
+				&& _extension != null)
 			{
-				ClothesInfoJsonExtension extension = _gltfRoot.Extensions[ClothesInfoJsonExtensionFactory.Extension_Name] as ClothesInfoJsonExtension;
+				ClothesInfoJsonExtension extension = _extension as ClothesInfoJsonExtension;
 				if (extension != null)
 					clothesInfoJson = extension.clothesInfoJson;
 			}
