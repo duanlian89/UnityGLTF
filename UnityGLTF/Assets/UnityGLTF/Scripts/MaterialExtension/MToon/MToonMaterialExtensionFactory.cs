@@ -112,7 +112,7 @@ namespace CKUnityGLTF
 		public const string _SocksTexture = "_SocksTexture";
 		public const string _SpecColor = "_SpecColor";
 		public const string _RimSoftness = "_RimSoftness";
-		public const string _RimWeight = "_RimSoftness";
+		public const string _RimWeight = "_RimWeight";
 		public const string _RimSphereWeight = "_RimSphereWeight";
 		#endregion
 

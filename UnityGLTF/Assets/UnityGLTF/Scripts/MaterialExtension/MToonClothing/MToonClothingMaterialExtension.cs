@@ -3,6 +3,7 @@ using GLTF.Schema;
 using Newtonsoft.Json.Linq;
 using GLTF.Extensions;
 using UnityGLTF.Extensions;
+using CKUnityGLTF;
 
 namespace CKUnityGLTF
 {
@@ -275,6 +276,46 @@ namespace CKUnityGLTF
 				ext.Add(new JProperty(MToonClothingMaterialExtensionFactory._AlphaToMask, _AlphaToMask));
 			}
 
+			if (_LinearLitColor != _LinearLitColor_Default)
+			{
+				ext.Add(new JProperty(MToonClothingMaterialExtensionFactory._LinearLitColor, new JArray(_LinearLitColor.r, _LinearLitColor.g, _LinearLitColor.b, _LinearLitColor.a)));
+			}
+
+			if (_SpecTexture != _SpecTexture_Default)
+			{
+				ext.Add(new JProperty(MToonClothingMaterialExtensionFactory._SpecTexture, new JObject(new JProperty(TextureInfo.INDEX, _SpecTexture.Index.Id))));
+			}
+
+			if (_PatternTexture != _PatternTexture_Default)
+			{
+				ext.Add(new JProperty(MToonClothingMaterialExtensionFactory._PatternTexture, new JObject(new JProperty(TextureInfo.INDEX, _PatternTexture.Index.Id))));
+			}
+
+			if (_SocksTexture != _SocksTexture_Default)
+			{
+				ext.Add(new JProperty(MToonClothingMaterialExtensionFactory._SocksTexture, new JObject(new JProperty(TextureInfo.INDEX, _SocksTexture.Index.Id))));
+			}
+
+			if (_SpecColor != _SpecColor_Default)
+			{
+				ext.Add(new JProperty(MToonClothingMaterialExtensionFactory._SpecColor, new JArray(_SpecColor.r, _SpecColor.g, _SpecColor.b, _SpecColor.a)));
+			}
+
+			if (_RimSoftness != _RimSoftness_Default)
+			{
+				ext.Add(new JProperty(MToonClothingMaterialExtensionFactory._RimSoftness, _RimSoftness));
+			}
+
+			if (_RimWeight != _RimWeight_Default)
+			{
+				ext.Add(new JProperty(MToonClothingMaterialExtensionFactory._RimWeight, _RimWeight));
+			}
+
+			if (_RimSphereWeight != _RimSphereWeight_Default)
+			{
+				ext.Add(new JProperty(MToonClothingMaterialExtensionFactory._RimSphereWeight, _RimSphereWeight));
+			}
+
 			if (shaderKeywords.Length > 0)
 			{
 				System.Text.StringBuilder str = new System.Text.StringBuilder();
@@ -292,16 +333,6 @@ namespace CKUnityGLTF
 			}
 
 			ext.Add(new JProperty(MToonMaterialExtensionFactory.renderQueue, renderQueue));
-
-			if (_LinearLitColor != _LinearLitColor_Default)
-			{
-				ext.Add(new JProperty(MToonClothingMaterialExtensionFactory._LinearLitColor, new JArray(_LinearLitColor.r, _LinearLitColor.g, _LinearLitColor.b, _LinearLitColor.a)));
-			}
-
-			if (_SpecTexture != _SpecTexture_Default)
-			{
-				ext.Add(new JProperty(MToonClothingMaterialExtensionFactory._SpecTexture, new JObject(new JProperty(TextureInfo.INDEX, _SpecTexture.Index.Id))));
-			}
 
 			return new JProperty(MToonClothingMaterialExtensionFactory.Extension_Name, ext);
 		}

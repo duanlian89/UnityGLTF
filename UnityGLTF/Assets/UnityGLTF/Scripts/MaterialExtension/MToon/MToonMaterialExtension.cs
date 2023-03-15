@@ -645,6 +645,24 @@ namespace CKUnityGLTF
 
 			token = extensionToken.Value[MToonMaterialExtensionFactory._SpecTexture];
 			_SpecTexture = token != null ? token.DeserializeAsTexture(root) : _SpecTexture_Default;
+
+			token = extensionToken.Value[MToonMaterialExtensionFactory._PatternTexture];
+			_PatternTexture = token != null ? token.DeserializeAsTexture(root) : _PatternTexture_Default;
+
+			token = extensionToken.Value[MToonMaterialExtensionFactory._SocksTexture];
+			_SocksTexture = token != null ? token.DeserializeAsTexture(root) : _SocksTexture_Default;
+
+			token = extensionToken.Value[MToonMaterialExtensionFactory._SpecColor];
+			_SpecColor = token != null ? token.DeserializeAsColor().ToUnityColorLinear() : _SpecColor_Default;
+
+			token = extensionToken.Value[MToonMaterialExtensionFactory._RimSoftness];
+			_RimSoftness = token != null ? (float)token.DeserializeAsDouble() : _RimSoftness_Default;
+
+			token = extensionToken.Value[MToonMaterialExtensionFactory._RimWeight];
+			_RimWeight = token != null ? (float)token.DeserializeAsDouble() : _RimWeight_Default;
+
+			token = extensionToken.Value[MToonMaterialExtensionFactory._RimSphereWeight];
+			_RimSphereWeight = token != null ? (float)token.DeserializeAsDouble() : _RimSphereWeight_Default;
 		}
 	}
 }
