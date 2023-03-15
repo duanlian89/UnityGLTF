@@ -163,6 +163,24 @@ namespace CKUnityGLTF
 		public float _SpecSoftness = 0.0f;
 		public static readonly float _SpecSoftness_Default = 0.0f;
 
+		public TextureInfo _PatternTexture;
+		public static readonly TextureInfo _PatternTexture_Default;
+
+		public TextureInfo _SocksTexture;
+		public static readonly TextureInfo _SocksTexture_Default;
+
+		public Color _SpecColor;
+		public static readonly Color _SpecColor_Default = Color.white;
+
+		public float _RimSoftness = 0.0f;
+		public static readonly float _RimSoftness_Default = 0.0f;
+
+		public float _RimWeight = 0.0f;
+		public static readonly float _RimWeight_Default = 1.0f;
+
+		public float _RimSphereWeight = 0.0f;
+		public static readonly float _RimSphereWeight_Default = 0.0f;
+
 		#endregion
 
 		public MToonMaterialExtension()

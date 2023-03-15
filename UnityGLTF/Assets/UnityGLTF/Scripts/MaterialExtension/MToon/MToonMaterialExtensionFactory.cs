@@ -108,6 +108,12 @@ namespace CKUnityGLTF
 
 		public const string _SpecSoftness = "_SpecSoftness";
 
+		public const string _PatternTexture = "_PatternTexture";
+		public const string _SocksTexture = "_SocksTexture";
+		public const string _SpecColor = "_SpecColor";
+		public const string _RimSoftness = "_RimSoftness";
+		public const string _RimWeight = "_RimSoftness";
+		public const string _RimSphereWeight = "_RimSphereWeight";
 		#endregion
 
 		public MToonMaterialExtensionFactory()
@@ -119,13 +125,15 @@ namespace CKUnityGLTF
 		_IndirectLightIntensity,_RimLightingMix,_RimFresnelPower    ,_RimLift,_OutlineWidth,_OutlineScaledMaxDistance,
 		_OutlineLightingMix,_UvAnimScrollX,_UvAnimScrollY,_UvAnimRotation,_MToonVersion ,
 		_DebugMode ,_BlendMode ,_OutlineWidthMode ,_OutlineColorMode ,_CullMode ,
-		_OutlineCullMode,_SrcBlend ,_DstBlend ,_ZWrite,_AlphaToMask,_SpecMulti,_SpecRange ,_SpecSoftness };
+		_OutlineCullMode,_SrcBlend ,_DstBlend ,_ZWrite,_AlphaToMask,_SpecMulti,_SpecRange ,_SpecSoftness
+			,_RimSoftness,_RimWeight,_RimSphereWeight};
 
-			ColorProperties = new string[] { _Color, _ColorOL, _ShadeColor, _RimColor, _EmissionColor, _OutlineColor, _LinearLitColor };
+			ColorProperties = new string[] { _Color, _ColorOL, _ShadeColor, _RimColor,
+				_EmissionColor, _OutlineColor, _LinearLitColor, _SpecColor};
 
 			TextureProperties = new string[] { _MainTex, _MainTex2, _ShadeTexture , _BumpMap ,
 		_ReceiveShadowTexture, _ShadingGradeTexture ,_RimTexture,_SphereAdd,_EmissionMap,
-		_OutlineWidthTexture,_UvAnimMaskTexture,_SpecTexture};
+		_OutlineWidthTexture,_UvAnimMaskTexture,_SpecTexture, _SocksTexture, _PatternTexture};
 		}
 
 		// 从extensionToken读出属性，初始化 MToonMaterialExtension
