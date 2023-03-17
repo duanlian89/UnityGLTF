@@ -387,7 +387,10 @@ namespace CKUnityGLTF
 						MaterialExtensionFactory factory = GLTFMaterial.TryGetExtension(ext.Key) as MaterialExtensionFactory;
 
 						if (factory != null && Shader.Find(factory.ExtensionName) != null)
+						{
 							mapper.Material = await ConstructMaterial(factory, def.Extensions[ext.Key]);
+							mapper.Material.name = def.Name;
+						}
 					}
 				}
 
@@ -556,12 +559,14 @@ namespace CKUnityGLTF
 			await base.ConstructUnityTexture(stream, markGpuOnly, isLinear, image, imageCacheIndex);
 
 			Texture2D originalTexture2d = _assetCache.ImageCache[imageCacheIndex];
+			originalTexture2d.name = _gltfRoot.Textures[imageCacheIndex].Name;
 
 			if (scaleFactor != 1.0f)
 			{
 				var scaleTexture2D = TextureUtil.ResizeTexture(originalTexture2d, (int)(originalTexture2d.width * scaleFactor), (int)(originalTexture2d.height * scaleFactor));
 				if (scaleTexture2D)
 				{
+					scaleTexture2D.name = originalTexture2d.name;
 					_assetCache.ImageCache[imageCacheIndex] = scaleTexture2D;
 					UnityEngine.Object.Destroy(originalTexture2d);
 				}
