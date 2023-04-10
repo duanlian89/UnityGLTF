@@ -44,12 +44,18 @@ public class ModelLoader
 		return sceneImporter;
 	}
 
-	public static ModelImporter GetImporter(string fileName, byte[] data, float scaleFactor = 0.5f)
+	public static ModelImporter GetImporter(string fileName, byte[] data)
+	{
+		return GetImporter(fileName, data, 1.0f, Vector2.one * 512.0f);
+	}
+
+	public static ModelImporter GetImporter(string fileName, byte[] data, float scaleFactor, Vector2 maxSize)
 	{
 		//string directoryPath = URIHelper.GetDirectoryName(absoluteStreamingPath);
 
 		ImportOptionsExtension importOptions = new ImportOptionsExtension();
 		importOptions.scaleFactor = scaleFactor;
+		importOptions.maxSize = maxSize;
 		importOptions.DataLoader = new VirtualStreamLoader() { data = data };
 
 		ModelImporter sceneImporter = new ModelImporter(fileName, importOptions);

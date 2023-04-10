@@ -19,6 +19,11 @@ namespace CKUnityGLTF
 		/// 纹理缩放比例
 		/// </summary>
 		public float scaleFactor = 0.5f;
+
+		/// <summary>
+		/// 纹理最大尺寸
+		/// </summary>
+		public Vector2 maxSize = Vector2.one * 512.0f;
 	}
 
 	public class ModelImporter : GLTFSceneImporter
@@ -32,11 +37,18 @@ namespace CKUnityGLTF
 		/// 纹理缩放比例
 		/// </summary>
 		float scaleFactor = 1.0f;
+
+		/// <summary>
+		/// 纹理最大尺寸
+		/// </summary>
+		Vector2 maxSize = Vector2.one * 512.0f;
+
 		public ModelImporter(string gltfFileName, ImportOptions options)
 			: base(gltfFileName, options)
 		{
 			ImportOptionsExtension optionsExtension = options as ImportOptionsExtension;
 			scaleFactor = (float)optionsExtension?.scaleFactor;
+			maxSize = (Vector2)optionsExtension?.maxSize;
 		}
 
 		string configJson;
@@ -564,6 +576,17 @@ namespace CKUnityGLTF
 			if (scaleFactor != 1.0f)
 			{
 				var scaleTexture2D = TextureUtil.ResizeTexture(originalTexture2d, (int)(originalTexture2d.width * scaleFactor), (int)(originalTexture2d.height * scaleFactor));
+				if (scaleTexture2D)
+				{
+					scaleTexture2D.name = originalTexture2d.name;
+					_assetCache.ImageCache[imageCacheIndex] = scaleTexture2D;
+					UnityEngine.Object.Destroy(originalTexture2d);
+				}
+			}
+
+			if (originalTexture2d.width > maxSize.x || originalTexture2d.height > maxSize.y)
+			{
+				var scaleTexture2D = TextureUtil.ResizeTexture(originalTexture2d, (int)MathF.Min(originalTexture2d.width, maxSize.x), (int)MathF.Min(originalTexture2d.height, maxSize.y));
 				if (scaleTexture2D)
 				{
 					scaleTexture2D.name = originalTexture2d.name;
