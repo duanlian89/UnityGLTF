@@ -48,9 +48,9 @@ namespace CKUnityGLTF
 				Animations = new List<GLTFAnimation>(),
 				Asset = new Asset
 				{
-					Version = "2.0.0",
+					Version = "2.0",
 					Generator = "UnityGLTF",
-					MinVersion = Application.version
+					MinVersion = "6.6"
 				},
 				Buffers = new List<GLTFBuffer>(),
 				BufferViews = new List<BufferView>(),
