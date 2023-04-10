@@ -580,7 +580,11 @@ namespace CKUnityGLTF
 				{
 					scaleTexture2D.name = originalTexture2d.name;
 					_assetCache.ImageCache[imageCacheIndex] = scaleTexture2D;
+#if UNITY_EDITOR
+					UnityEngine.Object.DestroyImmediate(originalTexture2d, true);
+#else
 					UnityEngine.Object.Destroy(originalTexture2d);
+#endif
 				}
 			}
 
@@ -591,7 +595,11 @@ namespace CKUnityGLTF
 				{
 					scaleTexture2D.name = originalTexture2d.name;
 					_assetCache.ImageCache[imageCacheIndex] = scaleTexture2D;
+#if UNITY_EDITOR
+					UnityEngine.Object.DestroyImmediate(originalTexture2d, true);
+#else
 					UnityEngine.Object.Destroy(originalTexture2d);
+#endif
 				}
 			}
 		}
