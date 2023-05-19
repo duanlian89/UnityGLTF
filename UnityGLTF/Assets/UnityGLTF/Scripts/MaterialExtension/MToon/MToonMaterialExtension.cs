@@ -181,6 +181,9 @@ namespace CKUnityGLTF
 		public float _RimSphereWeight = 0.0f;
 		public static readonly float _RimSphereWeight_Default = 0.0f;
 
+		public int _IsGrayTex = 1;
+		public static readonly int _IsGrayTex_Default = 1;
+
 		#endregion
 
 		public MToonMaterialExtension()
@@ -471,6 +474,11 @@ namespace CKUnityGLTF
 				ext.Add(new JProperty(MToonClothingMaterialExtensionFactory._SpecTexture, new JObject(new JProperty(TextureInfo.INDEX, _SpecTexture.Index.Id))));
 			}
 
+			if (_IsGrayTex != _IsGrayTex_Default)
+			{
+				ext.Add(new JProperty(MToonClothingMaterialExtensionFactory._IsGrayTex, _IsGrayTex));
+			}
+
 			return new JProperty(MToonMaterialExtensionFactory.Extension_Name, ext);
 		}
 
@@ -663,6 +671,9 @@ namespace CKUnityGLTF
 
 			token = extensionToken.Value[MToonMaterialExtensionFactory._RimSphereWeight];
 			_RimSphereWeight = token != null ? (float)token.DeserializeAsDouble() : _RimSphereWeight_Default;
+
+			token = extensionToken.Value[MToonMaterialExtensionFactory._IsGrayTex];
+			_IsGrayTex = token != null ? token.DeserializeAsInt() : _IsGrayTex_Default;
 		}
 	}
 }

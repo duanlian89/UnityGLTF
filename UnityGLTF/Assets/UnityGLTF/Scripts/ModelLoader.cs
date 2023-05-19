@@ -49,10 +49,13 @@ public class ModelLoader
 		return GetImporter(fileName, data, 1.0f, Vector2.one * 512.0f);
 	}
 
+	public static ModelImporter GetImporter(string fileName, byte[] data, float scaleFactor)
+	{
+		return GetImporter(fileName, data, scaleFactor, Vector2.one * 4096 * 2);
+	}
+
 	public static ModelImporter GetImporter(string fileName, byte[] data, float scaleFactor, Vector2 maxSize)
 	{
-		//string directoryPath = URIHelper.GetDirectoryName(absoluteStreamingPath);
-
 		ImportOptionsExtension importOptions = new ImportOptionsExtension();
 		importOptions.scaleFactor = scaleFactor;
 		importOptions.maxSize = maxSize;
@@ -61,14 +64,7 @@ public class ModelLoader
 		ModelImporter sceneImporter = new ModelImporter(fileName, importOptions);
 		sceneImporter.Collider = UnityGLTF.GLTFSceneImporter.ColliderType.None;
 
-		//sceneImporter.ConfigJson = ParseConfigJson(data);
-
 		return sceneImporter;
-
-		//await sceneImporter.LoadSceneAsync(-1, true, (go, e) =>
-		//{
-		//	onLoadComplete.Invoke(go, sceneImporter.ConfigJson, e);
-		//});
 	}
 
 	/*

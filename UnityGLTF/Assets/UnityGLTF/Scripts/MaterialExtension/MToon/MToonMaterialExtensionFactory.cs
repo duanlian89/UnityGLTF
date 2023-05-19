@@ -114,6 +114,7 @@ namespace CKUnityGLTF
 		public const string _RimSoftness = "_RimSoftness";
 		public const string _RimWeight = "_RimWeight";
 		public const string _RimSphereWeight = "_RimSphereWeight";
+		public const string _IsGrayTex = "_IsGrayTex";
 		#endregion
 
 		public MToonMaterialExtensionFactory()
@@ -126,7 +127,7 @@ namespace CKUnityGLTF
 		_OutlineLightingMix,_UvAnimScrollX,_UvAnimScrollY,_UvAnimRotation,_MToonVersion ,
 		_DebugMode ,_BlendMode ,_OutlineWidthMode ,_OutlineColorMode ,_CullMode ,
 		_OutlineCullMode,_SrcBlend ,_DstBlend ,_ZWrite,_AlphaToMask,_SpecMulti,_SpecRange ,_SpecSoftness
-			,_RimSoftness,_RimWeight,_RimSphereWeight};
+			,_RimSoftness,_RimWeight,_RimSphereWeight,_IsGrayTex};
 
 			ColorProperties = new string[] { _Color, _ColorOL, _ShadeColor, _RimColor,
 				_EmissionColor, _OutlineColor, _LinearLitColor, _SpecColor};
