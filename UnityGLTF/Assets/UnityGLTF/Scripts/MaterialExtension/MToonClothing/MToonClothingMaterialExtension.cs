@@ -334,6 +334,11 @@ namespace CKUnityGLTF
 
 			ext.Add(new JProperty(MToonMaterialExtensionFactory.renderQueue, renderQueue));
 
+			if (_IsGrayTex != _IsGrayTex_Default)
+			{
+				ext.Add(new JProperty(MToonClothingMaterialExtensionFactory._IsGrayTex, _IsGrayTex));
+			}
+
 			return new JProperty(MToonClothingMaterialExtensionFactory.Extension_Name, ext);
 		}
 

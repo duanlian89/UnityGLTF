@@ -482,6 +482,13 @@ namespace CKUnityGLTF
 		{
 			System.Type t = ext.GetType();
 
+			for (int i = 0; i < factory.IntProperties.Length; i++)
+			{
+				string prop = factory.IntProperties[i];
+				if (materialObj.HasInt(prop))
+					t.GetField(prop).SetValue(ext, materialObj.GetInt(prop));
+			}
+
 			for (int i = 0; i < factory.FloatProperties.Length; i++)
 			{
 				string prop = factory.FloatProperties[i];

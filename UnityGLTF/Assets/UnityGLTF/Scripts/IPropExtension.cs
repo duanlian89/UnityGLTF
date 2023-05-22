@@ -26,6 +26,8 @@ namespace CKUnityGLTF
 
 	public abstract class MaterialExtensionFactory : ExtensionFactory
 	{
+		public string[] IntProperties = new string[] { };
+
 		public string[] FloatProperties = new string[] { };
 
 		public string[] ColorProperties = new string[] { };

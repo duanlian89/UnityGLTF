@@ -47,8 +47,8 @@ namespace CKUnityGLTF
 			: base(gltfFileName, options)
 		{
 			ImportOptionsExtension optionsExtension = options as ImportOptionsExtension;
-			scaleFactor = (float)optionsExtension?.scaleFactor;
-			maxSize = (Vector2)optionsExtension?.maxSize;
+			scaleFactor = (float)(optionsExtension?.scaleFactor ?? scaleFactor);
+			maxSize = (Vector2)(optionsExtension?.maxSize ?? maxSize);
 		}
 
 		string configJson;
@@ -437,6 +437,19 @@ namespace CKUnityGLTF
 			var material = new Material(shader);
 
 			System.Type t = extension.GetType();
+
+			for (int i = 0; i < factory.IntProperties.Length; i++)
+			{
+				string prop = factory.IntProperties[i];
+				if (t.GetField(prop) != null)
+				{
+					material.SetInt(prop, (int)t.GetField(prop).GetValue(extension));
+				}
+				else
+				{
+					Debug.Log(string.Format("can not get Field by name:{0}", prop));
+				}
+			}
 
 			for (int i = 0; i < factory.FloatProperties.Length; i++)
 			{

@@ -121,13 +121,15 @@ namespace CKUnityGLTF
 		{
 			ExtensionName = Extension_Name;
 
+			IntProperties = new string[] { _IsGrayTex };
+
 			FloatProperties = new string[] { _Cutoff, _UvAnimRotation, _BumpScale , _ReceiveShadowRate ,
 		_ShadingGradeRate , _ShadeShift,    _ShadeShift,_ShadeToony,_LightColorAttenuation,
 		_IndirectLightIntensity,_RimLightingMix,_RimFresnelPower    ,_RimLift,_OutlineWidth,_OutlineScaledMaxDistance,
 		_OutlineLightingMix,_UvAnimScrollX,_UvAnimScrollY,_UvAnimRotation,_MToonVersion ,
 		_DebugMode ,_BlendMode ,_OutlineWidthMode ,_OutlineColorMode ,_CullMode ,
 		_OutlineCullMode,_SrcBlend ,_DstBlend ,_ZWrite,_AlphaToMask,_SpecMulti,_SpecRange ,_SpecSoftness
-			,_RimSoftness,_RimWeight,_RimSphereWeight,_IsGrayTex};
+			,_RimSoftness,_RimWeight,_RimSphereWeight};
 
 			ColorProperties = new string[] { _Color, _ColorOL, _ShadeColor, _RimColor,
 				_EmissionColor, _OutlineColor, _LinearLitColor, _SpecColor};
