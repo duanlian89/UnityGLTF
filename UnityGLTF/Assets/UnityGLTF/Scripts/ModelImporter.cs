@@ -18,12 +18,12 @@ namespace CKUnityGLTF
 		/// <summary>
 		/// 纹理缩放比例
 		/// </summary>
-		public float scaleFactor = 0.5f;
+		public float scaleFactor = 1.0f;
 
 		/// <summary>
 		/// 纹理最大尺寸
 		/// </summary>
-		public Vector2 maxSize = Vector2.one * 512.0f;
+		public Vector2 maxSize = Vector2.one * 4096 * 2;
 	}
 
 	public class ModelImporter : GLTFSceneImporter
@@ -601,6 +601,7 @@ namespace CKUnityGLTF
 				}
 			}
 
+			originalTexture2d = _assetCache.ImageCache[imageCacheIndex];
 			if (originalTexture2d.width > maxSize.x || originalTexture2d.height > maxSize.y)
 			{
 				var scaleTexture2D = TextureUtil.ResizeTexture(originalTexture2d, (int)MathF.Min(originalTexture2d.width, maxSize.x), (int)MathF.Min(originalTexture2d.height, maxSize.y));

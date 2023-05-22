@@ -12,7 +12,8 @@ namespace CKUnityGLTF
 	{
 		//public string glbPath = @"C:\WorkSpace\ForkUnityGLTF\UnityGLTF\www\M_Upper_Ugc_016_01_01.glb";
 		public string glbPath = @"http://127.0.0.1:8080/M_Upper_Ugc_016_01_01.glb";
-
+		public float scaleFactor = 1.0f;
+		public Vector2 maxSize = Vector2.one * 4096 * 2;
 
 		public GameObject go1;
 		public string config1;
@@ -37,7 +38,7 @@ namespace CKUnityGLTF
 			//Debug.Log(stream.CanSeek);
 
 			//await ModelLoader.LoadStream(glbPath);
-			importer = ModelLoader.GetImporter(glbPath);
+			importer = ModelLoader.GetImporter(glbPath, scaleFactor, maxSize);
 			config1 = importer.ConfigJson;
 
 			await Task.Delay(3000);
