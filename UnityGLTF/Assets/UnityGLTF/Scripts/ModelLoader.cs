@@ -25,6 +25,7 @@ public class ModelLoader
 		GLTFMaterial.RegisterExtension(new StandardMaterialExtensionFactory());
 		GLTFMaterial.RegisterExtension(new StandardRoughnessMaterialExtensionFactory());
 		GLTFMaterial.RegisterExtension(new ConfigJsonExtensionFactory());
+		GLTFMaterial.RegisterExtension(new ClothesInfoJsonExtensionFactory());
 		Node.RegisterExtension(new MeshFilterAndMeshColliderExtensionFactory());
 	}
 

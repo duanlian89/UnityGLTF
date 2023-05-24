@@ -50,7 +50,7 @@ namespace CKUnityGLTF
 				{
 					Version = "2.0",
 					Generator = "UnityGLTF",
-					MinVersion = "6.7"
+					MinVersion = "6.8"
 				},
 				Buffers = new List<GLTFBuffer>(),
 				BufferViews = new List<BufferView>(),

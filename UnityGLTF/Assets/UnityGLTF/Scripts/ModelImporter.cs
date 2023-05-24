@@ -51,6 +51,13 @@ namespace CKUnityGLTF
 			maxSize = (Vector2)(optionsExtension?.maxSize ?? maxSize);
 		}
 
+		void ParseGltfRoot()
+		{
+			_gltfStream.Stream = _options.DataLoader.LoadStreamAsync(_gltfFileName).GetAwaiter().GetResult();
+			_gltfStream.StartPosition = 0;
+			GLTFParser.ParseJson(_gltfStream.Stream, out _gltfRoot, _gltfStream.StartPosition);
+		}
+
 		string configJson;
 		/// <summary>
 		/// info.json
@@ -75,9 +82,7 @@ namespace CKUnityGLTF
 
 		private void GetConfigJson()
 		{
-			_gltfStream.Stream = _options.DataLoader.LoadStreamAsync(_gltfFileName).GetAwaiter().GetResult();
-			_gltfStream.StartPosition = 0;
-			GLTFParser.ParseJson(_gltfStream.Stream, out _gltfRoot, _gltfStream.StartPosition);
+			ParseGltfRoot();
 
 			IExtension _extension;
 			if (_gltfRoot != null && _gltfRoot.Extensions != null
@@ -110,9 +115,7 @@ namespace CKUnityGLTF
 
 		private void GetClothesInfoJson()
 		{
-			_gltfStream.Stream = _options.DataLoader.LoadStreamAsync(_gltfFileName).GetAwaiter().GetResult();
-			_gltfStream.StartPosition = 0;
-			GLTFParser.ParseJson(_gltfStream.Stream, out _gltfRoot, _gltfStream.StartPosition);
+			ParseGltfRoot();
 
 			IExtension _extension;
 			if (_gltfRoot != null && _gltfRoot.Extensions != null
@@ -124,6 +127,38 @@ namespace CKUnityGLTF
 				if (extension != null)
 					clothesInfoJson = extension.clothesInfoJson;
 			}
+		}
+
+		string sceneName;
+		/// <summary>
+		/// 获取默认[第一个]场景[模型根节点]名字
+		/// </summary>
+		public string DefaultSceneName
+		{
+			get
+			{
+				if (string.IsNullOrEmpty(sceneName))
+				{
+					sceneName = GetSceneName(0);
+				}
+				return sceneName;
+			}
+		}
+
+		/// <summary>
+		/// 获取位于索引位置的场景[模型根节点]名字
+		/// </summary>
+		public string SceneName(int index)
+		{
+			return GetSceneName(index);
+		}
+
+		string GetSceneName(int index)
+		{
+			if (!(_gltfRoot != null && _gltfRoot.Scenes != null))
+				ParseGltfRoot();
+
+			return _gltfRoot.Scenes[index]?.Name ?? "";
 		}
 
 		// 创建GameObject
