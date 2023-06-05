@@ -58,7 +58,7 @@ namespace CKUnityGLTF
 			GLTFParser.ParseJson(_gltfStream.Stream, out _gltfRoot, _gltfStream.StartPosition);
 		}
 
-		string configJson;
+		string configJson = "";
 		/// <summary>
 		/// info.json
 		/// </summary>
@@ -96,7 +96,7 @@ namespace CKUnityGLTF
 			}
 		}
 
-		string clothesInfoJson;
+		string clothesInfoJson = "";
 		/// <summary>
 		/// ClothesInfo 结构的反序列
 		/// </summary>
@@ -129,7 +129,7 @@ namespace CKUnityGLTF
 			}
 		}
 
-		string sceneName;
+		string sceneName = "";
 		/// <summary>
 		/// 获取默认[第一个]场景[模型根节点]名字
 		/// </summary>
