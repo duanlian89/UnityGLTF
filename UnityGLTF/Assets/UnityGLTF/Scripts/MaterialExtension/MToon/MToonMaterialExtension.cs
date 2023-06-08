@@ -181,8 +181,8 @@ namespace CKUnityGLTF
 		public float _RimSphereWeight = 0.0f;
 		public static readonly float _RimSphereWeight_Default = 0.0f;
 
-		public int _IsGrayTex = 1;
-		public static readonly int _IsGrayTex_Default = 1;
+		public int _IsGrayTex = 0;
+		public static readonly int _IsGrayTex_Default = 0;
 
 		#endregion
 
